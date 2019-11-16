@@ -6,11 +6,7 @@ from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from . import (
-    DOMAIN,
-    DATA_LIVEBOX,
-    DATA_LIVEBOX_UNSUB
-)
+from . import DOMAIN, DATA_LIVEBOX, DATA_LIVEBOX_UNSUB
 
 TRACKER_UPDATE = "{}_tracker_update".format(DOMAIN)
 _LOGGER = logging.getLogger(__name__)
@@ -27,11 +23,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
         hass.data[DOMAIN]["devices"].add(device["PhysAddress"])
 
-        async_add_entities([LiveboxDeviceScannerEntity(config_entry.data["id"], hass.data[DOMAIN][DATA_LIVEBOX], **device)])
+        async_add_entities(
+            [
+                LiveboxDeviceScannerEntity(
+                    config_entry.data["id"], hass.data[DOMAIN][DATA_LIVEBOX], **device
+                )
+            ]
+        )
 
     hass.data[DOMAIN][DATA_LIVEBOX_UNSUB][
         config_entry.entry_id
-        ] = async_dispatcher_connect(hass, TRACKER_UPDATE, _receive_data)
+    ] = async_dispatcher_connect(hass, TRACKER_UPDATE, _receive_data)
 
     box_data = hass.data[DOMAIN][DATA_LIVEBOX]
     device_trackers = await box_data.async_devices()
@@ -42,7 +44,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for device in device_trackers:
         if "IPAddress" in device:
             hass.data[DOMAIN]["devices"].add(device["PhysAddress"])
-            entity = LiveboxDeviceScannerEntity(config_entry.data["id"], hass.data[DOMAIN][DATA_LIVEBOX], **device)
+            entity = LiveboxDeviceScannerEntity(
+                config_entry.data["id"], hass.data[DOMAIN][DATA_LIVEBOX], **device
+            )
             entities.append(entity)
 
     async_add_entities(entities, update_before_add=True)
@@ -82,7 +86,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
 
     async def async_added_to_hass(self):
         """Register state update callback."""
-        _LOGGER.info("Ajout %s",self.name)
+
         await super().async_added_to_hass()
         self._unsubs = async_dispatcher_connect(
             self.hass, TRACKER_UPDATE, self._async_receive_data
@@ -90,10 +94,9 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
 
     async def async_will_remove_from_hass(self) -> None:
         """Disconnect entity object when removed."""
-        _LOGGER.info("Retrait %s",self.name)
+
         await super().async_will_remove_from_hass()
         self._unsubs()
-            
 
     async def async_update(self):
         """Handle polling."""
@@ -126,7 +129,6 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @callback
     def _async_receive_data(self, device):
         """Mark the device as seen."""
-        _LOGGER.info("Receive Data %s",self.name)
 
         if device["Name"] != self.name:
             return
