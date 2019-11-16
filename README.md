@@ -1,15 +1,3 @@
----
-title: "Livebox"
-description: "Instructions on how to integrate Orange Livebox routers into Home Assistant."
-logo: orange_livebox.svg
-ha_category:
-  - Network
-  - Presence Detection
-  - Sensor
-ha_release: 0.99
-ha_iot_class: Local Polling
----
-
 The `livebox` integration allows you to observe and control [Livebox router](http://www.orange.fr/).
 
 There is currently support for the following device types within Home Assistant:
