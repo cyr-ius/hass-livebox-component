@@ -1,5 +1,5 @@
 {
-  "name": "My awesome thing",
+  "name": "Orange Livebox routeur",
   "country": "FR",
   "domains": ["device_tracker", "sensor"],
   "homeassistant": "0.99.9"
