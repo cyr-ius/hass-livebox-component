@@ -19,9 +19,7 @@ There is currently support for the following device types within Home Assistant:
 The preferred way to setup the Orange Livebox platform is by enabling the discovery component.
 Add your equipment via the Integration menu
 
-If you have enabled the [discovery component](/components/discovery/),
-your Livebox should be detected automatically. Otherwise, you can set it
-up manually in your `configuration.yaml` file:
+Otherwise, you can set it up manually in your `configuration.yaml` file:
 
 ```yaml
 livebox:
