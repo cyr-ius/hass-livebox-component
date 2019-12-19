@@ -1,29 +1,35 @@
 """Livebox binary sensor entities."""
-from homeassistant.util import Throttle
+import logging
+
 from homeassistant.components.binary_sensor import (
-    BinarySensorDevice,
     DEVICE_CLASS_CONNECTIVITY,
+    BinarySensorDevice,
 )
-from . import DOMAIN, SCAN_INTERVAL, DATA_LIVEBOX
+
+from . import DATA_LIVEBOX, DOMAIN, ID_BOX
 from .const import TEMPLATE_SENSOR
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Defer binary sensor setup to the shared sensor module."""
-    box_data = hass.data[DOMAIN][DATA_LIVEBOX]
-    box_id = config_entry.data["id"]
-    async_add_entities([InfoSensor(box_data, box_id)], True)
+    box_id = hass.data[DOMAIN][ID_BOX]
+    bridge = hass.data[DOMAIN][DATA_LIVEBOX]
+    status = []
+    status.append(WanStatus(bridge, box_id))
+    async_add_entities(status, True)
 
 
-class InfoSensor(BinarySensorDevice):
+class WanStatus(BinarySensorDevice):
     """Representation of a livebox sensor."""
 
     device_class = DEVICE_CLASS_CONNECTIVITY
 
-    def __init__(self, box_data, box_id):
+    def __init__(self, bridge, box_id):
         """Initialize the sensor."""
 
-        self._box_data = box_data
+        self._bridge = bridge
         self._box_id = box_id
         self._state = None
         self._dsl = {}
@@ -54,7 +60,7 @@ class InfoSensor(BinarySensorDevice):
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
-            "manufacturer": "Orange",
+            "manufacturer": TEMPLATE_SENSOR,
             "via_device": (DOMAIN, self._box_id),
         }
 
@@ -70,10 +76,9 @@ class InfoSensor(BinarySensorDevice):
             "wan_ipv6address": self._dsl.get("IPv6Address", None),
         }
 
-    @Throttle(SCAN_INTERVAL)
     async def async_update(self):
         """Fetch status from livebox."""
 
-        data_status = await self._box_data.async_status()
+        data_status = await self._bridge.async_get_status()
         if data_status:
             self._dsl = data_status
