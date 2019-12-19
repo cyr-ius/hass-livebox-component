@@ -1,8 +1,9 @@
 """Constants for the Livebox component."""
 DOMAIN = "livebox"
 DATA_LIVEBOX = "date_livebox"
+SESSION_SYSBUS = "session_sysbus"
 ID_BOX = "id"
-COMPONENTS = ["sensor", "binary_sensor", "device_tracker"]
+COMPONENTS = ["sensor", "binary_sensor", "device_tracker", "switch"]
 
 TEMPLATE_SENSOR = "Orange Livebox"
 UNSUB_DEVICES = "unsub_device_tracker"

@@ -18,6 +18,7 @@ from .const import (
     DEFAULT_USERNAME,
     DOMAIN,
     ID_BOX,
+    SESSION_SYSBUS,
     TRACK_ENTITIES,
     UNSUB_DEVICES,
 )
@@ -67,6 +68,7 @@ async def async_setup_entry(hass, config_entry):
             UNSUB_DEVICES: {},
             ID_BOX: config_entry.data["id"],
             DATA_LIVEBOX: bridge,
+            SESSION_SYSBUS: session,
         }
         infos = await bridge.async_get_infos()
         device_registry = await dr.async_get_registry(hass)
@@ -83,6 +85,13 @@ async def async_setup_entry(hass, config_entry):
             hass.async_create_task(
                 hass.config_entries.async_forward_entry_setup(config_entry, component)
             )
+
+        async def async_livebox_reboot(call):
+            """Handle reboot service call."""
+            await bridge.system.reboot()
+
+        hass.services.async_register(DOMAIN, "reboot", async_livebox_reboot)
+
         return True
 
     return False
