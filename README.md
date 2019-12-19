@@ -1,9 +1,18 @@
+
+# Orange Livebox Router
+This a *custom component* for [Home Assistant](https://www.home-assistant.io/). 
 The `livebox` integration allows you to observe and control [Livebox router](http://www.orange.fr/).
 
 There is currently support for the following device types within Home Assistant:
 
 * [Sensor](#sensor) with traffic metrics
+* [Binary Sensor](#sensor) with wan status , public ip , private ip
 * [Device tracker](#presence-detection) for connected devices
+
+
+![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+
 
 ## Configuration
 
