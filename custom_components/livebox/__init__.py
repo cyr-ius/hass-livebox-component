@@ -19,8 +19,6 @@ from .const import (
     DOMAIN,
     ID_BOX,
     SESSION_SYSBUS,
-    TRACK_ENTITIES,
-    UNSUB_DEVICES,
 )
 
 CONFIG_SCHEMA = vol.Schema(
@@ -64,8 +62,6 @@ async def async_setup_entry(hass, config_entry):
     if perms is not None:
         bridge = BridgeData(session, config_entry)
         hass.data[DOMAIN] = {
-            TRACK_ENTITIES: set(),
-            UNSUB_DEVICES: {},
             ID_BOX: config_entry.data["id"],
             DATA_LIVEBOX: bridge,
             SESSION_SYSBUS: session,

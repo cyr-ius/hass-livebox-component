@@ -6,8 +6,6 @@ ID_BOX = "id"
 COMPONENTS = ["sensor", "binary_sensor", "device_tracker", "switch"]
 
 TEMPLATE_SENSOR = "Orange Livebox"
-UNSUB_DEVICES = "unsub_device_tracker"
-TRACK_ENTITIES = "devices"
 
 DEFAULT_USERNAME = "admin"
 DEFAULT_HOST = "192.168.1.1"
