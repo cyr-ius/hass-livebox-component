@@ -5,13 +5,14 @@ The `livebox` integration allows you to observe and control [Livebox router](htt
 
 There is currently support for the following device types within Home Assistant:
 
-* [Sensor](#sensor) with traffic metrics
-* [Binary Sensor](#sensor) with wan status , public ip , private ip
-* [Device tracker](#presence-detection) for connected devices
+* Sensor with traffic metrics
+* Binary Sensor with wan status , public ip , private ip
+* Device tracker for connected devices
+* Switch for enable/disable Wireless
+* Service for restart the router
 
 
 ![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 
 ## Configuration
