@@ -7,7 +7,7 @@ There is currently support for the following device types within Home Assistant:
 
 * Sensor with traffic metrics
 * Binary Sensor with wan status , public ip , private ip
-* Device tracker for connected devices
+* Device tracker for connected devices (via option add wired devices)
 * Switch for enable/disable Wireless
 * Service for restart the router
 
@@ -18,14 +18,15 @@ There is currently support for the following device types within Home Assistant:
 ## Configuration
 
 The preferred way to setup the Orange Livebox platform is by enabling the discovery component.
-Add your equipment via the Integration menu
+Add your device via the Integration menu
 
 Otherwise, you can set it up manually in your `configuration.yaml` file:
 
 ```yaml
 livebox:
-  host: IP_ADDRESS
-  password: 'PASSWORD'
+  host: 192.168.1.1
+  username: 'admin'
+  password: 'my-password'
 ```
 
 {% configuration %}
