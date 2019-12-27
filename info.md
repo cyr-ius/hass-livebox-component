@@ -13,7 +13,7 @@ There is currently support for the following device types within Home Assistant:
 
 
 ![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
-
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 ## Configuration
 
