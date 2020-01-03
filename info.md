@@ -1,35 +1,32 @@
----
-title: "Livebox"
-description: "Instructions on how to integrate Orange Livebox routers into Home Assistant."
-logo: orange_livebox.svg
-ha_category:
-  - Network
-  - Presence Detection
-  - Sensor
-ha_release: 0.99
-ha_iot_class: Local Polling
----
 
+# Orange Livebox Router
+This a *custom component* for [Home Assistant](https://www.home-assistant.io/). 
 The `livebox` integration allows you to observe and control [Livebox router](http://www.orange.fr/).
 
 There is currently support for the following device types within Home Assistant:
 
-* [Sensor](#sensor) with traffic metrics
-* [Device tracker](#presence-detection) for connected devices
+* Sensor with traffic metrics
+* Binary Sensor with wan status , public ip , private ip
+* Device tracker for connected devices (via option add wired devices)
+* Switch for enable/disable Wireless
+* Service for restart the router
+
+
+![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 ## Configuration
 
 The preferred way to setup the Orange Livebox platform is by enabling the discovery component.
-Add your equipment via the Integration menu
+Add your device via the Integration menu
 
-If you have enabled the [discovery component](/components/discovery/),
-your Livebox should be detected automatically. Otherwise, you can set it
-up manually in your `configuration.yaml` file:
+Otherwise, you can set it up manually in your `configuration.yaml` file:
 
 ```yaml
 livebox:
-  host: IP_ADDRESS
-  password: 'PASSWORD'
+  host: 192.168.1.1
+  username: 'admin'
+  password: 'my-password'
 ```
 
 {% configuration %}
