@@ -4,8 +4,6 @@ import logging
 
 from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util import Throttle
 
 from . import DATA_LIVEBOX, DOMAIN, ID_BOX
