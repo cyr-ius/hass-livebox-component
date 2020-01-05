@@ -12,7 +12,6 @@ _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=60)
 
-
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker from config entry."""
 
@@ -23,9 +22,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entities = []
     for device in device_trackers:
         if "IPAddress" and "PhysAddress" in device:
-            entity = LiveboxDeviceScannerEntity(
-                device["PhysAddress"], bridge_id, bridge
-            )
+            entity = LiveboxDeviceScannerEntity(device["PhysAddress"], bridge_id, bridge)
             entities.append(entity)
     async_add_entities(entities, update_before_add=True)
 
@@ -86,14 +83,12 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         data_status = await self._bridge.async_get_device(self.unique_id)
         if data_status:
             self._device = data_status
-            if self._device.get("Active") is False and self._retry < 2:
-                self._retry += 1
-                self._device["Active"] = True
+            if self._device.get("Active") is False and self._retry < 2 :
+                self._retry +=  1
+                self._device["Active"] =  True
             elif self._device.get("Active") is False and self._retry == 2:
-                self._device["Active"] = False
+                self._device["Active"] =  False
             else:
                 self._retry = 0
-                self._device["Active"] = True
-            _LOGGER.debug(
-                f"Update {self.name} - {self.unique_id} - {self._retry} - {self._device['Active']}"
-            )
+                self._device["Active"] =  True
+            _LOGGER.debug(f"Update {self.name} - {self.unique_id} - {self._retry} - {self._device['Active']}")
