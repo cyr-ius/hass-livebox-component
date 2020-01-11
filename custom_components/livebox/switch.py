@@ -52,12 +52,12 @@ class WifiSwitch(SwitchDevice):
 
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
-        parameters = {"parameters": {"Enable": "true", "Status": "true"}}
+        parameters = {"Enable": "true", "Status": "true"}
         await self._session.wifi.set_wifi(parameters)
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
-        parameters = {"parameters": {"Enable": "false", "Status": "false"}}
+        parameters = {"Enable": "false", "Status": "false"}
         await self._session.wifi.set_wifi(parameters)
 
     async def async_update(self):
