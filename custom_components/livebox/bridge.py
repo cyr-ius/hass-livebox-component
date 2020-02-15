@@ -60,3 +60,10 @@ class BridgeData:
         if dsl_status is not None:
             return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
         return
+
+    async def async_get_nmc(self):
+        """Get dsl status."""
+        nmc = await self._session.system.get_nmc()
+        if nmc is not None:
+            return nmc.get("status", {})
+        return

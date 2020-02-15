@@ -13,6 +13,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     box_id = hass.data[DOMAIN][ID_BOX]
     bridge = hass.data[DOMAIN][DATA_LIVEBOX]
+    nmc = await bridge.async_get_nmc()
+    if "ETHERNET" in nmc["WanMode"].upper():
+        return
     async_add_entities(
         [FlowSensor(bridge, box_id, "down"), FlowSensor(bridge, box_id, "up")], True
     )
