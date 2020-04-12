@@ -11,8 +11,10 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
-    box_id = hass.data[DOMAIN][ID_BOX]
-    bridge = hass.data[DOMAIN][DATA_LIVEBOX]
+    datas = hass.data[DOMAIN][config_entry.entry_id] 
+    box_id = datas[ID_BOX]
+    bridge = datas[DATA_LIVEBOX]
+    
     nmc = await bridge.async_get_nmc()
     if "ETHERNET" in nmc["WanMode"].upper():
         return

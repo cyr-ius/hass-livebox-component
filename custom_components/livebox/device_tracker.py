@@ -15,16 +15,16 @@ SCAN_INTERVAL = timedelta(seconds=60)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker from config entry."""
-
-    bridge_id = hass.data[DOMAIN][ID_BOX]
-    bridge = hass.data[DOMAIN][DATA_LIVEBOX]
+    datas = hass.data[DOMAIN][config_entry.entry_id] 
+    box_id = datas[ID_BOX]
+    bridge = datas[DATA_LIVEBOX]
 
     device_trackers = await bridge.async_get_devices()
     entities = []
     for device in device_trackers:
         if "IPAddress" and "PhysAddress" in device:
             entity = LiveboxDeviceScannerEntity(
-                device["PhysAddress"], bridge_id, bridge
+                device["PhysAddress"], box_id, bridge
             )
             entities.append(entity)
     async_add_entities(entities, update_before_add=True)

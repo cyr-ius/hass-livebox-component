@@ -5,7 +5,7 @@ from aiosysbus import Sysbus
 from aiosysbus.exceptions import AuthorizationError
 import voluptuous as vol
 
-from homeassistant import config_entries
+from homeassistant import config_entries, core
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 
@@ -31,6 +31,31 @@ DATA_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
+async def validate_input(hass: core.HomeAssistant, data):
+    """Validate the user input allows us to connect.
+
+    Data has the keys from DATA_SCHEMA with values provided by the user.
+    """
+
+    try:
+        session = Sysbus(
+            username=data["username"],
+            password=data["password"],
+            host=data["host"],
+            port=data["port"],
+        )
+
+        perms = await session.async_get_permissions()
+        if perms is not None:
+            return await session.system.get_deviceinfo()
+
+    except AuthorizationError:
+        raise AuthorizationError
+    except Exception as e:
+        _LOGGER.warn("Error to connect {}".format(e))
+        raise AuthorizationError
+    
+
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
 
@@ -40,12 +65,11 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize the Livebox flow."""
 
-        self._session = None
-        self.host = None
-        self.port = None
-        self.username = None
-        self.password = None
-        self.box_id = None
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get option flow."""
+        return LiveboxOptionsFlowHandler(config_entry)
 
     async def async_step_import(self, import_config):
         """Import a config entry from configuration.yaml."""
@@ -56,69 +80,32 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         errors = {}
         if user_input is not None:
-            self.host = user_input["host"]
-            self.port = user_input["port"]
-            self.username = user_input["username"]
-            self.password = user_input["password"]
             try:
-                self._session = Sysbus(
-                    username=self.username,
-                    password=self.password,
-                    host=self.host,
-                    port=self.port,
-                )
-
-                perms = await self._session.async_get_permissions()
-                if perms is not None:
-                    return await self.async_step_register()
-
+                infos = await validate_input(self.hass, user_input)
+                if infos is not None:
+                    return await self.async_step_register(infos, user_input)
             except AuthorizationError:
                 errors["base"] = "login_inccorect"
-
-            except Exception as e:
-                _LOGGER.warn("Error to connect {}".format(e))
+            except Exception:   # pylint: disable=broad-except
                 errors["base"] = "linking"
-
-        # If there was no user input, do not show the errors.
-        if user_input is None:
-            errors = {}
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_step_register(self, user_input=None):
+    async def async_step_register(self, infos, user_input=None):
         """Step for register component."""
-
         errors = {}
-        infos = await self._session.system.get_deviceinfo()
-        self.box_id = infos.get("status").get("SerialNumber")
-        entry_id = self.hass.config_entries.async_entries(DOMAIN)
-
-        if self.box_id is not None:
-            if entry_id and entry_id.get("data", {}).get("id", 0) == self.box_id:
-                self.hass.config_entries.async_remove(entry_id)
-
-            return self.async_create_entry(
-                title=f"{TEMPLATE_SENSOR}",
-                data={
-                    "id": self.box_id,
-                    "host": self.host,
-                    "port": self.port,
-                    "username": self.username,
-                    "password": self.password,
-                },
-            )
-        else:
-            errors["base"] = "register_failed"
-
+        box_id = infos.get("status",{}).get("SerialNumber")
+        title = infos.get("status",{}).get("ProductClass")
+        title 
+        if box_id is not None:
+            await self.async_set_unique_id(box_id)
+            self._abort_if_unique_id_configured()
+            return self.async_create_entry(title=title, data=user_input)
+            
+        errors["base"] = "register_failed"
         return self.async_show_form(step_id="register", errors=errors)
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Get option flow."""
-        return LiveboxOptionsFlowHandler(config_entry)
 
 
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
@@ -131,7 +118,6 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
         self._lan_tracking = self.config_entry.options.get(
             CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
         )
-        self.config_entry.add_update_listener(update_listener)
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
@@ -148,9 +134,3 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="user", data_schema=OPTIONS_SCHEMA)
-
-
-async def update_listener(hass, config_entry):
-    """Reload device tracker if change option."""
-    await hass.config_entries.async_forward_entry_unload(config_entry, "device_tracker")
-    await hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
