@@ -30,3 +30,5 @@ jobs:
 
     - name: Pyflakes Syntax Checker
       uses: lgeiger/pyflakes-action@v1.0.1
+      with: 
+        ignore-patterns: 'line-too-long'
