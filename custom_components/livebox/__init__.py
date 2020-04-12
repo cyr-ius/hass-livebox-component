@@ -45,14 +45,13 @@ async def async_setup(hass, config):
     """Load configuration for Livebox component."""
     hass.data.setdefault(DOMAIN, {})
 
-    if DOMAIN not in config:
-        return True
+    if not hass.config_entries.async_entries(DOMAIN) and DOMAIN in config:
 
-    hass.async_create_task(
-        hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
+        hass.async_create_task(
+            hass.config_entries.flow.async_init(
+                DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
+            )
         )
-    )
 
     return True
 
@@ -85,6 +84,7 @@ async def async_setup_entry(hass, config_entry):
     if infos is None:
         return False
 
+    _LOGGER.debug(infos)
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
