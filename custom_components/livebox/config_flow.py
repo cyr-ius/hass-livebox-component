@@ -16,7 +16,6 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_USERNAME,
     DOMAIN,
-    TEMPLATE_SENSOR,
 )
 
 DATA_SCHEMA = vol.Schema(
@@ -45,15 +44,17 @@ async def validate_input(hass: core.HomeAssistant, data):
             port=data["port"],
         )
 
-        perms = await session.async_get_permissions()
-        if perms is not None:
-            return await session.system.get_deviceinfo()
-
     except AuthorizationError:
         raise AuthorizationError
     except Exception as e:
         _LOGGER.warn("Error to connect {}".format(e))
         raise AuthorizationError
+
+    perms = await session.async_get_permissions()
+    if perms is None:
+        raise AuthorizationError
+
+    return await session.system.get_deviceinfo()
 
 
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -83,7 +84,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 infos = await validate_input(self.hass, user_input)
                 if infos is not None:
-                    return await self.async_step_register(infos, user_input)
+                    title = infos.get("status", {}).get("ProductClass")
+                    if title is not None:
+                        return self.async_create_entry(title=title, data=user_input)
             except AuthorizationError:
                 errors["base"] = "login_inccorect"
             except Exception:  # pylint: disable=broad-except
@@ -92,19 +95,6 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
-
-    async def async_step_register(self, infos, user_input=None):
-        """Step for register component."""
-        errors = {}
-        box_id = infos.get("status", {}).get("SerialNumber")
-        title = infos.get("status", {}).get("ProductClass")
-        if box_id is not None:
-            await self.async_set_unique_id(box_id)
-            self._abort_if_unique_id_configured()
-            return self.async_create_entry(title=title, data=user_input)
-
-        errors["base"] = "register_failed"
-        return self.async_show_form(step_id="register", errors=errors)
 
 
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
