@@ -66,11 +66,11 @@ async def async_setup_entry(hass, config_entry):
         host=config_entry.data["host"],
         port=config_entry.data["port"],
     )
-    
+
     perms = await session.async_get_permissions()
     if perms is None:
         return False
-        
+
     bridge = BridgeData(session, config_entry)
     if bridge is None:
         return False
@@ -80,11 +80,11 @@ async def async_setup_entry(hass, config_entry):
         DATA_LIVEBOX: bridge,
         SESSION_SYSBUS: session,
     }
-            
+
     infos = await bridge.async_get_infos()
     if infos is None:
         return False
-        
+
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,

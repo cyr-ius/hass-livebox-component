@@ -54,7 +54,7 @@ async def validate_input(hass: core.HomeAssistant, data):
     except Exception as e:
         _LOGGER.warn("Error to connect {}".format(e))
         raise AuthorizationError
-    
+
 
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
@@ -86,7 +86,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     return await self.async_step_register(infos, user_input)
             except AuthorizationError:
                 errors["base"] = "login_inccorect"
-            except Exception:   # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 errors["base"] = "linking"
 
         return self.async_show_form(
@@ -96,14 +96,13 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_register(self, infos, user_input=None):
         """Step for register component."""
         errors = {}
-        box_id = infos.get("status",{}).get("SerialNumber")
-        title = infos.get("status",{}).get("ProductClass")
-        title 
+        box_id = infos.get("status", {}).get("SerialNumber")
+        title = infos.get("status", {}).get("ProductClass")
         if box_id is not None:
             await self.async_set_unique_id(box_id)
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=title, data=user_input)
-            
+
         errors["base"] = "register_failed"
         return self.async_show_form(step_id="register", errors=errors)
 

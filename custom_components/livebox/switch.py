@@ -10,10 +10,10 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
-    datas = hass.data[DOMAIN][config_entry.entry_id] 
+    datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[ID_BOX]
     session = datas[SESSION_SYSBUS]
-    
+
     async_add_entities([WifiSwitch(session, box_id)], True)
 
 
