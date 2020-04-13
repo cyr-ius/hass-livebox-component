@@ -3,6 +3,11 @@ import asyncio
 import logging
 
 from aiosysbus import Sysbus
+from aiosysbus.exceptions import (
+    AuthorizationError,
+    NotOpenError,
+    InsufficientPermissionsError,
+)
 import voluptuous as vol
 
 from homeassistant import exceptions
@@ -59,16 +64,7 @@ async def async_setup(hass, config):
 async def async_setup_entry(hass, config_entry):
     """Set up Livebox as config entry."""
 
-    session = Sysbus(
-        username=config_entry.data["username"],
-        password=config_entry.data["password"],
-        host=config_entry.data["host"],
-        port=config_entry.data["port"],
-    )
-
-    perms = await session.async_get_permissions()
-    if perms is None:
-        return False
+    session = await async_connect_box(config_entry.data)
 
     bridge = BridgeData(session, config_entry)
     if bridge is None:
@@ -133,5 +129,31 @@ async def update_listener(hass, config_entry):
     await hass.config_entries.async_reload(config_entry.entry_id)
 
 
-class CannotConnect(exceptions.HomeAssistantError):
-    """Error to indicate we cannot connect."""
+async def async_connect_box(data):
+    """Connect at livebox."""
+
+    try:
+        return Sysbus(
+            username=data["username"],
+            password=data["password"],
+            host=data["host"],
+            port=data["port"],
+        )
+    except AuthorizationError:
+        _LOGGER.error("Authentication Required.")
+        raise AuthenticationRequired
+    except NotOpenError:
+        _LOGGER.error("Cannot Connect.")
+        raise NotOpenError
+    except Exception as e:
+        _LOGGER.error("Error unknown {}".format(e))
+        raise LiveboxException(e)
+
+    perms = await session.async_get_permissions()
+    if perms is None:
+        _LOGGER.error("Insufficient Permissions.")
+        raise InsufficientPermissionsError
+
+
+class LiveboxException(exceptions.HomeAssistantError):
+    """Base class for Livebox exceptions."""

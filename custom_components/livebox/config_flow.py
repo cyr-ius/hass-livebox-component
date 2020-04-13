@@ -2,13 +2,19 @@
 import logging
 
 from aiosysbus import Sysbus
-from aiosysbus.exceptions import AuthorizationError
+from aiosysbus.exceptions import (
+    AuthorizationError,
+    NotOpenError,
+    InsufficientPermissionsError,
+)
+
 import voluptuous as vol
 
-from homeassistant import config_entries, core
+from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 
+from . import async_connect_box, LiveboxException
 from .const import (
     CONF_LAN_TRACKING,
     DEFAULT_HOST,
@@ -36,23 +42,7 @@ async def validate_input(hass: core.HomeAssistant, data):
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
 
-    try:
-        session = Sysbus(
-            username=data["username"],
-            password=data["password"],
-            host=data["host"],
-            port=data["port"],
-        )
-
-    except AuthorizationError:
-        raise AuthorizationError
-    except Exception as e:
-        _LOGGER.warn("Error to connect {}".format(e))
-        raise AuthorizationError
-
-    perms = await session.async_get_permissions()
-    if perms is None:
-        raise AuthorizationError
+    session = await async_connect_box(data)
 
     return await session.system.get_deviceinfo()
 
@@ -85,12 +75,21 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 infos = await validate_input(self.hass, user_input)
                 if infos is not None:
                     title = infos.get("status", {}).get("ProductClass")
-                    if title is not None:
-                        return self.async_create_entry(title=title, data=user_input)
             except AuthorizationError:
+                _LOGGER.error("Authentication Required")
                 errors["base"] = "login_inccorect"
-            except Exception:  # pylint: disable=broad-except
-                errors["base"] = "linking"
+            except InsufficientPermissionsError:
+                _LOGGER.error("Insufficient Permissions")
+                errors["base"] = "insufficient_permission"
+            except NotOpenError:
+                _LOGGER.error("Cannot Connect")
+                errors["base"] = "cannot_connect"
+            except LiveboxException:
+                _LOGGER.error("Error unknown {}".format(e))
+                errors["base"] = "unknown"
+
+            if "base" not in errors:
+                return self.async_create_entry(title=title, data=user_input)
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
