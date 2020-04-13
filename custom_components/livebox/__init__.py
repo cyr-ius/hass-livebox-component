@@ -80,7 +80,6 @@ async def async_setup_entry(hass, config_entry):
     if infos is None:
         return False
 
-    _LOGGER.debug(infos)
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
