@@ -8,10 +8,9 @@
                     "host": "IP Address",
                     "port": "Port",
                     "username": "Username",
-                    "password": "Password",
-                },
-            },
-            "register": {"title": "Orange Livebox", "description": "Register livebox "},
+                    "password": "Password"
+                }
+            }
         },
         "error": {
             "login_inccorect": "User or password inccorect",
@@ -25,7 +24,7 @@
             "user": {
                 "title": "Device Tracking - Track devices on lan",
                 "description": "you want tracking  yours wired devices in addition to wireless devices",
-                "data": {"lan_tracking": "Wired tracking"},
+                "data": {"lan_tracking": "Wired tracking"}
             }
         }
     },

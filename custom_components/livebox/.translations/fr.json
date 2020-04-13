@@ -10,10 +10,6 @@
           "username": "Utilisateur",
           "password": "Mot de pass"
         }
-      },
-      "register": {
-          "title": "Orange Livebox",
-          "description":"Enregistrement de la Livebox."
       }
     },
     "error": {
