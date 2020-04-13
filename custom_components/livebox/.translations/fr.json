@@ -17,11 +17,8 @@
       }
     },
     "error": {
-      "register_failed": "Enregistrement impossible, Numéro de série introuvable.",
       "login_inccorect": "Utilisateur ou mot de passe incorrect.",
-      "linking": "Erreur inconnue."
-    },
-    "abort": {
+      "insufficient_permission": "Permission insuffisante.",      
       "unknown": "Erreur inconnue.",
       "cannot_connect": "Impossible de se connecter à la Livebox."
     }
