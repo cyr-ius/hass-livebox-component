@@ -1,25 +1,29 @@
 """Support for the Livebox platform."""
+from datetime import timedelta
 import logging
 
 from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.util import Throttle
 
-from . import DOMAIN, LIVEBOX_ID, COORDINATOR
+from . import DATA_LIVEBOX, DOMAIN, ID_BOX
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=60)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker from config entry."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[LIVEBOX_ID]
-    coordinator = datas[COORDINATOR]
+    box_id = datas[ID_BOX]
+    bridge = datas[DATA_LIVEBOX]
 
-    device_trackers = coordinator.data.devices
+    device_trackers = await bridge.async_get_devices()
     entities = []
-    for key, device in device_trackers.items():
+    for device in device_trackers:
         if "IPAddress" and "PhysAddress" in device:
-            entity = LiveboxDeviceScannerEntity(key, box_id, coordinator)
+            entity = LiveboxDeviceScannerEntity(device["PhysAddress"], box_id, bridge)
             entities.append(entity)
     async_add_entities(entities, update_before_add=True)
 
@@ -27,28 +31,28 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class LiveboxDeviceScannerEntity(ScannerEntity):
     """Represent a tracked device."""
 
-    def __init__(self, key, bridge_id, coordinator):
+    def __init__(self, device_id, bridge_id, bridge):
         """Initialize the device tracker."""
-        self.box_id = id
-        self.coordinator = coordinator
-        self.key = key
-        self.device = coordinator.data.devices.get(key)
+        self._bridge_id = id
+        self._device_id = device_id
+        self._bridge = bridge
         self._retry = 0
+        self._device = {}
 
     @property
     def name(self):
         """Return Entity's default name."""
-        return self.device.get("Name")
+        return self._device.get("Name")
 
     @property
     def unique_id(self):
         """Return a unique ID."""
-        return self.key
+        return self._device_id
 
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
-        return self.device.get("Active") is True
+        return self._device.get("Active") is True
 
     @property
     def source_type(self):
@@ -62,45 +66,32 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
-            "via_device": (DOMAIN, self.box_id),
+            "via_device": (DOMAIN, self._bridge_id),
         }
 
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
         _attributs = {
-            "ip_address": self.device.get("IPAddress"),
-            "first_seen": self.device.get("FirstSeen"),
+            "ip_address": self._device.get("IPAddress"),
+            "first_seen": self._device.get("FirstSeen"),
         }
         return _attributs
 
-    @property
-    def should_poll(self):
-        """No polling needed."""
-        return False
-
-    async def async_added_to_hass(self):
-        """When entity is added to hass."""
-        self.coordinator.async_add_listener(self.async_write_ha_state)
-
-    async def async_will_remove_from_hass(self):
-        """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(self.async_write_ha_state)
-
-    # ~ @Throttle(SCAN_INTERVAL)
-    # ~ async def async_update(self):
-    # ~ """Handle polling."""
-    # ~ data_status = await self._bridge.async_get_device(self.unique_id)
-    # ~ if data_status:
-    # ~ self._device = data_status
-    # ~ if self._device.get("Active") is False and self._retry < 2:
-    # ~ self._retry += 1
-    # ~ self._device["Active"] = True
-    # ~ elif self._device.get("Active") is False and self._retry == 2:
-    # ~ self._device["Active"] = False
-    # ~ else:
-    # ~ self._retry = 0
-    # ~ self._device["Active"] = True
-    # ~ _LOGGER.debug(
-    # ~ f"Update {self.name} - {self.unique_id} - {self._retry} - {self._device['Active']}"
-    # ~ )
+    @Throttle(SCAN_INTERVAL)
+    async def async_update(self):
+        """Handle polling."""
+        data_status = await self._bridge.async_get_device(self.unique_id)
+        if data_status:
+            self._device = data_status
+            if self._device.get("Active") is False and self._retry < 2:
+                self._retry += 1
+                self._device["Active"] = True
+            elif self._device.get("Active") is False and self._retry == 2:
+                self._device["Active"] = False
+            else:
+                self._retry = 0
+                self._device["Active"] = True
+            _LOGGER.debug(
+                f"Update {self.name} - {self.unique_id} - {self._retry} - {self._device['Active']}"
+            )
