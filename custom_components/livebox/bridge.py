@@ -38,7 +38,6 @@ class BridgeData:
             raise LiveboxException(e)
 
         perms = await self._hass.async_add_executor_job(self._session.get_permissions)
-        _LOGGER.debug(perms)
         if perms is None:
             _LOGGER.error("Insufficient Permissions.")
             raise InsufficientPermissionsError
