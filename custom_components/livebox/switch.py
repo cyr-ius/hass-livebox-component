@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.switch import SwitchDevice
 
-from .const import DOMAIN, ID_BOX, DATA_LIVEBOX, TEMPLATE_SENSOR
+from .const import DOMAIN, LIVEBOX_ID, COORDINATOR, TEMPLATE_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,20 +11,19 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[ID_BOX]
-    bridge = datas[DATA_LIVEBOX]
-
-    async_add_entities([WifiSwitch(bridge, box_id)], True)
+    box_id = datas[LIVEBOX_ID]
+    coordinator = datas[COORDINATOR]    
+    async_add_entities([WifiSwitch(coordinator, box_id)], True)
 
 
 class WifiSwitch(SwitchDevice):
     """Representation of a livebox sensor."""
 
-    def __init__(self, bridge, box_id):
+    def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
-        self._bridge = bridge
-        self._box_id = box_id
-        self._state = None
+        self.coordinator = coordinator
+        self.box_id = box_id
+        self._state = coordinator.data.wifi
 
     @property
     def name(self):
@@ -34,7 +33,7 @@ class WifiSwitch(SwitchDevice):
     @property
     def unique_id(self):
         """Return unique_id."""
-        return f"{self._box_id}_wifi"
+        return f"{self.box_id}_wifi"
 
     @property
     def device_info(self):
@@ -44,7 +43,7 @@ class WifiSwitch(SwitchDevice):
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
             "manufacturer": TEMPLATE_SENSOR,
-            "via_device": (DOMAIN, self._box_id),
+            "via_device": (DOMAIN, self.box_id),
         }
 
     @property
@@ -52,18 +51,29 @@ class WifiSwitch(SwitchDevice):
         """Return true if device is on."""
         return self._state
 
+    @property
+    def should_poll(self):
+        """No polling needed."""
+        return False
+
+    async def async_added_to_hass(self):
+        """When entity is added to hass."""
+        self.coordinator.async_add_listener(
+            self.async_write_ha_state
+        )
+
+    async def async_will_remove_from_hass(self):
+        """When entity will be removed from hass."""
+        self.coordinator.async_remove_listener(
+            self.async_write_ha_state
+        )
+
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self._bridge.wifi.set_wifi(parameters)
+        await self.coordinator.async_set_wifi(parameters)
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self._bridge.wifi.set_wifi(parameters)
-
-    async def async_update(self):
-        """Return update entry."""
-        data_status = await self._bridge.async_get_wifi()
-        if data_status:
-            self._state = data_status["status"]["Enable"] == "true"
+        await self.coordinator.async_set_wifi(parameters)

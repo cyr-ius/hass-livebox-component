@@ -42,11 +42,10 @@ async def validate_input(hass: core.HomeAssistant, data):
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
 
-    bridge = BridgeData(hass)
-    await bridge.async_connect(data)
+    bridge = BridgeData(hass=hass,config_flow_data=data)
+    await bridge.async_connect()
 
     return await bridge.async_get_infos()
-
 
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
@@ -74,23 +73,19 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 infos = await validate_input(self.hass, user_input)
-                if infos is not None:
-                    title = infos.get("status", {}).get("ProductClass")
+                await self.async_set_unique_id(infos["SerialNumber"])
+                self._abort_if_unique_id_configured()
             except AuthorizationError:
-                _LOGGER.error("Authentication Required")
                 errors["base"] = "login_inccorect"
             except InsufficientPermissionsError:
-                _LOGGER.error("Insufficient Permissions")
                 errors["base"] = "insufficient_permission"
             except NotOpenError:
-                _LOGGER.error("Cannot Connect")
                 errors["base"] = "cannot_connect"
-            except LiveboxException as e:
-                _LOGGER.error("Error unknown {}".format(e))
+            except LiveboxException:
                 errors["base"] = "unknown"
 
             if "base" not in errors:
-                return self.async_create_entry(title=title, data=user_input)
+                return self.async_create_entry(title=infos["ProductClass"], data=user_input)
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors

@@ -3,8 +3,7 @@ import logging
 
 from homeassistant.helpers.entity import Entity
 
-from . import DATA_LIVEBOX, DOMAIN, ID_BOX
-from .const import ATTR_SENSORS, TEMPLATE_SENSOR
+from .const import ATTR_SENSORS, TEMPLATE_SENSOR, DOMAIN, COORDINATOR, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,14 +11,13 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[ID_BOX]
-    bridge = datas[DATA_LIVEBOX]
-
-    nmc = await bridge.async_get_nmc()
+    box_id = datas[LIVEBOX_ID]
+    coordinator = datas[COORDINATOR]    
+    nmc = coordinator.data.nmc
     if "ETHERNET" in nmc["WanMode"].upper():
         return
     async_add_entities(
-        [FlowSensor(bridge, box_id, "down"), FlowSensor(bridge, box_id, "up")], True
+        [FlowSensor(coordinator, box_id, "down"), FlowSensor(coordinator, box_id, "up")], True
     )
 
 
@@ -28,13 +26,11 @@ class FlowSensor(Entity):
 
     unit_of_measurement = "Mb/s"
 
-    def __init__(self, device, box_id, flow_direction):
+    def __init__(self, coordinator, box_id, flow_direction):
         """Initialize the sensor."""
-
-        self._device = device
-        self._box_id = box_id
-        self._state = None
-        self._state = {}
+        self.box_id = box_id
+        self.coordinator = coordinator
+        self._state = coordinator.data.dsl_status
         self._attributs = ATTR_SENSORS[flow_direction]
 
     @property
@@ -46,7 +42,7 @@ class FlowSensor(Entity):
     def unique_id(self):
         """Return unique_id."""
         cr = self._attributs["current_rate"]
-        return f"{self._box_id}_{cr}"
+        return f"{self.box_id}_{cr}"
 
     @property
     def state(self):
@@ -63,7 +59,7 @@ class FlowSensor(Entity):
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
             "manufacturer": TEMPLATE_SENSOR,
-            "via_device": (DOMAIN, self._box_id),
+            "via_device": (DOMAIN, self.box_id),
         }
 
     @property
@@ -74,8 +70,19 @@ class FlowSensor(Entity):
             _attributs[key] = self._state.get(value)
         return _attributs
 
-    async def async_update(self):
-        """Return update entry."""
-        data_status = await self._device.async_get_dsl_status()
-        if data_status:
-            self._state = data_status
+    @property
+    def should_poll(self):
+        """No polling needed."""
+        return False
+
+    async def async_added_to_hass(self):
+        """When entity is added to hass."""
+        self.coordinator.async_add_listener(
+            self.async_write_ha_state
+        )
+
+    async def async_will_remove_from_hass(self):
+        """When entity will be removed from hass."""
+        self.coordinator.async_remove_listener(
+            self.async_write_ha_state
+        )

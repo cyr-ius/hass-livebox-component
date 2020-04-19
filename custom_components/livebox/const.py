@@ -1,8 +1,8 @@
 """Constants for the Livebox component."""
 DOMAIN = "livebox"
-DATA_LIVEBOX = "date_livebox"
+COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
-ID_BOX = "id"
+LIVEBOX_ID = "id"
 COMPONENTS = ["sensor", "binary_sensor", "device_tracker", "switch"]
 
 TEMPLATE_SENSOR = "Orange Livebox"
