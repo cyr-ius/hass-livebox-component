@@ -17,6 +17,7 @@ from .const import (
     DEFAULT_USERNAME,
     DOMAIN,
     ID_BOX,
+    UNSUB_LISTENER,
 )
 
 CONFIG_SCHEMA = vol.Schema(
@@ -60,14 +61,11 @@ async def async_setup_entry(hass, config_entry):
     if bridge is None:
         return False
 
-    hass.data[DOMAIN][config_entry.entry_id] = {
-        ID_BOX: config_entry.unique_id,
-        DATA_LIVEBOX: bridge,
-    }
-
     infos = await bridge.async_get_infos()
     if infos is None:
-        return False
+               return False
+
+    unsub_listener = config_entry.add_update_listener(update_listener)
 
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
@@ -79,6 +77,13 @@ async def async_setup_entry(hass, config_entry):
         sw_version=infos["SoftwareVersion"],
     )
 
+
+    hass.data[DOMAIN][config_entry.entry_id] = {
+        ID_BOX: config_entry.unique_id,
+        DATA_LIVEBOX: bridge,
+        UNSUB_LISTENER: unsub_listener,
+    }
+
     for component in COMPONENTS:
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(config_entry, component)
@@ -89,9 +94,6 @@ async def async_setup_entry(hass, config_entry):
         await bridge.async_reboot()
 
     hass.services.async_register(DOMAIN, "reboot", async_livebox_reboot)
-
-    if not config_entry.update_listeners:
-        config_entry.add_update_listener(update_listener)
 
     return True
 
@@ -106,6 +108,9 @@ async def async_unload_entry(hass, config_entry):
             ]
         )
     )
+
+    hass.data[DOMAIN][config_entry.entry_id][UNSUB_LISTENER]()
+
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
 
