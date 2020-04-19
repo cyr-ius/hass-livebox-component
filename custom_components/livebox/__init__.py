@@ -2,6 +2,10 @@
 import asyncio
 import logging
 import voluptuous as vol
+from datetime import timedelta
+
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.exceptions import PlatformNotReady
 
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
@@ -11,13 +15,13 @@ from .bridge import BridgeData
 from .const import (
     COMPONENTS,
     CONF_LAN_TRACKING,
-    DATA_LIVEBOX,
     DEFAULT_HOST,
     DEFAULT_PORT,
     DEFAULT_USERNAME,
     DOMAIN,
-    ID_BOX,
+    LIVEBOX_ID,
     UNSUB_LISTENER,
+    COORDINATOR,
 )
 
 CONFIG_SCHEMA = vol.Schema(
@@ -34,6 +38,8 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+
+SCAN_INTERVAL = timedelta(seconds=60)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,31 +63,44 @@ async def async_setup_entry(hass, config_entry):
     """Set up Livebox as config entry."""
 
     bridge = BridgeData(hass, config_entry)
-    await bridge.async_connect(config_entry.data)
-    if bridge is None:
+    try:
+        await bridge.async_connect()
+    except Exception:  # pylint: disable=broad-except
         return False
 
-    infos = await bridge.async_get_infos()
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name="livebox",
+        update_method=bridge.async_fetch_datas,
+        update_interval=SCAN_INTERVAL,
+    )
+    await coordinator.async_refresh()
+
+    if not coordinator.last_update_success:
+        raise PlatformNotReady
+
+    infos = coordinator.data.infos
+    _LOGGER.debug(infos)
     if infos is None:
-               return False
+        return False
 
     unsub_listener = config_entry.add_update_listener(update_listener)
 
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
-        identifiers={(DOMAIN, config_entry.unique_id)},
+        identifiers={(DOMAIN, infos["SerialNumber"])},
         manufacturer=infos["Manufacturer"],
         name=infos["ProductClass"],
         model=infos["ModelName"],
         sw_version=infos["SoftwareVersion"],
     )
 
-
     hass.data[DOMAIN][config_entry.entry_id] = {
-        ID_BOX: config_entry.unique_id,
-        DATA_LIVEBOX: bridge,
+        LIVEBOX_ID: config_entry.unique_id,
         UNSUB_LISTENER: unsub_listener,
+        COORDINATOR: coordinator,
     }
 
     for component in COMPONENTS:
