@@ -1,6 +1,7 @@
 """Constants for the Livebox component."""
 DOMAIN = "livebox"
 DATA_LIVEBOX = "date_livebox"
+UNSUB_LISTENER = "unsubscribe_listener"
 ID_BOX = "id"
 COMPONENTS = ["sensor", "binary_sensor", "device_tracker", "switch"]
 
