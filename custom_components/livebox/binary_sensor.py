@@ -32,7 +32,7 @@ class WanStatus(BinarySensorDevice):
         self._bridge = bridge
         self._box_id = box_id
         self._state = None
-        self._dsl = {}
+        self._state = {}
 
     @property
     def name(self):
@@ -43,8 +43,8 @@ class WanStatus(BinarySensorDevice):
     def is_on(self):
         """Return true if the binary sensor is on."""
 
-        if self._dsl.get("WanState"):
-            return self._dsl["WanState"] == "up"
+        if self._state.get("WanState"):
+            return self._state["WanState"] == "up"
         return None
 
     @property
@@ -69,16 +69,15 @@ class WanStatus(BinarySensorDevice):
         """Return the device state attributes."""
 
         return {
-            "link_type": self._dsl.get("LinkType", None),
-            "link_state": self._dsl.get("LinkState", None),
-            "last_connection_error": self._dsl.get("LastConnectionError", None),
-            "wan_ipaddress": self._dsl.get("IPAddress", None),
-            "wan_ipv6address": self._dsl.get("IPv6Address", None),
+            "link_type": self._state.get("LinkType", None),
+            "link_state": self._state.get("LinkState", None),
+            "last_connection_error": self._state.get("LastConnectionError", None),
+            "wan_ipaddress": self._state.get("IPAddress", None),
+            "wan_ipv6address": self._state.get("IPv6Address", None),
         }
 
     async def async_update(self):
         """Fetch status from livebox."""
-
         data_status = await self._bridge.async_get_status()
         if data_status:
-            self._dsl = data_status
+            self._state = data_status

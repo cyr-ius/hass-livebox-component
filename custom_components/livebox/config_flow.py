@@ -1,7 +1,7 @@
 """Config flow to configure Livebox."""
 import logging
 
-from aiosysbus import Sysbus
+
 from aiosysbus.exceptions import (
     AuthorizationError,
     NotOpenError,
@@ -10,11 +10,11 @@ from aiosysbus.exceptions import (
 
 import voluptuous as vol
 
-from homeassistant import config_entries, core, exceptions
+from homeassistant import config_entries, core
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 
-from . import async_connect_box, LiveboxException
+from .bridge import BridgeData, LiveboxException
 from .const import (
     CONF_LAN_TRACKING,
     DEFAULT_HOST,
@@ -42,9 +42,10 @@ async def validate_input(hass: core.HomeAssistant, data):
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
 
-    session = await async_connect_box(data)
+    bridge = BridgeData(hass)
+    await bridge.async_connect(data)
 
-    return await session.system.get_deviceinfo()
+    return await bridge.async_get_infos()
 
 
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -84,7 +85,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             except NotOpenError:
                 _LOGGER.error("Cannot Connect")
                 errors["base"] = "cannot_connect"
-            except LiveboxException:
+            except LiveboxException as e:
                 _LOGGER.error("Error unknown {}".format(e))
                 errors["base"] = "unknown"
 

@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.switch import SwitchDevice
 
-from .const import DOMAIN, ID_BOX, SESSION_SYSBUS, TEMPLATE_SENSOR
+from .const import DOMAIN, ID_BOX, DATA_LIVEBOX, TEMPLATE_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,17 +12,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[ID_BOX]
-    session = datas[SESSION_SYSBUS]
+    bridge = datas[DATA_LIVEBOX]
 
-    async_add_entities([WifiSwitch(session, box_id)], True)
+    async_add_entities([WifiSwitch(bridge, box_id)], True)
 
 
 class WifiSwitch(SwitchDevice):
     """Representation of a livebox sensor."""
 
-    def __init__(self, session, box_id):
+    def __init__(self, bridge, box_id):
         """Initialize the sensor."""
-        self._session = session
+        self._bridge = bridge
         self._box_id = box_id
         self._state = None
 
@@ -55,14 +55,15 @@ class WifiSwitch(SwitchDevice):
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self._session.wifi.set_wifi(parameters)
+        await self._bridge.wifi.set_wifi(parameters)
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self._session.wifi.set_wifi(parameters)
+        await self._bridge.wifi.set_wifi(parameters)
 
     async def async_update(self):
         """Return update entry."""
-        _state = await self._session.wifi.get_wifi()
-        self._state = _state["status"]["Enable"] == "true"
+        data_status = await self._bridge.async_get_wifi()
+        if data_status:
+            self._state = data_status["status"]["Enable"] == "true"

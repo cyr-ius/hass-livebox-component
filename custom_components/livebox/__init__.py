@@ -1,16 +1,8 @@
 """Orange Livebox."""
 import asyncio
 import logging
-
-from aiosysbus import Sysbus
-from aiosysbus.exceptions import (
-    AuthorizationError,
-    NotOpenError,
-    InsufficientPermissionsError,
-)
 import voluptuous as vol
 
-from homeassistant import exceptions
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.helpers import config_validation as cv, device_registry as dr
@@ -25,7 +17,6 @@ from .const import (
     DEFAULT_USERNAME,
     DOMAIN,
     ID_BOX,
-    SESSION_SYSBUS,
 )
 
 CONFIG_SCHEMA = vol.Schema(
@@ -64,16 +55,14 @@ async def async_setup(hass, config):
 async def async_setup_entry(hass, config_entry):
     """Set up Livebox as config entry."""
 
-    session = await async_connect_box(config_entry.data)
-
-    bridge = BridgeData(session, config_entry)
+    bridge = BridgeData(hass, config_entry)
+    await bridge.async_connect(config_entry.data)
     if bridge is None:
         return False
 
     hass.data[DOMAIN][config_entry.entry_id] = {
         ID_BOX: config_entry.unique_id,
         DATA_LIVEBOX: bridge,
-        SESSION_SYSBUS: session,
     }
 
     infos = await bridge.async_get_infos()
@@ -97,7 +86,7 @@ async def async_setup_entry(hass, config_entry):
 
     async def async_livebox_reboot(call):
         """Handle reboot service call."""
-        await session.system.reboot()
+        await bridge.async_reboot()
 
     hass.services.async_register(DOMAIN, "reboot", async_livebox_reboot)
 
@@ -126,33 +115,3 @@ async def async_unload_entry(hass, config_entry):
 async def update_listener(hass, config_entry):
     """Reload device tracker if change option."""
     await hass.config_entries.async_reload(config_entry.entry_id)
-
-
-async def async_connect_box(data):
-    """Connect at livebox."""
-
-    try:
-        return Sysbus(
-            username=data["username"],
-            password=data["password"],
-            host=data["host"],
-            port=data["port"],
-        )
-    except AuthorizationError:
-        _LOGGER.error("Authentication Required.")
-        raise AuthenticationRequired
-    except NotOpenError:
-        _LOGGER.error("Cannot Connect.")
-        raise NotOpenError
-    except Exception as e:
-        _LOGGER.error("Error unknown {}".format(e))
-        raise LiveboxException(e)
-
-    perms = await session.async_get_permissions()
-    if perms is None:
-        _LOGGER.error("Insufficient Permissions.")
-        raise InsufficientPermissionsError
-
-
-class LiveboxException(exceptions.HomeAssistantError):
-    """Base class for Livebox exceptions."""

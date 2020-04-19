@@ -34,7 +34,7 @@ class FlowSensor(Entity):
         self._device = device
         self._box_id = box_id
         self._state = None
-        self._dsl = {}
+        self._state = {}
         self._attributs = ATTR_SENSORS[flow_direction]
 
     @property
@@ -51,8 +51,8 @@ class FlowSensor(Entity):
     @property
     def state(self):
         """Return the state of the device."""
-        if self._dsl.get(self._attributs["current_rate"]):
-            return round(self._dsl[self._attributs["current_rate"]] / 1000, 2)
+        if self._state.get(self._attributs["current_rate"]):
+            return round(self._state[self._attributs["current_rate"]] / 1000, 2)
         return None
 
     @property
@@ -71,12 +71,11 @@ class FlowSensor(Entity):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs["attr"].items():
-            _attributs[key] = self._dsl.get(value)
+            _attributs[key] = self._state.get(value)
         return _attributs
 
     async def async_update(self):
         """Return update entry."""
-
         data_status = await self._device.async_get_dsl_status()
         if data_status:
-            self._dsl = data_status
+            self._state = data_status
