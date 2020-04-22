@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.switch import SwitchDevice
 
-from .const import DOMAIN, LIVEBOX_ID, COORDINATOR, TEMPLATE_SENSOR
+from .const import DOMAIN, LIVEBOX_ID, COORDINATOR, TEMPLATE_SENSOR, LIVEBOX_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,18 +12,20 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
+    api = datas[LIVEBOX_API]
     coordinator = datas[COORDINATOR]    
-    async_add_entities([WifiSwitch(coordinator, box_id)], True)
+    async_add_entities([WifiSwitch(coordinator, box_id, api)], True)
 
 
 class WifiSwitch(SwitchDevice):
     """Representation of a livebox sensor."""
 
-    def __init__(self, coordinator, box_id):
+    def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""
         self.coordinator = coordinator
         self.box_id = box_id
-        self._state = coordinator.data.wifi
+        self._state = coordinator.data.get("wifi")
+        self._api = api
 
     @property
     def name(self):
@@ -71,9 +73,9 @@ class WifiSwitch(SwitchDevice):
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self.coordinator.async_set_wifi(parameters)
+        await self._api.async_set_wifi(parameters)
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self.coordinator.async_set_wifi(parameters)
+        await self._api.async_set_wifi(parameters)

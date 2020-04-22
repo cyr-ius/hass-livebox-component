@@ -20,6 +20,7 @@ from .const import (
     DEFAULT_USERNAME,
     DOMAIN,
     LIVEBOX_ID,
+    LIVEBOX_API,
     UNSUB_LISTENER,
     COORDINATOR,
 )
@@ -80,8 +81,7 @@ async def async_setup_entry(hass, config_entry):
     if not coordinator.last_update_success:
         raise PlatformNotReady
 
-    infos = coordinator.data.infos
-    _LOGGER.debug(infos)
+    infos = coordinator.data.get("infos")
     if infos is None:
         return False
 
@@ -101,6 +101,7 @@ async def async_setup_entry(hass, config_entry):
         LIVEBOX_ID: config_entry.unique_id,
         UNSUB_LISTENER: unsub_listener,
         COORDINATOR: coordinator,
+        LIVEBOX_API: bridge.api,
     }
 
     for component in COMPONENTS:

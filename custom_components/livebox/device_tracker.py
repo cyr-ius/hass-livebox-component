@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     box_id = datas[LIVEBOX_ID]
     coordinator = datas[COORDINATOR]
 
-    device_trackers = coordinator.data.devices
+    device_trackers = coordinator.data.get("devices")
     entities = []
     for key, device in device_trackers.items():
         if "IPAddress" and "PhysAddress" in device:
@@ -32,7 +32,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         self.box_id = id
         self.coordinator = coordinator
         self.key = key
-        self.device = coordinator.data.devices.get(key)
+        self.device = coordinator.data.get("devices").get(key)
         self._retry = 0
 
     @property

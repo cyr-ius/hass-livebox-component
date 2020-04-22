@@ -13,7 +13,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
     coordinator = datas[COORDINATOR]    
-    nmc = coordinator.data.nmc
+    nmc = coordinator.data.get("nmc")
     if "ETHERNET" in nmc["WanMode"].upper():
         return
     async_add_entities(
@@ -30,7 +30,7 @@ class FlowSensor(Entity):
         """Initialize the sensor."""
         self.box_id = box_id
         self.coordinator = coordinator
-        self._state = coordinator.data.dsl_status
+        self._state = coordinator.data.get("dsl_status")
         self._attributs = ATTR_SENSORS[flow_direction]
 
     @property

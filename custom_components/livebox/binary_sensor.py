@@ -28,7 +28,7 @@ class WanStatus(BinarySensorDevice):
         """Initialize the sensor."""
         self.box_id = box_id
         self.coordinator = coordinator        
-        self._state = coordinator.data.status
+        self._state = coordinator.data.get("status")
 
     @property
     def name(self):
