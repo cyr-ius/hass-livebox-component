@@ -32,13 +32,12 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         self.box_id = id
         self.coordinator = coordinator
         self.key = key
-        self.device = coordinator.data.get("devices").get(key)
         self._retry = 0
 
     @property
     def name(self):
         """Return Entity's default name."""
-        return self.device.get("Name")
+        return self.coordinator.data.get("devices").get(self.key).get("Name")
 
     @property
     def unique_id(self):
@@ -48,7 +47,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
-        return self.device.get("Active") is True
+        return self.coordinator.data.get("devices").get(self.key).get("Active") is True
 
     @property
     def source_type(self):
@@ -69,10 +68,19 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     def device_state_attributes(self):
         """Return the device state attributes."""
         _attributs = {
-            "ip_address": self.device.get("IPAddress"),
-            "first_seen": self.device.get("FirstSeen"),
+            "ip_address": self.coordinator.data.get("devices")
+            .get(self.key)
+            .get("IPAddress"),
+            "first_seen": self.coordinator.data.get("devices")
+            .get(self.key)
+            .get("FirstSeen"),
         }
         return _attributs
+
+    @property
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        return self.coordinator.last_update_success
 
     @property
     def should_poll(self):
@@ -86,6 +94,10 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     async def async_will_remove_from_hass(self):
         """When entity will be removed from hass."""
         self.coordinator.async_remove_listener(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Update WLED entity."""
+        await self.coordinator.async_request_refresh()
 
     # ~ @Throttle(SCAN_INTERVAL)
     # ~ async def async_update(self):

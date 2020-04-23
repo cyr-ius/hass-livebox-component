@@ -12,12 +12,16 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
-    coordinator = datas[COORDINATOR]    
+    coordinator = datas[COORDINATOR]
     nmc = coordinator.data.get("nmc")
     if "ETHERNET" in nmc["WanMode"].upper():
         return
     async_add_entities(
-        [FlowSensor(coordinator, box_id, "down"), FlowSensor(coordinator, box_id, "up")], True
+        [
+            FlowSensor(coordinator, box_id, "down"),
+            FlowSensor(coordinator, box_id, "up"),
+        ],
+        True,
     )
 
 
@@ -30,7 +34,6 @@ class FlowSensor(Entity):
         """Initialize the sensor."""
         self.box_id = box_id
         self.coordinator = coordinator
-        self._state = coordinator.data.get("dsl_status")
         self._attributs = ATTR_SENSORS[flow_direction]
 
     @property
@@ -47,9 +50,17 @@ class FlowSensor(Entity):
     @property
     def state(self):
         """Return the state of the device."""
-        if self._state.get(self._attributs["current_rate"]):
-            return round(self._state[self._attributs["current_rate"]] / 1000, 2)
+        if self.coordinator.data.get("dsl_status").get(self._attributs["current_rate"]):
+            return round(
+                self.coordinator.data.get("dsl_status")[self._attributs["current_rate"]] / 1000,
+                2,
+            )
         return None
+
+    @property
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        return self.coordinator.last_update_success
 
     @property
     def device_info(self):
@@ -67,7 +78,7 @@ class FlowSensor(Entity):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs["attr"].items():
-            _attributs[key] = self._state.get(value)
+            _attributs[key] = self.coordinator.data.get("dsl_status").get(value)
         return _attributs
 
     @property
@@ -77,12 +88,12 @@ class FlowSensor(Entity):
 
     async def async_added_to_hass(self):
         """When entity is added to hass."""
-        self.coordinator.async_add_listener(
-            self.async_write_ha_state
-        )
+        self.coordinator.async_add_listener(self.async_write_ha_state)
 
     async def async_will_remove_from_hass(self):
         """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(
-            self.async_write_ha_state
-        )
+        self.coordinator.async_remove_listener(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Update WLED entity."""
+        await self.coordinator.async_request_refresh()

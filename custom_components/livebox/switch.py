@@ -13,7 +13,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
     api = datas[LIVEBOX_API]
-    coordinator = datas[COORDINATOR]    
+    coordinator = datas[COORDINATOR]
     async_add_entities([WifiSwitch(coordinator, box_id, api)], True)
 
 
@@ -24,7 +24,6 @@ class WifiSwitch(SwitchDevice):
         """Initialize the sensor."""
         self.coordinator = coordinator
         self.box_id = box_id
-        self._state = coordinator.data.get("wifi")
         self._api = api
 
     @property
@@ -51,7 +50,7 @@ class WifiSwitch(SwitchDevice):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self._state
+        return self.coordinator.data.get("wifi")
 
     @property
     def should_poll(self):
@@ -60,15 +59,15 @@ class WifiSwitch(SwitchDevice):
 
     async def async_added_to_hass(self):
         """When entity is added to hass."""
-        self.coordinator.async_add_listener(
-            self.async_write_ha_state
-        )
+        self.coordinator.async_add_listener(self.async_write_ha_state)
 
     async def async_will_remove_from_hass(self):
         """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(
-            self.async_write_ha_state
-        )
+        self.coordinator.async_remove_listener(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Update WLED entity."""
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""

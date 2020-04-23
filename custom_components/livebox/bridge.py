@@ -58,12 +58,12 @@ class BridgeData:
     async def async_fetch_datas(self):
         """Fetch datas."""
         return {
-        "devices": await self.async_get_devices(),
-        "infos": await self.async_get_infos(),
-        "status": await self.async_get_status(),
-        "dsl_status": await self.async_get_dsl_status(),
-        "wifi": await self.async_get_wifi(),
-        "nmc": await self.async_get_nmc(),
+            "devices": await self.async_get_devices(),
+            "infos": await self.async_get_infos(),
+            "status": await self.async_get_status(),
+            "dsl_status": await self.async_get_dsl_status(),
+            "wifi": await self.async_get_wifi(),
+            "nmc": await self.async_get_nmc(),
         }
 
     async def async_get_devices(self):
@@ -94,18 +94,14 @@ class BridgeData:
 
     async def async_get_infos(self):
         """Get router infos."""
-        infos = await self._hass.async_add_executor_job(
-            self.api.system.get_deviceinfo
-        )
+        infos = await self._hass.async_add_executor_job(self.api.system.get_deviceinfo)
         if infos is not None:
             return infos.get("status", {})
         return
 
     async def async_get_status(self):
         """Get status."""
-        status = await self._hass.async_add_executor_job(
-            self.api.system.get_WANStatus
-        )
+        status = await self._hass.async_add_executor_job(self.api.system.get_WANStatus)
         if status is not None:
             return status.get("data", {})
         return

@@ -42,10 +42,11 @@ async def validate_input(hass: core.HomeAssistant, data):
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
 
-    bridge = BridgeData(hass=hass,config_flow_data=data)
+    bridge = BridgeData(hass=hass, config_flow_data=data)
     await bridge.async_connect()
 
     return await bridge.async_get_infos()
+
 
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
@@ -85,7 +86,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
 
             if "base" not in errors:
-                return self.async_create_entry(title=infos["ProductClass"], data=user_input)
+                return self.async_create_entry(
+                    title=infos["ProductClass"], data=user_input
+                )
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
