@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.binary_sensor import (
     DEVICE_CLASS_CONNECTIVITY,
-    BinarySensorDevice,
+    BinarySensorEntity,
 )
 
 from .const import DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR, COORDINATOR
@@ -19,7 +19,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities([WanStatus(coordinator, box_id)], True)
 
 
-class WanStatus(BinarySensorDevice):
+class WanStatus(BinarySensorEntity):
     """Representation of a livebox sensor."""
 
     device_class = DEVICE_CLASS_CONNECTIVITY
