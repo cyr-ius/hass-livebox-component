@@ -30,7 +30,6 @@ class BridgeData:
 
     async def async_connect(self):
         """Connect at livebox."""
-
         self.api = AIOSysbus(
             username=self.data_config["username"],
             password=self.data_config["password"],
@@ -68,43 +67,45 @@ class BridgeData:
 
     async def async_get_devices(self):
         """Get all devices."""
+        devices_tracker = {}
         parameters = {
             "expression": {
                 "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
                 "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
+
         devices = await self._hass.async_add_executor_job(
             self.api.system.get_devices, parameters
         )
+        _LOGGER.debug("Devices %s" % (devices is None))
         if devices is not None:
-
             devices_status_wireless = devices.get("status", {}).get("wifi", {})
-            devices_tracker = {}
             for device in devices_status_wireless:
-                devices_tracker.update({device.get("Key"): device})
+                if device.get("Key"):
+                    devices_tracker.update({device.get("Key"): device})
 
             if self.config_entry.options.get(CONF_LAN_TRACKING, False):
                 devices_status_wired = devices.get("status", {}).get("eth", {})
                 for device in devices_status_wired:
-                    devices_tracker.update({device.get("Key"): device})
+                    if device.get("Key"):
+                        devices_tracker.update({device.get("Key"): device})
 
-            return devices_tracker
-        return
+        return devices_tracker
 
     async def async_get_infos(self):
         """Get router infos."""
         infos = await self._hass.async_add_executor_job(self.api.system.get_deviceinfo)
-        if infos is not None:
-            return infos.get("status", {})
-        return
+        if infos:
+            return infos.get("status")
+        return {}
 
     async def async_get_status(self):
         """Get status."""
         status = await self._hass.async_add_executor_job(self.api.system.get_WANStatus)
-        if status is not None:
-            return status.get("data", {})
-        return
+        if status:
+            return status.get("data")
+        return {}
 
     async def async_get_dsl_status(self):
         """Get dsl status."""
@@ -112,26 +113,30 @@ class BridgeData:
         dsl_status = await self._hass.async_add_executor_job(
             self.api.connection.get_data_MIBS, parameters
         )
-        if dsl_status is not None:
-            return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
-        return
+        if dsl_status:
+            return dsl_status.get("status", {}).get("dsl", {}).get("dsl0")
+        return {}
 
     async def async_get_nmc(self):
         """Get dsl status."""
         nmc = await self._hass.async_add_executor_job(self.api.system.get_nmc)
-        if nmc is not None:
-            return nmc.get("status", {})
-        return
+        if nmc:
+            return nmc.get("status")
+        return {}
 
     async def async_get_wifi(self):
         """Get dsl status."""
         wifi = await self._hass.async_add_executor_job(self.api.wifi.get_wifi)
-        return wifi.get("status", {}).get("Enable") == "true"
+        if wifi:
+            return wifi.get("status", {}).get("Enable") == "true"
+        return {}
 
     async def async_set_wifi(self, parameters):
+        """Set wifi."""
         await self._hass.async_add_executor_job(self.api.wifi.set_wifi, parameters)
 
     async def async_reboot(self):
+        """Turn on reboot."""
         await self._hass.async_add_executor_job(self.api.system.reboot)
 
 

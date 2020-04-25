@@ -1,29 +1,21 @@
 """Orange Livebox."""
 import asyncio
 import logging
-import voluptuous as vol
 from datetime import timedelta
 
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.exceptions import PlatformNotReady
-
+import voluptuous as vol
 from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.const import (CONF_HOST, CONF_PASSWORD, CONF_PORT,
+                                 CONF_USERNAME)
+from homeassistant.exceptions import PlatformNotReady
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .bridge import BridgeData
-from .const import (
-    COMPONENTS,
-    CONF_LAN_TRACKING,
-    DEFAULT_HOST,
-    DEFAULT_PORT,
-    DEFAULT_USERNAME,
-    DOMAIN,
-    LIVEBOX_ID,
-    LIVEBOX_API,
-    UNSUB_LISTENER,
-    COORDINATOR,
-)
+from .const import (COMPONENTS, CONF_LAN_TRACKING, COORDINATOR, DEFAULT_HOST,
+                    DEFAULT_PORT, DEFAULT_USERNAME, DOMAIN, LIVEBOX_API,
+                    LIVEBOX_ID, UNSUB_LISTENER)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -62,7 +54,6 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, config_entry):
     """Set up Livebox as config entry."""
-
     bridge = BridgeData(hass, config_entry)
     try:
         await bridge.async_connect()
@@ -90,11 +81,11 @@ async def async_setup_entry(hass, config_entry):
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
-        identifiers={(DOMAIN, infos["SerialNumber"])},
-        manufacturer=infos["Manufacturer"],
-        name=infos["ProductClass"],
-        model=infos["ModelName"],
-        sw_version=infos["SoftwareVersion"],
+        identifiers={(DOMAIN, infos.get("SerialNumber"))},
+        manufacturer=infos.get("Manufacturer"),
+        name=infos.get("ProductClass"),
+        model=infos.get("ModelName"),
+        sw_version=infos.get("SoftwareVersion"),
     )
 
     hass.data[DOMAIN][config_entry.entry_id] = {

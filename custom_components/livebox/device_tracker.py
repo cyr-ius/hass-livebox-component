@@ -32,12 +32,13 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         self.box_id = id
         self.coordinator = coordinator
         self.key = key
-        self._retry = 0
+        self._device = self.coordinator.data.get("devices").get(self.key)
+        # self._retry = 0
 
     @property
     def name(self):
         """Return Entity's default name."""
-        return self.coordinator.data.get("devices").get(self.key).get("Name")
+        return self._device.get("Name")
 
     @property
     def unique_id(self):
@@ -57,7 +58,6 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def device_info(self):
         """Return the device info."""
-
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
@@ -68,12 +68,8 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     def device_state_attributes(self):
         """Return the device state attributes."""
         _attributs = {
-            "ip_address": self.coordinator.data.get("devices")
-            .get(self.key)
-            .get("IPAddress"),
-            "first_seen": self.coordinator.data.get("devices")
-            .get(self.key)
-            .get("FirstSeen"),
+            "ip_address": self.coordinator.data.get("devices").get(self.key).get("IPAddress"),
+            "first_seen": self.coordinator.data.get("devices").get(self.key).get("FirstSeen"),
         }
         return _attributs
 

@@ -32,26 +32,23 @@ class WanStatus(BinarySensorEntity):
     @property
     def name(self):
         """Return name sensor."""
-
         return f"{TEMPLATE_SENSOR} Wan status"
 
     def is_on(self):
         """Return true if the binary sensor is on."""
-
-        if self._state.get("WanState"):
-            return self.coordinator.data.get("status")["WanState"] == "up"
+        wan_state = self.coordinator.data.get("status", {}).get("WanState")
+        if wan_state:
+            return wan_state == "up"
         return None
 
     @property
     def unique_id(self):
         """Return unique_id."""
-
         return f"{self.box_id}_connectivity"
 
     @property
     def device_info(self):
         """Return the device info."""
-
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
@@ -62,17 +59,12 @@ class WanStatus(BinarySensorEntity):
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
-
         return {
-            "link_type": self.coordinator.data.get("status").get("LinkType", None),
-            "link_state": self.coordinator.data.get("status").get("LinkState", None),
-            "last_connection_error": self.coordinator.data.get("status").get(
-                "LastConnectionError", None
-            ),
-            "wan_ipaddress": self.coordinator.data.get("status").get("IPAddress", None),
-            "wan_ipv6address": self.coordinator.data.get("status").get(
-                "IPv6Address", None
-            ),
+            "link_type": self.coordinator.data.get("status", {}).get("LinkType"),
+            "link_state": self.coordinator.data.get("status", {}).get("LinkState"),
+            "last_connection_error": self.coordinator.data.get("status", {}).get("LastConnectionError"),
+            "wan_ipaddress": self.coordinator.data.get("status", {}).get("IPAddress"),
+            "wan_ipv6address": self.coordinator.data.get("status", {}).get("IPv6Address"),
         }
 
     @property

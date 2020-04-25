@@ -50,9 +50,9 @@ class FlowSensor(Entity):
     @property
     def state(self):
         """Return the state of the device."""
-        if self.coordinator.data.get("dsl_status").get(self._attributs["current_rate"]):
+        if self.coordinator.data.get("dsl_status", {}).get(self._attributs["current_rate"]):
             return round(
-                self.coordinator.data.get("dsl_status")[self._attributs["current_rate"]] / 1000,
+                self.coordinator.data.get("dsl_status", {})[self._attributs["current_rate"]] / 1000,
                 2,
             )
         return None
@@ -65,7 +65,6 @@ class FlowSensor(Entity):
     @property
     def device_info(self):
         """Return the device info."""
-
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
@@ -78,7 +77,7 @@ class FlowSensor(Entity):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs["attr"].items():
-            _attributs[key] = self.coordinator.data.get("dsl_status").get(value)
+            _attributs[key] = self.coordinator.data.get("dsl_status", {}).get(value)
         return _attributs
 
     @property
