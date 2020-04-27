@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.helpers.entity import Entity
 
-from .const import ATTR_SENSORS, TEMPLATE_SENSOR, DOMAIN, COORDINATOR, LIVEBOX_ID
+from .const import ATTR_SENSORS, COORDINATOR, DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,16 +13,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
     coordinator = datas[COORDINATOR]
-    nmc = coordinator.data.get("nmc")
-    if "ETHERNET" in nmc["WanMode"].upper():
-        return
-    async_add_entities(
-        [
-            FlowSensor(coordinator, box_id, "down"),
-            FlowSensor(coordinator, box_id, "up"),
-        ],
-        True,
-    )
+    nmc = coordinator.data["nmc"]
+    if "ETHERNET" not in nmc["WanMode"].upper():
+        async_add_entities(
+            [
+                FlowSensor(coordinator, box_id, "down"),
+                FlowSensor(coordinator, box_id, "up"),
+            ],
+            True,
+        )
 
 
 class FlowSensor(Entity):
@@ -50,9 +49,10 @@ class FlowSensor(Entity):
     @property
     def state(self):
         """Return the state of the device."""
-        if self.coordinator.data.get("dsl_status", {}).get(self._attributs["current_rate"]):
+        if self.coordinator.data["dsl_status"].get(self._attributs["current_rate"]):
             return round(
-                self.coordinator.data.get("dsl_status", {})[self._attributs["current_rate"]] / 1000,
+                self.coordinator.data["dsl_status"][self._attributs["current_rate"]]
+                / 1000,
                 2,
             )
         return None
@@ -77,7 +77,7 @@ class FlowSensor(Entity):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs["attr"].items():
-            _attributs[key] = self.coordinator.data.get("dsl_status", {}).get(value)
+            _attributs[key] = self.coordinator.data["dsl_status"].get(value)
         return _attributs
 
     @property

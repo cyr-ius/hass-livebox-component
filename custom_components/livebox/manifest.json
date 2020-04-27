@@ -2,7 +2,7 @@
     "domain": "livebox",
     "name": "Orange Livebox",
     "config_flow": true,
-    "documentation": "https://www.home-assistant.io/components/livebox",
+    "documentation": "https://www.home-assistant.io/integrations/livebox",
     "requirements": ["aiosysbus==0.1.6"],
     "dependencies": [],
     "codeowners": ["@cyr-ius"]

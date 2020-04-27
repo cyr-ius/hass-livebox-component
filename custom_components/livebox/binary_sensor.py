@@ -6,7 +6,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 
-from .const import DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR, COORDINATOR
+from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,10 +36,7 @@ class WanStatus(BinarySensorEntity):
 
     def is_on(self):
         """Return true if the binary sensor is on."""
-        wan_state = self.coordinator.data.get("status", {}).get("WanState")
-        if wan_state:
-            return wan_state == "up"
-        return None
+        return self.coordinator.data["wan_status"].get("status")
 
     @property
     def unique_id(self):
@@ -60,11 +57,21 @@ class WanStatus(BinarySensorEntity):
     def device_state_attributes(self):
         """Return the device state attributes."""
         return {
-            "link_type": self.coordinator.data.get("status", {}).get("LinkType"),
-            "link_state": self.coordinator.data.get("status", {}).get("LinkState"),
-            "last_connection_error": self.coordinator.data.get("status", {}).get("LastConnectionError"),
-            "wan_ipaddress": self.coordinator.data.get("status", {}).get("IPAddress"),
-            "wan_ipv6address": self.coordinator.data.get("status", {}).get("IPv6Address"),
+            "link_type": self.coordinator.data["wan_status"]
+            .get("data", {})
+            .get("LinkType"),
+            "link_state": self.coordinator.data["wan_status"]
+            .get("data", {})
+            .get("LinkState"),
+            "last_connection_error": self.coordinator.data["wan_status"]
+            .get("data", {})
+            .get("LastConnectionError"),
+            "wan_ipaddress": self.coordinator.data["wan_status"]
+            .get("data", {})
+            .get("IPAddress"),
+            "wan_ipv6address": self.coordinator.data["wan_status"]
+            .get("data", {})
+            .get("IPv6Address"),
         }
 
     @property

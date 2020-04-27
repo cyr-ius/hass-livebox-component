@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.components.switch import SwitchDevice
 
-from .const import DOMAIN, LIVEBOX_ID, COORDINATOR, TEMPLATE_SENSOR, LIVEBOX_API
+from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID, TEMPLATE_SENSOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,6 @@ class WifiSwitch(SwitchDevice):
     @property
     def device_info(self):
         """Return the device info."""
-
         return {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},

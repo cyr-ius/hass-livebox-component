@@ -4,7 +4,7 @@ import logging
 from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 
-from . import DOMAIN, LIVEBOX_ID, COORDINATOR
+from . import COORDINATOR, DOMAIN, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,13 +15,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     box_id = datas[LIVEBOX_ID]
     coordinator = datas[COORDINATOR]
 
-    device_trackers = coordinator.data.get("devices")
-    entities = []
-    for key, device in device_trackers.items():
-        if "IPAddress" and "PhysAddress" in device:
-            entity = LiveboxDeviceScannerEntity(key, box_id, coordinator)
-            entities.append(entity)
-    async_add_entities(entities, update_before_add=True)
+    device_trackers = coordinator.data["devices"]
+    entities = [
+        LiveboxDeviceScannerEntity(key, box_id, coordinator)
+        for key, device in device_trackers.items() if "IPAddress" and "PhysAddress" in device
+    ]
+    async_add_entities(entities, True)
 
 
 class LiveboxDeviceScannerEntity(ScannerEntity):
@@ -32,7 +31,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         self.box_id = id
         self.coordinator = coordinator
         self.key = key
-        self._device = self.coordinator.data.get("devices").get(self.key)
+        self._device = self.coordinator.data["devices"].get(self.key)
         # self._retry = 0
 
     @property
@@ -48,7 +47,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
-        return self.coordinator.data.get("devices").get(self.key).get("Active") is True
+        return self.coordinator.data["devices"].get(self.key).get("Active") is True
 
     @property
     def source_type(self):
@@ -67,9 +66,10 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
+        _device = self.coordinator.data["devices"].get(self.key)
         _attributs = {
-            "ip_address": self.coordinator.data.get("devices").get(self.key).get("IPAddress"),
-            "first_seen": self.coordinator.data.get("devices").get(self.key).get("FirstSeen"),
+            "ip_address": _device.get("IPAddress"),
+            "first_seen": _device.get("FirstSeen"),
         }
         return _attributs
 

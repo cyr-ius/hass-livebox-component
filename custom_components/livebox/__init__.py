@@ -1,21 +1,29 @@
 """Orange Livebox."""
 import asyncio
-import logging
 from datetime import timedelta
+import logging
 
 import voluptuous as vol
+
 from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import (CONF_HOST, CONF_PASSWORD, CONF_PORT,
-                                 CONF_USERNAME)
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .bridge import BridgeData
-from .const import (COMPONENTS, CONF_LAN_TRACKING, COORDINATOR, DEFAULT_HOST,
-                    DEFAULT_PORT, DEFAULT_USERNAME, DOMAIN, LIVEBOX_API,
-                    LIVEBOX_ID, UNSUB_LISTENER)
+from .const import (
+    COMPONENTS,
+    CONF_LAN_TRACKING,
+    COORDINATOR,
+    DEFAULT_HOST,
+    DEFAULT_PORT,
+    DEFAULT_USERNAME,
+    DOMAIN,
+    LIVEBOX_API,
+    LIVEBOX_ID,
+    UNSUB_LISTENER,
+)
 
 CONFIG_SCHEMA = vol.Schema(
     {
