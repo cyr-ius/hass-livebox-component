@@ -1,7 +1,7 @@
 """Sensor for Livebox router."""
 import logging
 
-from homeassistant.components.switch import SwitchEntity
+from homeassistant.components.switch import SwitchDevice
 
 from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID, TEMPLATE_SENSOR
 
@@ -17,7 +17,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities([WifiSwitch(coordinator, box_id, api)], True)
 
 
-class WifiSwitch(SwitchEntity):
+class WifiSwitch(SwitchDevice):
     """Representation of a livebox sensor."""
 
     def __init__(self, coordinator, box_id, api):
