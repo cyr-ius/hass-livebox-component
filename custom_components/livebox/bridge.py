@@ -125,11 +125,7 @@ class BridgeData:
     async def async_get_wifi(self):
         """Get dsl status."""
         wifi = await self.async_make_request(self.api.wifi.get_wifi)
-        return wifi.get("status", {}).get("Enable") == "true"
-
-    async def async_set_wifi(self, parameters):
-        """Set wifi."""
-        await self._hass.async_add_executor_job(self.api.wifi.set_wifi, **parameters)
+        return wifi.get("status", {}).get("Enable") == True
 
     async def async_reboot(self):
         """Turn on reboot."""

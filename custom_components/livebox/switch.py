@@ -71,9 +71,9 @@ class WifiSwitch(SwitchDevice):
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self._api.async_set_wifi(parameters)
+        await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self._api.async_set_wifi(parameters)
+        await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
