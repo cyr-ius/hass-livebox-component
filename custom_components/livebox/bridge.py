@@ -39,19 +39,20 @@ class BridgeData:
 
         try:
             await self._hass.async_add_executor_job(self.api.connect)
-        except AuthorizationError:
-            _LOGGER.error("Authentication Required.")
+        except AuthorizationError as e:
+            _LOGGER.error("Error Authorization ({}).".format(str(e)))
             raise AuthorizationError
-        except NotOpenError:
-            _LOGGER.error("Cannot Connect.")
+        except NotOpenError as e:
+            _LOGGER.error("Error Not open ({}).".format(str(e)))
             raise NotOpenError
-        except Exception as e:  # pylint: disable=broad-except
-            _LOGGER.error(f"Error unknown {e}")
-            raise LiveboxException(e)
+        except LiveboxException as e:
+            _LOGGER.error("Error Unknown ({}).".format(str(e)))
+            raise LiveboxException
 
-        perms = await self._hass.async_add_executor_job(self.api.get_permissions)
-        if perms is None:
-            _LOGGER.error("Insufficient Permissions.")
+        try:
+            await self._hass.async_add_executor_job(self.api.get_permissions)
+        except InsufficientPermissionsError as e:
+            _LOGGER.error("Error Insufficient Permissions ({}).".format(str(e)))
             raise InsufficientPermissionsError
 
     async def async_make_request(self, call_api, **kwargs):
@@ -129,7 +130,10 @@ class BridgeData:
 
     async def async_reboot(self):
         """Turn on reboot."""
-        await self._hass.async_add_executor_job(self.api.system.reboot)
+        try:
+            await self._hass.async_add_executor_job(self.api.system.reboot)
+        except LiveboxException as e:
+            _LOGGER.error("Error to restart ({})".format(str(e)))
 
 
 class LiveboxException(exceptions.HomeAssistantError):
