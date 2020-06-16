@@ -2,7 +2,8 @@
     "domain": "livebox",
     "name": "Orange Livebox",
     "config_flow": true,
-    "documentation": "https://www.home-assistant.io/integrations/livebox",
+    "documentation": "https://github.com/cyr-ius/hass-livebox-component",
+    "issue_tracker": "https://github.com/cyr-ius/hass-livebox-component/issues",
     "requirements": ["aiosysbus==0.1.7"],
     "dependencies": [],
     "codeowners": ["@cyr-ius"]
