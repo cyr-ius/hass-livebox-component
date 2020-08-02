@@ -18,7 +18,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     device_trackers = coordinator.data["devices"]
     entities = [
         LiveboxDeviceScannerEntity(key, box_id, coordinator)
-        for key, device in device_trackers.items() if "IPAddress" and "PhysAddress" in device
+        for key, device in device_trackers.items()
+        if "IPAddress" and "PhysAddress" in device
     ]
     async_add_entities(entities, True)
 
@@ -31,8 +32,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
         self.box_id = id
         self.coordinator = coordinator
         self.key = key
-        self._device = self.coordinator.data["devices"].get(self.key)
-        # self._retry = 0
+        self._device = self.coordinator.data.get("devices", {}).get(self.key, {})
 
     @property
     def name(self):
@@ -47,7 +47,10 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
-        return self.coordinator.data["devices"].get(self.key).get("Active") is True
+        return (
+            self.coordinator.data.get("devices", {}).get(self.key, {}).get("Active")
+            is True
+        )
 
     @property
     def source_type(self):
@@ -66,7 +69,7 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
-        _device = self.coordinator.data["devices"].get(self.key)
+        _device = self.coordinator.data["devices"].get(self.key, {})
         _attributs = {
             "ip_address": _device.get("IPAddress"),
             "first_seen": _device.get("FirstSeen"),
@@ -94,21 +97,3 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
     async def async_update(self) -> None:
         """Update WLED entity."""
         await self.coordinator.async_request_refresh()
-
-    # ~ @Throttle(SCAN_INTERVAL)
-    # ~ async def async_update(self):
-    # ~ """Handle polling."""
-    # ~ data_status = await self._bridge.async_get_device(self.unique_id)
-    # ~ if data_status:
-    # ~ self._device = data_status
-    # ~ if self._device.get("Active") is False and self._retry < 2:
-    # ~ self._retry += 1
-    # ~ self._device["Active"] = True
-    # ~ elif self._device.get("Active") is False and self._retry == 2:
-    # ~ self._device["Active"] = False
-    # ~ else:
-    # ~ self._retry = 0
-    # ~ self._device["Active"] = True
-    # ~ _LOGGER.debug(
-    # ~ f"Update {self.name} - {self.unique_id} - {self._retry} - {self._device['Active']}"
-    # ~ )
