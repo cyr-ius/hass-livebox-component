@@ -27,6 +27,8 @@ class BridgeData:
         if config_flow_data is not None:
             self.data_config = config_flow_data
         self.api = None
+        self.count_wired_devices = 0
+        self.count_wireless_devices = 0
 
     async def async_connect(self):
         """Connect at livebox."""
@@ -59,8 +61,12 @@ class BridgeData:
         """Make request for API."""
         try:
             response = await self._hass.async_add_executor_job(call_api, kwargs)
-            if response:
+            if response.get("errors", None) is not None:
+                _LOGGER.warning("Reconnect at box")
+                await self.async_connect()
+            elif response.get("status", None) is not None:
                 return response
+            return {}
         except Exception:  # pylint: disable=broad-except
             return {}
 
@@ -73,6 +79,8 @@ class BridgeData:
             "dsl_status": await self.async_get_dsl_status(),
             "wifi": await self.async_get_wifi(),
             "nmc": await self.async_get_nmc(),
+            "count_wired_devices": self.count_wired_devices,
+            "count_wireless_devices": self.count_wireless_devices,
         }
 
     async def async_get_devices(self):
@@ -88,12 +96,14 @@ class BridgeData:
             self.api.system.get_devices, **parameters
         )
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
+        self.count_wireless_devices = len(devices_status_wireless)
         for device in devices_status_wireless:
             if device.get("Key"):
                 devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if self.config_entry.options.get(CONF_LAN_TRACKING, False):
             devices_status_wired = devices.get("status", {}).get("eth", {})
+            self.count_wired_devices = len(devices_status_wired)
             for device in devices_status_wired:
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
@@ -126,7 +136,7 @@ class BridgeData:
     async def async_get_wifi(self):
         """Get dsl status."""
         wifi = await self.async_make_request(self.api.wifi.get_wifi)
-        return wifi.get("status", {}).get("Enable") == True
+        return wifi.get("status", {}).get("Enable") is True
 
     async def async_reboot(self):
         """Turn on reboot."""

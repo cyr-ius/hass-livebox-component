@@ -34,9 +34,11 @@ class WanStatus(BinarySensorEntity):
         """Return name sensor."""
         return f"{TEMPLATE_SENSOR} Wan status"
 
+    @property
     def is_on(self):
         """Return true if the binary sensor is on."""
-        return self.coordinator.data["wan_status"].get("status")
+        wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
+        return wstatus.get("WanState") == "up"
 
     @property
     def unique_id(self):
@@ -56,23 +58,20 @@ class WanStatus(BinarySensorEntity):
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
-        return {
-            "link_type": self.coordinator.data["wan_status"]
-            .get("data", {})
-            .get("LinkType"),
-            "link_state": self.coordinator.data["wan_status"]
-            .get("data", {})
-            .get("LinkState"),
-            "last_connection_error": self.coordinator.data["wan_status"]
-            .get("data", {})
-            .get("LastConnectionError"),
-            "wan_ipaddress": self.coordinator.data["wan_status"]
-            .get("data", {})
-            .get("IPAddress"),
-            "wan_ipv6address": self.coordinator.data["wan_status"]
-            .get("data", {})
-            .get("IPv6Address"),
+        wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
+        _attributs = {
+            "link_type": wstatus.get("LinkType"),
+            "link_state": wstatus.get("LinkState"),
+            "last_connection_error": wstatus.get("LastConnectionError"),
+            "wan_ipaddress": wstatus.get("IPAddress"),
+            "wan_ipv6address": wstatus.get("IPv6Address"),
         }
+        if (cwired := self.coordinator.data.get("count_wired_devices")) > 0:
+            _attributs.update({"wired clients": cwired})
+        if (cwireless := self.coordinator.data.get("count_wireless_devices")) > 0:
+            _attributs.update({"wired clients": cwireless})
+
+        return _attributs
 
     @property
     def available(self) -> bool:
@@ -86,10 +85,12 @@ class WanStatus(BinarySensorEntity):
 
     async def async_added_to_hass(self):
         """When entity is added to hass."""
+        await super().async_added_to_hass()
         self.coordinator.async_add_listener(self.async_write_ha_state)
 
     async def async_will_remove_from_hass(self):
         """When entity will be removed from hass."""
+        await super().async_will_remove_from_hass()
         self.coordinator.async_remove_listener(self.async_write_ha_state)
 
     async def async_update(self) -> None:
