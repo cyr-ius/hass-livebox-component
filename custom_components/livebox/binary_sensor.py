@@ -69,7 +69,7 @@ class WanStatus(BinarySensorEntity):
         if (cwired := self.coordinator.data.get("count_wired_devices")) > 0:
             _attributs.update({"wired clients": cwired})
         if (cwireless := self.coordinator.data.get("count_wireless_devices")) > 0:
-            _attributs.update({"wired clients": cwireless})
+            _attributs.update({"wireless clients": cwireless})
 
         return _attributs
 
