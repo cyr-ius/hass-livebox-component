@@ -1,0 +1,31 @@
+{
+    "config": {
+        "title": "Orange Livebox",
+        "step": {
+            "user": {
+                "title": "Sjekk liveboxen din",
+                "data": {
+                    "host": "IP Address",
+                    "port": "Port",
+                    "username": "Brukernavn",
+                    "password": "Passord"
+                }
+            }
+        },
+        "error": {
+            "login_inccorect": "Feil bruker eller passord",
+            "insufficient_permission": "Utilstrekkelig tillatelse.",
+            "unknown": "Det oppstod en ukjent feil",
+            "cannot_connect": "Kan ikke koble til liveboxen"
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Enhetssporing - Spor enheter på lan",
+                "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
+                "data": {"lan_tracking": "Kablet sporing"}
+            }
+        }
+    }
+}
