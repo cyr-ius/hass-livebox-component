@@ -3,12 +3,12 @@
     "title": "Orange Livebox",
     "step": {
       "user": {
-        "title": "Vérfication de votre livebox.",
+        "title": "Vérification de votre livebox.",
         "data": {
           "host": "Adresse IP",
           "port": "Port",
           "username": "Utilisateur",
-          "password": "Mot de pass"
+          "password": "Mot de passe"
         }
       }
     },
