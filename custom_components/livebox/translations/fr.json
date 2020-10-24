@@ -3,12 +3,16 @@
     "title": "Orange Livebox",
     "step": {
       "user": {
-        "title": "Vérfication de votre livebox.",
+        "title": "Vérification de votre livebox.",
         "data": {
           "host": "Adresse IP",
           "username": "Utilisateur",
+<<<<<<< HEAD
           "password": "Mot de passe",
           "port": "Port"
+=======
+          "password": "Mot de passe"
+>>>>>>> ef88031... Update fr.json
         }
       }
     },
