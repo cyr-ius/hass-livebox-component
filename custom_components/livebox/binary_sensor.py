@@ -66,10 +66,10 @@ class WanStatus(BinarySensorEntity):
             "wan_ipaddress": wstatus.get("IPAddress"),
             "wan_ipv6address": wstatus.get("IPv6Address"),
         }
-        if (cwired := self.coordinator.data.get("count_wired_devices")) > 0:
+        if (cwired = self.coordinator.data.get("count_wired_devices")) > 0:
             _attributs.update({"wired clients": cwired})
-        if (cwireless := self.coordinator.data.get("count_wireless_devices")) > 0:
-            _attributs.update({"wired clients": cwireless})
+        if (cwireless = self.coordinator.data.get("count_wireless_devices")) > 0:
+            _attributs.update({"wireless clients": cwireless})
 
         return _attributs
 
