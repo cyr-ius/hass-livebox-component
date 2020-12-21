@@ -6,9 +6,9 @@
                 "title": "Sjekk liveboxen din",
                 "data": {
                     "host": "IP Address",
-                    "port": "Port",
                     "username": "Brukernavn",
-                    "password": "Passord"
+                    "password": "Passord",
+                    "port": "Port"                    
                 }
             }
         },
@@ -21,10 +21,13 @@
     },
     "options": {
         "step": {
-            "user": {
+            "init": {
                 "title": "Enhetssporing - Spor enheter på lan",
                 "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
-                "data": {"lan_tracking": "Kablet sporing"}
+                "data": {
+                    "lan_tracking": "Kablet sporing",
+                    "timeout_tracking": "Tid før overvejelse om manglende udstyr"
+                }
             }
         }
     }
