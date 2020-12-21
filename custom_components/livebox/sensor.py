@@ -65,12 +65,7 @@ class FlowSensor(Entity):
     @property
     def device_info(self):
         """Return the device info."""
-        return {
-            "name": self.name,
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "manufacturer": TEMPLATE_SENSOR,
-            "via_device": (DOMAIN, self.box_id),
-        }
+        return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
     def device_state_attributes(self):

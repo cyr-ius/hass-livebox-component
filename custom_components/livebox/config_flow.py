@@ -1,23 +1,25 @@
 """Config flow to configure Livebox."""
 import logging
 
+import voluptuous as vol
 from aiosysbus.exceptions import (
     AuthorizationError,
     InsufficientPermissionsError,
     NotOpenError,
 )
-import voluptuous as vol
-
 from homeassistant import config_entries, core
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
+from homeassistant.helpers import config_validation as cv
 
 from .bridge import BridgeData, LiveboxException
 from .const import (
     CONF_LAN_TRACKING,
+    CONF_TRACKING_TIMEOUT,
     DEFAULT_HOST,
     DEFAULT_LAN_TRACKING,
     DEFAULT_PORT,
+    DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_USERNAME,
     DOMAIN,
 )
@@ -25,9 +27,9 @@ from .const import (
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST, default=DEFAULT_HOST): str,
-        vol.Required(CONF_PORT, default=DEFAULT_PORT): str,
         vol.Required(CONF_USERNAME, default=DEFAULT_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
+        vol.Required(CONF_PORT, default=DEFAULT_PORT): cv.port,
     }
 )
 
@@ -100,18 +102,22 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
         self._lan_tracking = self.config_entry.options.get(
             CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
         )
+        self._tracking_timeout = self.config_entry.options.get(
+            CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
+        )
 
     async def async_step_init(self, user_input=None):
-        """Manage the options."""
-        return await self.async_step_user()
-
-    async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-        OPTIONS_SCHEMA = vol.Schema(
-            {vol.Required(CONF_LAN_TRACKING, default=self._lan_tracking): bool}
+        options_schema = vol.Schema(
+            {
+                vol.Required(CONF_LAN_TRACKING, default=self._lan_tracking): bool,
+                vol.Required(
+                    CONF_TRACKING_TIMEOUT, default=self._tracking_timeout
+                ): int,
+            },
         )
 
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        return self.async_show_form(step_id="user", data_schema=OPTIONS_SCHEMA)
+        return self.async_show_form(step_id="init", data_schema=options_schema)

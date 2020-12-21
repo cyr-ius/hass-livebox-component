@@ -2,28 +2,31 @@
     "config": {
         "step": {
             "user": {
-                "title": "Register your Livebox",
+                "title": "[%key:components::livebox::config::step::user::title%]",
                 "data": {
-                    "host": "IP Address",
-                    "port": "Port",
-                    "username": "Username",
-                    "password": "Password"
+                    "host": "[%key:common::config_flow::data::host%]",
+                    "username": "[%key:common::config_flow::data::username%]",
+                    "password": "[%key:common::config_flow::data::password%]",
+                    "port": "[%key:common::config_flow::data::port%]"            
                 }
             }
         },
         "error": {
-            "login_inccorect": "User or password incorrect",
-            "insufficient_permission": "Insufficient permission.",
-            "unknown": "Unknown error occurred",
-            "cannot_connect": "Unable to connect to the Livebox"
+            "login_inccorect": "[%key:components::livebox::config::error::login_inccorect%]",
+            "insufficient_permission": "[%key:components::livebox::config::error::insufficient_permission%]",
+            "unknown": "[%key:common::config_flow::error::unknown%]",
+            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
         }
     },
     "options": {
         "step": {
-            "user": {
-                "title": "Device Tracking - Track devices on lan",
-                "description": "Tracking  yours wired devices in addition to wireless devices",
-                "data": {"lan_tracking": "Wired tracking"}
+            "init": {
+                "title": "[%key:components::livebox::options::step::init::title%]",
+                "description": "[%key:components::livebox::options::step::init::description%]",
+                "data": {
+                    "lan_tracking": "[%key:components::livebox::options::step::init::data::lan_tracking%]",
+                    "timeout_tracking": "[%key:components::livebox::options::step::init::data::timeout_tracking%]"
+                }
             }
         }
     }

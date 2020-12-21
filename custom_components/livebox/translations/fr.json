@@ -6,9 +6,9 @@
         "title": "Vérification de votre livebox.",
         "data": {
           "host": "Adresse IP",
-          "port": "Port",
           "username": "Utilisateur",
-          "password": "Mot de passe"
+          "password": "Mot de passe",
+          "port": "Port"
         }
       }
     },
@@ -21,11 +21,12 @@
   },
   "options": {
     "step": {
-        "user": {
+        "init": {
             "title": "Suivre les équipements filaires",
             "description": "Pour suivre les équipements filaires en plus des équipements Wifi",
             "data": {
-                "lan_tracking": "Equipements Filaires"
+                "lan_tracking": "Equipements Filaires",
+                "timeout_tracking": "Délai avant de considérer un équipement absent"
             }
         }
     }

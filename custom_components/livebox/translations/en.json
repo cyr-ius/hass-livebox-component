@@ -6,9 +6,9 @@
                 "title": "Check your livebox",
                 "data": {
                     "host": "IP Address",
-                    "port": "Port",
                     "username": "Username",
-                    "password": "Password"
+                    "password": "Password",
+                    "port": "Port"
                 }
             }
         },
@@ -21,10 +21,13 @@
     },
     "options": {
         "step": {
-            "user": {
+            "init": {
                 "title": "Device Tracking - Track devices on lan",
                 "description": "you want tracking  yours wired devices in addition to wireless devices",
-                "data": {"lan_tracking": "Wired tracking"}
+                "data": {
+                    "lan_tracking": "Wired tracking", 
+                    "timeout_tracking": "Timeout tracking"
+                }
             }
         }
     }
