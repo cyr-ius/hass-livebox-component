@@ -41,6 +41,8 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
+SCAN_INTERVAL = timedelta(minutes=1)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -67,7 +69,11 @@ async def async_setup_entry(hass, config_entry):
         return False
 
     coordinator = DataUpdateCoordinator(
-        hass, _LOGGER, name=DOMAIN, update_method=bridge.async_fetch_datas
+        hass,
+        _LOGGER,
+        name=DOMAIN,
+        update_method=bridge.async_fetch_datas,
+        update_interval=SCAN_INTERVAL,
     )
     await coordinator.async_refresh()
 
