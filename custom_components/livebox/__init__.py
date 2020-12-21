@@ -1,20 +1,21 @@
 """Orange Livebox."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import voluptuous as vol
-
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .bridge import BridgeData
 from .const import (
     COMPONENTS,
     CONF_LAN_TRACKING,
+    CONF_TRACKING_TIMEOUT,
     COORDINATOR,
     DEFAULT_HOST,
     DEFAULT_PORT,
@@ -40,8 +41,6 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
-SCAN_INTERVAL = timedelta(seconds=60)
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -50,7 +49,6 @@ async def async_setup(hass, config):
     hass.data.setdefault(DOMAIN, {})
 
     if not hass.config_entries.async_entries(DOMAIN) and DOMAIN in config:
-
         hass.async_create_task(
             hass.config_entries.flow.async_init(
                 DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
@@ -69,11 +67,7 @@ async def async_setup_entry(hass, config_entry):
         return False
 
     coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name="livebox",
-        update_method=bridge.async_fetch_datas,
-        update_interval=SCAN_INTERVAL,
+        hass, _LOGGER, name=DOMAIN, update_method=bridge.async_fetch_datas
     )
     await coordinator.async_refresh()
 
@@ -101,6 +95,7 @@ async def async_setup_entry(hass, config_entry):
         UNSUB_LISTENER: unsub_listener,
         COORDINATOR: coordinator,
         LIVEBOX_API: bridge.api,
+        CONF_TRACKING_TIMEOUT: config_entry.options.get(CONF_TRACKING_TIMEOUT, 0),
     }
 
     for component in COMPONENTS:
@@ -108,7 +103,7 @@ async def async_setup_entry(hass, config_entry):
             hass.config_entries.async_forward_entry_setup(config_entry, component)
         )
 
-    async def async_livebox_reboot(call):
+    async def async_livebox_reboot():
         """Handle reboot service call."""
         await bridge.async_reboot()
 
