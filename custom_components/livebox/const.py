@@ -15,6 +15,9 @@ DEFAULT_PORT = 80
 CONF_LAN_TRACKING = "lan_tracking"
 DEFAULT_LAN_TRACKING = False
 
+CONF_TRACKING_TIMEOUT = "timeout_tracking"
+DEFAULT_TRACKING_TIMEOUT = 300
+
 ATTR_SENSORS = {
     "down": {
         "name": "Orange Livebox Download speed",
