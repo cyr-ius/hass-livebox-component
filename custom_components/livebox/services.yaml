@@ -2,4 +2,4 @@
 
 reboot:
   # Description of the service
-  description: Reboots the Livebox.
+  description: Restart the Livebox.

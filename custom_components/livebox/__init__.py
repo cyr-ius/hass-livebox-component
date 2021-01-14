@@ -109,11 +109,13 @@ async def async_setup_entry(hass, config_entry):
             hass.config_entries.async_forward_entry_setup(config_entry, component)
         )
 
-    async def async_livebox_reboot():
+    async def async_livebox_reboot(call) -> None:  # pylint: disable=unused-argument
         """Handle reboot service call."""
         await bridge.async_reboot()
 
-    hass.services.async_register(DOMAIN, "reboot", async_livebox_reboot)
+    hass.services.async_register(
+        DOMAIN, "reboot", async_livebox_reboot, schema=vol.Schema({})
+    )
 
     return True
 
