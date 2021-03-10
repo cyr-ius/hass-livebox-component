@@ -6,5 +6,6 @@
     "issue_tracker": "https://github.com/cyr-ius/hass-livebox-component/issues",
     "requirements": ["aiosysbus==0.1.7"],
     "dependencies": [],
-    "codeowners": ["@cyr-ius"]
+    "codeowners": ["@cyr-ius"],
+    "version": "1.5.6"
 }
