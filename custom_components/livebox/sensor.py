@@ -1,7 +1,7 @@
 """Sensor for Livebox router."""
 import logging
 
-from homeassistant.helpers.entity import Entity
+from homeassistant.components.sensor import SensorEntity
 
 from .const import ATTR_SENSORS, COORDINATOR, DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR
 
@@ -24,7 +24,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         )
 
 
-class FlowSensor(Entity):
+class FlowSensor(SensorEntity):
     """Representation of a livebox sensor."""
 
     unit_of_measurement = "Mb/s"
@@ -68,7 +68,7 @@ class FlowSensor(Entity):
         return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs["attr"].items():
