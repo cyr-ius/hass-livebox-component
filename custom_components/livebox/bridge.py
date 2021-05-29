@@ -6,11 +6,11 @@ from aiosysbus.exceptions import (
     AuthorizationError,
     InsufficientPermissionsError,
     NotOpenError,
+    HttpRequestError,
+    LiveboxException,
 )
 
-from homeassistant import exceptions
-
-from .const import CONF_LAN_TRACKING
+from .const import CONF_LAN_TRACKING, CALLID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,28 +60,28 @@ class BridgeData:
     async def async_make_request(self, call_api, **kwargs):
         """Make request for API."""
         try:
-            response = await self._hass.async_add_executor_job(call_api, kwargs)
-            if response.get("errors", None) is not None:
-                _LOGGER.warning("Reconnect at box")
-                await self.async_connect()
-            elif response.get("status", None) is not None:
-                return response
+            return await self._hass.async_add_executor_job(call_api, kwargs)
+        except HttpRequestError as error:
+            _LOGGER.error("HTTP Request {}.".format(error))
             return {}
-        except Exception:  # pylint: disable=broad-except
+        except LiveboxException as error:
+            _LOGGER.error("Error Unknown ({}).".format(error))
             return {}
 
     async def async_fetch_datas(self):
         """Fetch datas."""
-        return {
+        datas = {
+            "cmissed": await self.async_get_caller_missed(),
             "devices": await self.async_get_devices(),
-            "infos": await self.async_get_infos(),
-            "wan_status": await self.async_get_wan_status(),
             "dsl_status": await self.async_get_dsl_status(),
-            "wifi": await self.async_get_wifi(),
+            "infos": await self.async_get_infos(),
             "nmc": await self.async_get_nmc(),
+            "wan_status": await self.async_get_wan_status(),
+            "wifi": await self.async_get_wifi(),
             "count_wired_devices": self.count_wired_devices,
             "count_wireless_devices": self.count_wireless_devices,
         }
+        return datas
 
     async def async_get_devices(self):
         """Get all devices."""
@@ -93,7 +93,7 @@ class BridgeData:
             }
         }
         devices = await self.async_make_request(
-            self.api.system.get_devices, **parameters
+            self.api.devices.get_devices, **parameters
         )
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
         self.count_wireless_devices = len(devices_status_wireless)
@@ -112,13 +112,31 @@ class BridgeData:
 
     async def async_get_infos(self):
         """Get router infos."""
-        infos = await self.async_make_request(self.api.system.get_deviceinfo)
+        infos = await self.async_make_request(self.api.deviceinfo.get_deviceinfo)
         return infos.get("status", {})
 
     async def async_get_wan_status(self):
         """Get status."""
-        wan_status = await self.async_make_request(self.api.system.get_WANStatus)
+        wan_status = await self.async_make_request(self.api.system.get_wanstatus)
         return wan_status
+
+    async def async_get_caller_missed(self):
+        """Get caller missed."""
+        cmisseds = []
+        calls = await self.async_make_request(
+            self.api.call.get_voiceapplication_calllist
+        )
+        for call in calls.get("status", {}):
+            if call["callType"] != "succeeded":
+                cmisseds.append(
+                    {
+                        "phone_number": call["remoteNumber"],
+                        "date": call["startTime"],
+                        "callId": call["callId"],
+                    }
+                )
+
+        return {"call missed": cmisseds}
 
     async def async_get_dsl_status(self):
         """Get dsl status."""
@@ -140,11 +158,11 @@ class BridgeData:
 
     async def async_reboot(self):
         """Turn on reboot."""
-        try:
-            await self._hass.async_add_executor_job(self.api.system.reboot)
-        except LiveboxException as e:
-            _LOGGER.error("Error to restart ({})".format(str(e)))
+        await self.async_make_request(self.api.system.reboot)
 
-
-class LiveboxException(exceptions.HomeAssistantError):
-    """Base class for Livebox exceptions."""
+    async def async_remove_cmissed(self, call) -> None:
+        """Remove call missed."""
+        await self.async_make_request(
+            self.api.call.get_voiceapplication_clearlist,
+            **{CALLID: call.data.get(CALLID)},
+        )

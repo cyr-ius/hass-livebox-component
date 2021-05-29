@@ -3,3 +3,11 @@
 reboot:
   # Description of the service
   description: Restart the Livebox.
+
+remove_call_missed:
+  description: Remove call missed
+  fields:
+    callId:
+      name: Call Id
+      description: ID of the call (information in the attribute field of the binary sensor). Value to put in quotation marks. If you omit so that it deletes all calls
+      example: '"666"'
