@@ -13,6 +13,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .bridge import BridgeData
 from .const import (
+    CALLID,
     COMPONENTS,
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
@@ -25,6 +26,8 @@ from .const import (
     LIVEBOX_ID,
     UNSUB_LISTENER,
 )
+
+CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -75,14 +78,10 @@ async def async_setup_entry(hass, config_entry):
         update_method=bridge.async_fetch_datas,
         update_interval=SCAN_INTERVAL,
     )
-    await coordinator.async_refresh()
+    await coordinator.async_config_entry_first_refresh()
 
-    if not coordinator.last_update_success:
+    if (infos := coordinator.data.get("infos")) is None:
         raise PlatformNotReady
-
-    infos = coordinator.data.get("infos")
-    if infos is None:
-        return False
 
     unsub_listener = config_entry.add_update_listener(update_listener)
 
@@ -109,12 +108,20 @@ async def async_setup_entry(hass, config_entry):
             hass.config_entries.async_forward_entry_setup(config_entry, component)
         )
 
-    async def async_livebox_restart(call) -> None:  # pylint: disable=unused-argument
+    async def async_box_restart(call) -> None:  # pylint: disable=unused-argument
         """Handle restart service call."""
         await bridge.async_reboot()
 
     hass.services.async_register(
-        DOMAIN, "reboot", async_livebox_restart, schema=vol.Schema({})
+        DOMAIN, "reboot", async_box_restart, schema=vol.Schema({})
+    )
+
+    async def async_remove_cmissed(call) -> None:
+        await bridge.async_remove_cmissed(call)
+        await coordinator.async_refresh()
+
+    hass.services.async_register(
+        DOMAIN, "remove_call_missed", async_remove_cmissed, schema=CALLMISSED_SCHEMA
     )
 
     return True
