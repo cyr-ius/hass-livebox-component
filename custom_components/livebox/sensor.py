@@ -1,9 +1,10 @@
 """Sensor for Livebox router."""
 import logging
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTR_SENSORS, COORDINATOR, DOMAIN, LIVEBOX_ID, TEMPLATE_SENSOR
+from .const import ATTR_SENSORS, COORDINATOR, DOMAIN, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         )
 
 
-class FlowSensor(SensorEntity):
+class FlowSensor(CoordinatorEntity, Entity):
     """Representation of a livebox sensor."""
 
     unit_of_measurement = "Mb/s"
@@ -58,11 +59,6 @@ class FlowSensor(SensorEntity):
         return None
 
     @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        return self.coordinator.last_update_success
-
-    @property
     def device_info(self):
         """Return the device info."""
         return {"identifiers": {(DOMAIN, self.box_id)}}
@@ -74,20 +70,3 @@ class FlowSensor(SensorEntity):
         for key, value in self._attributs["attr"].items():
             _attributs[key] = self.coordinator.data["dsl_status"].get(value)
         return _attributs
-
-    @property
-    def should_poll(self):
-        """No polling needed."""
-        return False
-
-    async def async_added_to_hass(self):
-        """When entity is added to hass."""
-        self.coordinator.async_add_listener(self.async_write_ha_state)
-
-    async def async_will_remove_from_hass(self):
-        """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(self.async_write_ha_state)
-
-    async def async_update(self) -> None:
-        """Update WLED entity."""
-        await self.coordinator.async_request_refresh()

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import CONF_TRACKING_TIMEOUT, COORDINATOR, DOMAIN, LIVEBOX_ID
 
@@ -26,7 +27,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(entities, True)
 
 
-class LiveboxDeviceScannerEntity(ScannerEntity):
+class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
     """Represent a tracked device."""
 
     def __init__(self, key, bridge_id, coordinator, timeout):
@@ -87,25 +88,3 @@ class LiveboxDeviceScannerEntity(ScannerEntity):
             "first_seen": _device.get("FirstSeen"),
         }
         return _attributs
-
-    @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        return self.coordinator.last_update_success
-
-    @property
-    def should_poll(self):
-        """No polling needed."""
-        return False
-
-    async def async_added_to_hass(self):
-        """When entity is added to hass."""
-        self.coordinator.async_add_listener(self.async_write_ha_state)
-
-    async def async_will_remove_from_hass(self):
-        """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(self.async_write_ha_state)
-
-    async def async_update(self) -> None:
-        """Update WLED entity."""
-        await self.coordinator.async_request_refresh()
