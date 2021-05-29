@@ -1,18 +1,28 @@
 """Config flow to configure Livebox."""
 import logging
+from urllib.parse import urlparse
 
 import voluptuous as vol
 from aiosysbus.exceptions import (
     AuthorizationError,
     InsufficientPermissionsError,
+    LiveboxException,
     NotOpenError,
 )
 from homeassistant import config_entries, core
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
+from homeassistant.components import ssdp
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_PORT,
+    CONF_UNIQUE_ID,
+    CONF_USERNAME,
+)
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 
-from .bridge import BridgeData, LiveboxException
+from .bridge import BridgeData
 from .const import (
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
@@ -51,10 +61,6 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
-
-    def __init__(self):
-        """Initialize the Livebox flow."""
 
     @staticmethod
     @callback
@@ -91,6 +97,17 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
+
+    async def async_step_ssdp(self, discovery_info):
+        """Handle a discovered Webostv device."""
+        user_input = {
+            CONF_HOST: urlparse(discovery_info[ssdp.ATTR_SSDP_LOCATION]).hostname,
+            CONF_NAME: discovery_info[ssdp.ATTR_UPNP_FRIENDLY_NAME],
+            CONF_UNIQUE_ID: discovery_info[ssdp.ATTR_UPNP_SERIAL_NUMBER],
+        }
+        self.context["title_placeholders"] = {"name": user_input[CONF_NAME]}
+        self._force_pairing = True
+        return await self.async_step_user(user_input)
 
 
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
