@@ -2,8 +2,9 @@
 import logging
 
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID, TEMPLATE_SENSOR
+from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities([WifiSwitch(coordinator, box_id, api)], True)
 
 
-class WifiSwitch(SwitchEntity):
+class WifiSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a livebox sensor."""
 
     def __init__(self, coordinator, box_id, api):
@@ -45,23 +46,6 @@ class WifiSwitch(SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data.get("wifi")
-
-    @property
-    def should_poll(self):
-        """No polling needed."""
-        return False
-
-    async def async_added_to_hass(self):
-        """When entity is added to hass."""
-        self.coordinator.async_add_listener(self.async_write_ha_state)
-
-    async def async_will_remove_from_hass(self):
-        """When entity will be removed from hass."""
-        self.coordinator.async_remove_listener(self.async_write_ha_state)
-
-    async def async_update(self) -> None:
-        """Update WLED entity."""
-        await self.coordinator.async_request_refresh()
 
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
