@@ -1,16 +1,20 @@
 """Collect datas information from livebox."""
 import logging
+from datetime import datetime
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AuthorizationError,
-    InsufficientPermissionsError,
-    NotOpenError,
     HttpRequestError,
+    InsufficientPermissionsError,
     LiveboxException,
+    NotOpenError,
 )
-
-from .const import CONF_LAN_TRACKING, CALLID
+from homeassistant.util.dt import (
+    UTC,
+    DEFAULT_TIME_ZONE,
+)
+from .const import CALLID, CONF_LAN_TRACKING
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,12 +130,15 @@ class BridgeData:
         calls = await self.async_make_request(
             self.api.call.get_voiceapplication_calllist
         )
+
         for call in calls.get("status", {}):
             if call["callType"] != "succeeded":
+                utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
+                local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
                 cmisseds.append(
                     {
                         "phone_number": call["remoteNumber"],
-                        "date": call["startTime"],
+                        "date": str(local_dt),
                         "callId": call["callId"],
                     }
                 )
