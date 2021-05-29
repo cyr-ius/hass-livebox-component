@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     box_id = datas[LIVEBOX_ID]
     coordinator = datas[COORDINATOR]
     nmc = coordinator.data["nmc"]
-    if "ETHERNET" not in nmc["WanMode"].upper():
+    if nmc.get("WanMode") is not None and "ETHERNET" not in nmc["WanMode"].upper():
         async_add_entities(
             [
                 FlowSensor(coordinator, box_id, "down"),
