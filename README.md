@@ -20,14 +20,7 @@ There is currently support for the following device types within Home Assistant:
 The preferred way to setup the Orange Livebox platform is by enabling the discovery component.
 Add your device via the Integration menu
 
-Otherwise, you can set it up manually in your `configuration.yaml` file:
-
-```yaml
-livebox:
-  host: 192.168.1.1
-  username: 'admin'
-  password: 'my-password'
-```
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=livebox)
 
 {% configuration %}
 host:
