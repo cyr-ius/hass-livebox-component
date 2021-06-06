@@ -100,7 +100,7 @@ class CallMissed(CoordinatorEntity, BinarySensorEntity):
     @property
     def is_on(self):
         """Return true if the binary sensor is on."""
-        return len(self.coordinator.data.get("cmissed")) > 0
+        return len(self.coordinator.data.get("cmissed").get("call missed")) > 0
 
     @property
     def device_info(self):
