@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-
+from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from .const import ATTR_SENSORS, COORDINATOR, DOMAIN, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
@@ -35,6 +35,11 @@ class FlowSensor(CoordinatorEntity, Entity):
         self.box_id = box_id
         self.coordinator = coordinator
         self._attributs = ATTR_SENSORS[flow_direction]
+
+    @property
+    def device_class(self):
+        """Return the class of this device."""
+        return STATE_CLASS_MEASUREMENT
 
     @property
     def name(self):
