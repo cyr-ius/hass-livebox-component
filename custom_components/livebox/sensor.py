@@ -37,7 +37,7 @@ class FlowSensor(CoordinatorEntity, Entity):
         self._attributs = ATTR_SENSORS[flow_direction]
 
     @property
-    def device_class(self):
+    def state_class(self):
         """Return the class of this device."""
         return STATE_CLASS_MEASUREMENT
 
