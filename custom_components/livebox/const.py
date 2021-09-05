@@ -19,26 +19,3 @@ DEFAULT_LAN_TRACKING = False
 
 CONF_TRACKING_TIMEOUT = "timeout_tracking"
 DEFAULT_TRACKING_TIMEOUT = 300
-
-ATTR_SENSORS = {
-    "down": {
-        "name": "Orange Livebox Download speed",
-        "current_rate": "DownstreamCurrRate",
-        "attr": {
-            "downstream_maxrate": "DownstreamMaxRate",
-            "downstream_lineattenuation": "DownstreamLineAttenuation",
-            "downstream_noisemargin": "DownstreamNoiseMargin",
-            "downstream_power": "DownstreamPower",
-        },
-    },
-    "up": {
-        "name": "Orange Livebox Upload speed",
-        "current_rate": "UpstreamCurrRate",
-        "attr": {
-            "upstream_maxrate": "UpstreamMaxRate",
-            "upstream_lineattenuation": "UpstreamLineAttenuation",
-            "upstream_noisemargin": "UpstreamNoiseMargin",
-            "upstream_power": "UpstreamPower",
-        },
-    },
-}
