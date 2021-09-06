@@ -1,4 +1,12 @@
 """Constants for the Livebox component."""
+from dataclasses import dataclass
+from typing import Final
+from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND
+from homeassistant.components.sensor import (
+    STATE_CLASS_MEASUREMENT,
+    SensorEntityDescription,
+)
+
 DOMAIN = "livebox"
 COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
@@ -19,3 +27,41 @@ DEFAULT_LAN_TRACKING = False
 
 CONF_TRACKING_TIMEOUT = "timeout_tracking"
 DEFAULT_TRACKING_TIMEOUT = 300
+
+
+@dataclass
+class FlowSensorEntityDescription(SensorEntityDescription):
+    """Represents an Flow Sensor."""
+
+    current_rate: str | None = None
+    attr: dict | None = None
+
+
+SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
+    FlowSensorEntityDescription(
+        key="down",
+        name="Orange Livebox Download speed",
+        current_rate="DownstreamCurrRate",
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        state_class=STATE_CLASS_MEASUREMENT,
+        attr={
+            "downstream_maxrate": "DownstreamMaxRate",
+            "downstream_lineattenuation": "DownstreamLineAttenuation",
+            "downstream_noisemargin": "DownstreamNoiseMargin",
+            "downstream_power": "DownstreamPower",
+        },
+    ),
+    FlowSensorEntityDescription(
+        key="up",
+        name="Orange Livebox Upload speed",
+        current_rate="UpstreamCurrRate",
+        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
+        state_class=STATE_CLASS_MEASUREMENT,
+        attr={
+            "upstream_maxrate": "UpstreamMaxRate",
+            "upstream_lineattenuation": "UpstreamLineAttenuation",
+            "upstream_noisemargin": "UpstreamNoiseMargin",
+            "upstream_power": "UpstreamPower",
+        },
+    ),
+)
