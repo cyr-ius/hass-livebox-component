@@ -1,4 +1,6 @@
 """Constants for the Livebox component."""
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Final
 from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND
