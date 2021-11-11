@@ -26,28 +26,20 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class WanStatus(CoordinatorEntity, BinarySensorEntity):
     """Wan status sensor."""
 
-    device_class = DEVICE_CLASS_CONNECTIVITY
+    _attr_device_class = DEVICE_CLASS_CONNECTIVITY
+    _attr_name = "WAN Status"
 
     def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
         self.box_id = box_id
+        self._attr_unique_id = f"{self.box_id}_connectivity"
         self.coordinator = coordinator
-
-    @property
-    def name(self):
-        """Return name sensor."""
-        return "WAN Status"
 
     @property
     def is_on(self):
         """Return true if the binary sensor is on."""
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         return wstatus.get("WanState") == "up"
-
-    @property
-    def unique_id(self):
-        """Return unique_id."""
-        return f"{self.box_id}_connectivity"
 
     @property
     def device_info(self):
@@ -82,20 +74,13 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
 class CallMissed(CoordinatorEntity, BinarySensorEntity):
     """Call missed sensor."""
 
+    _attr_name = "Call missed"
+
     def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
         self.box_id = box_id
+        self._attr_unique_id = f"{self.box_id}_callmissed"
         self.coordinator = coordinator
-
-    @property
-    def unique_id(self):
-        """Return unique_id."""
-        return f"{self.box_id}_callmissed"
-
-    @property
-    def name(self):
-        """Return name sensor."""
-        return "Call missed"
 
     @property
     def is_on(self):
