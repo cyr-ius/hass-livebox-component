@@ -30,6 +30,11 @@ DEFAULT_LAN_TRACKING = False
 CONF_TRACKING_TIMEOUT = "timeout_tracking"
 DEFAULT_TRACKING_TIMEOUT = 300
 
+UPLOAD_ICON = "mdi:upload-network"
+DOWNLOAD_ICON = "mdi:download-network"
+MISSED_ICON = "mdi:phone-alert"
+RESTART_ICON = "mdi:restart-alert"
+
 
 @dataclass
 class FlowSensorEntityDescription(SensorEntityDescription):
@@ -43,6 +48,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     FlowSensorEntityDescription(
         key="down",
         name="Orange Livebox Download speed",
+        icon=DOWNLOAD_ICON,
         current_rate="DownstreamCurrRate",
         native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
         state_class=STATE_CLASS_MEASUREMENT,
@@ -56,6 +62,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     FlowSensorEntityDescription(
         key="up",
         name="Orange Livebox Upload speed",
+        icon=UPLOAD_ICON,
         current_rate="UpstreamCurrRate",
         native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
         state_class=STATE_CLASS_MEASUREMENT,

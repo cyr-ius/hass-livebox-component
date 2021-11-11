@@ -6,9 +6,9 @@ from homeassistant.components.binary_sensor import (
     DEVICE_CLASS_CONNECTIVITY,
     BinarySensorEntity,
 )
+from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-
-from .const import COORDINATOR, DOMAIN, LIVEBOX_ID
+from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, MISSED_ICON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
     """Wan status sensor."""
 
     _attr_device_class = DEVICE_CLASS_CONNECTIVITY
+    _attr_entity_category = ENTITY_CATEGORY_DIAGNOSTIC
     _attr_name = "WAN Status"
 
     def __init__(self, coordinator, box_id):
@@ -75,6 +76,7 @@ class CallMissed(CoordinatorEntity, BinarySensorEntity):
     """Call missed sensor."""
 
     _attr_name = "Call missed"
+    _attr_icon = MISSED_ICON
 
     def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
