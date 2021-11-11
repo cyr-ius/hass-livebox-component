@@ -1,5 +1,4 @@
 """Orange Livebox."""
-import asyncio
 import logging
 from datetime import timedelta
 
@@ -105,7 +104,6 @@ async def async_setup_entry(hass, config_entry):
 
     hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
 
-
     async def async_box_restart(call) -> None:  # pylint: disable=unused-argument
         """Handle restart service call."""
         await bridge.async_reboot()
@@ -127,7 +125,9 @@ async def async_setup_entry(hass, config_entry):
 
 async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
     hass.data[DOMAIN][config_entry.entry_id][UNSUB_LISTENER]()
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
