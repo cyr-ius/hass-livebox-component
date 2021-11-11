@@ -34,26 +34,19 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
         """Initialize the device tracker."""
         self.box_id = bridge_id
         self.coordinator = coordinator
-        self.key = key
-        self._device = self.coordinator.data.get("devices", {}).get(self.key, {})
+
+        self._device = self.coordinator.data.get("devices", {}).get(key, {})
         self._timeout_tracking = timeout
         self._old_status = datetime.today()
 
-    @property
-    def name(self):
-        """Return Entity's default name."""
-        return self._device.get("Name")
-
-    @property
-    def unique_id(self):
-        """Return a unique ID."""
-        return self.key
+        self._attr_name = self._device.get("Name")
+        self._attr_unique_id = key
 
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
         status = (
-            self.coordinator.data.get("devices", {}).get(self.key, {}).get("Active")
+            self.coordinator.data.get("devices", {}).get(self.unique_id, {}).get("Active")
         )
         if status is True:
             self._old_status = datetime.today() + timedelta(
@@ -82,7 +75,7 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
     @property
     def device_state_attributes(self):
         """Return the device state attributes."""
-        _device = self.coordinator.data["devices"].get(self.key, {})
+        _device = self.coordinator.data["devices"].get(self.unique_id, {})
         _attributs = {
             "ip_address": _device.get("IPAddress"),
             "first_seen": _device.get("FirstSeen"),

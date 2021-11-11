@@ -21,21 +21,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class WifiSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a livebox sensor."""
 
+    _attr_name = "Wifi switch"
+
     def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""
         self.coordinator = coordinator
         self.box_id = box_id
         self._api = api
-
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return "Wifi switch"
-
-    @property
-    def unique_id(self):
-        """Return unique_id."""
-        return f"{self.box_id}_wifi"
+        self._attr_unique_id = f"{self.box_id}_wifi"
 
     @property
     def device_info(self):
