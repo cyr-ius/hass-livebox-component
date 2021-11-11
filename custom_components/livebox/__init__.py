@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .bridge import BridgeData
 from .const import (
     CALLID,
-    COMPONENTS,
+    PLATFORMS,
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     COORDINATOR,
@@ -103,10 +103,8 @@ async def async_setup_entry(hass, config_entry):
         CONF_TRACKING_TIMEOUT: config_entry.options.get(CONF_TRACKING_TIMEOUT, 0),
     }
 
-    for component in COMPONENTS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(config_entry, component)
-        )
+    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+
 
     async def async_box_restart(call) -> None:  # pylint: disable=unused-argument
         """Handle restart service call."""
@@ -129,17 +127,8 @@ async def async_setup_entry(hass, config_entry):
 
 async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(config_entry, component)
-                for component in COMPONENTS
-            ]
-        )
-    )
-
+    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
     hass.data[DOMAIN][config_entry.entry_id][UNSUB_LISTENER]()
-
     if unload_ok:
         hass.data[DOMAIN].pop(config_entry.entry_id)
 
