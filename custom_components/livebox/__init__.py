@@ -92,6 +92,9 @@ async def async_setup_entry(hass, config_entry):
         name=infos.get("ProductClass"),
         model=infos.get("ModelName"),
         sw_version=infos.get("SoftwareVersion"),
+        configuration_url="http://{}:{}".format(
+            config_entry.data.get("host"), config_entry.data.get("port")
+        ),
     )
 
     hass.data[DOMAIN][config_entry.entry_id] = {
