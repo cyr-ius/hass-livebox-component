@@ -14,7 +14,8 @@ COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
 LIVEBOX_ID = "id"
 LIVEBOX_API = "api"
-PLATFORMS = ["sensor", "binary_sensor", "device_tracker", "switch", "button"]
+BASE_PLATFORMS = ["sensor", "binary_sensor", "device_tracker", "switch"]
+ALL_PLATFORMS = [*BASE_PLATFORMS, "button"]
 
 TEMPLATE_SENSOR = "Orange Livebox"
 
