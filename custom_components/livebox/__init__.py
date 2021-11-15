@@ -2,9 +2,15 @@
 import logging
 from datetime import timedelta
 
+from awesomeversion import AwesomeVersion
 import voluptuous as vol
 from homeassistant.config_entries import SOURCE_IMPORT
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_PORT, CONF_USERNAME,
+    __version__ as HA_VERSION
+)
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
@@ -13,7 +19,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .bridge import BridgeData
 from .const import (
     CALLID,
-    PLATFORMS,
+    ALL_PLATFORMS,
+    BASE_PLATFORMS,
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     COORDINATOR,
@@ -44,6 +51,8 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 SCAN_INTERVAL = timedelta(minutes=1)
+
+HOMEASSISTANT = AwesomeVersion(HA_VERSION)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -105,7 +114,9 @@ async def async_setup_entry(hass, config_entry):
         CONF_TRACKING_TIMEOUT: config_entry.options.get(CONF_TRACKING_TIMEOUT, 0),
     }
 
-    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+    hass.config_entries.async_setup_platforms(
+        config_entry, ALL_PLATFORMS if HOMEASSISTANT >= "2021.12.b0" else BASE_PLATFORMS,
+        )
 
     async def async_box_restart(call) -> None:  # pylint: disable=unused-argument
         """Handle restart service call."""
@@ -129,7 +140,8 @@ async def async_setup_entry(hass, config_entry):
 async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
+        config_entry, 
+        ALL_PLATFORMS if HOMEASSISTANT >= "2021.12.b0" else BASE_PLATFORMS,
     )
     hass.data[DOMAIN][config_entry.entry_id][UNSUB_LISTENER]()
     if unload_ok:
