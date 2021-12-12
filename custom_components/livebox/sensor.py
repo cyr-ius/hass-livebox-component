@@ -60,7 +60,7 @@ class FlowSensor(CoordinatorEntity, SensorEntity):
         return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         _attributs = {}
         for key, value in self._attributs.items():
