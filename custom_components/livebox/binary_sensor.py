@@ -3,8 +3,8 @@ import logging
 from datetime import datetime, timedelta
 
 from homeassistant.components.binary_sensor import (
-    DEVICE_CLASS_CONNECTIVITY,
     BinarySensorEntity,
+    BinarySensorDeviceClass,
 )
 from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -26,7 +26,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class WanStatus(CoordinatorEntity, BinarySensorEntity):
     """Wan status sensor."""
 
-    _attr_device_class = DEVICE_CLASS_CONNECTIVITY
+    _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = ENTITY_CATEGORY_DIAGNOSTIC
     _attr_name = "WAN Status"
 
