@@ -48,7 +48,7 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
         return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         uptime = datetime.today() - timedelta(
@@ -95,6 +95,6 @@ class CallMissed(CoordinatorEntity, BinarySensorEntity):
         return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return attributs."""
         return self.coordinator.data.get("cmissed")
