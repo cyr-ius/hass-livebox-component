@@ -73,7 +73,7 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
         }
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         _device = self.coordinator.data["devices"].get(self.unique_id, {})
         _attributs = {
