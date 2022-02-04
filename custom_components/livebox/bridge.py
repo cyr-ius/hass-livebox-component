@@ -163,10 +163,6 @@ class BridgeData:
         wifi = await self.async_make_request(self.api.wifi.get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
-    async def async_reboot(self):
-        """Turn on reboot."""
-        await self.async_make_request(self.api.system.reboot)
-
     async def async_remove_cmissed(self, call) -> None:
         """Remove call missed."""
         await self.async_make_request(
