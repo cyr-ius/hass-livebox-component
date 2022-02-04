@@ -34,19 +34,28 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
         """Initialize the device tracker."""
         self.box_id = bridge_id
         self.coordinator = coordinator
-
+        self.key = key
         self._device = self.coordinator.data.get("devices", {}).get(key, {})
         self._timeout_tracking = timeout
         self._old_status = datetime.today()
 
-        self._attr_name = self._device.get("Name")
-        self._attr_unique_id = key
+    @property
+    def name(self):
+        """Return name of device."""
+        return self._device.get("Name")
+
+    @property
+    def unique_id(self):
+        """Return unique_id."""
+        return self.key
 
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
         status = (
-            self.coordinator.data.get("devices", {}).get(self.unique_id, {}).get("Active")
+            self.coordinator.data.get("devices", {})
+            .get(self.unique_id, {})
+            .get("Active")
         )
         if status is True:
             self._old_status = datetime.today() + timedelta(
@@ -64,6 +73,17 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
         return SOURCE_TYPE_ROUTER
 
     @property
+    def ip_address(self):
+        """Return ip address."""
+        device = self.coordinator.data["devices"].get(self.unique_id, {})
+        return device.get("IPAddress")
+
+    @property
+    def mac_address(self):
+        """Return mac address."""
+        return self.key
+
+    @property
     def device_info(self):
         """Return the device info."""
         return {
@@ -75,9 +95,6 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
     @property
     def extra_state_attributes(self):
         """Return the device state attributes."""
-        _device = self.coordinator.data["devices"].get(self.unique_id, {})
-        _attributs = {
-            "ip_address": _device.get("IPAddress"),
-            "first_seen": _device.get("FirstSeen"),
+        return {
+            "first_seen": self._device.get("FirstSeen"),
         }
-        return _attributs
