@@ -107,14 +107,6 @@ async def async_setup_entry(hass, config_entry):
 
     hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
 
-    async def async_box_restart(call) -> None:  # pylint: disable=unused-argument
-        """Handle restart service call."""
-        await bridge.async_reboot()
-
-    hass.services.async_register(
-        DOMAIN, "reboot", async_box_restart, schema=vol.Schema({})
-    )
-
     async def async_remove_cmissed(call) -> None:
         await bridge.async_remove_cmissed(call)
         await coordinator.async_refresh()
