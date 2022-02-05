@@ -1,7 +1,7 @@
 
 # Orange Livebox Router
 
-This a *custom component* for [Home Assistant](https://www.home-assistant.io/). 
+This a *custom component* for [Home Assistant](https://www.home-assistant.io/).
 The `livebox` integration allows you to observe and control [Livebox router](http://www.orange.fr/).
 
 There is currently support for the following device types within Home Assistant:
