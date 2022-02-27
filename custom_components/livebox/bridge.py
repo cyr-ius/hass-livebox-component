@@ -45,36 +45,35 @@ class BridgeData:
 
         try:
             await self._hass.async_add_executor_job(self.api.connect)
-        except AuthorizationError as e:
-            _LOGGER.error("Error Authorization ({}).".format(str(e)))
-            raise AuthorizationError
-        except NotOpenError as e:
-            _LOGGER.error("Error Not open ({}).".format(str(e)))
-            raise NotOpenError
-        except LiveboxException as e:
-            _LOGGER.error("Error Unknown ({}).".format(str(e)))
-            raise LiveboxException
+        except AuthorizationError as error:
+            _LOGGER.error("Error Authorization (%s)", error)
+            raise AuthorizationError from error
+        except NotOpenError as error:
+            _LOGGER.error("Error Not open (%s)", error)
+            raise NotOpenError from error
+        except LiveboxException as error:
+            _LOGGER.error("Error Unknown (%s)", error)
+            raise LiveboxException from error
 
         try:
             await self._hass.async_add_executor_job(self.api.get_permissions)
-        except InsufficientPermissionsError as e:
-            _LOGGER.error("Error Insufficient Permissions ({}).".format(str(e)))
-            raise InsufficientPermissionsError
+        except InsufficientPermissionsError as error:
+            _LOGGER.error("Error Insufficient Permissions (%s)", error)
+            raise InsufficientPermissionsError from error
 
     async def async_make_request(self, call_api, **kwargs):
         """Make request for API."""
         try:
             return await self._hass.async_add_executor_job(call_api, kwargs)
         except HttpRequestError as error:
-            _LOGGER.error("HTTP Request {}.".format(error))
-            return {}
+            _LOGGER.error("HTTP Request (%s)", error)
         except LiveboxException as error:
-            _LOGGER.error("Error Unknown ({}).".format(error))
-            return {}
+            _LOGGER.error("Error Unknown (%s)", error)
+        return {}
 
     async def async_fetch_datas(self):
         """Fetch datas."""
-        datas = {
+        return {
             "cmissed": await self.async_get_caller_missed(),
             "devices": await self.async_get_devices(),
             "dsl_status": await self.async_get_dsl_status(),
@@ -85,7 +84,6 @@ class BridgeData:
             "count_wired_devices": self.count_wired_devices,
             "count_wireless_devices": self.count_wireless_devices,
         }
-        return datas
 
     async def async_get_devices(self):
         """Get all devices."""
