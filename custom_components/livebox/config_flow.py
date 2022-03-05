@@ -11,6 +11,7 @@ from aiosysbus.exceptions import (
 )
 from homeassistant import config_entries, core
 from homeassistant.components import ssdp
+from homeassistant.components.ssdp import ATTR_SSDP_UDN, ATTR_SSDP_USN
 from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
@@ -75,7 +76,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
-        if user_input is not None:
+        if user_input is not None and user_input.get(CONF_USERNAME) is not None:
             try:
                 infos = await validate_input(self.hass, user_input)
                 await self.async_set_unique_id(infos["SerialNumber"])
@@ -99,14 +100,20 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_ssdp(self, discovery_info):
-        """Handle a discovered Webostv device."""
+        """Handle a discovered device."""
+        hostname = urlparse(discovery_info.ssdp_location).hostname
+        friendly_name = discovery_info.upnp[ssdp.ATTR_UPNP_FRIENDLY_NAME]
+        unique_id = discovery_info.upnp[ssdp.ATTR_UPNP_SERIAL]
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
+
         user_input = {
-            CONF_HOST: urlparse(discovery_info[ssdp.ATTR_SSDP_LOCATION]).hostname,
-            CONF_NAME: discovery_info[ssdp.ATTR_UPNP_FRIENDLY_NAME],
-            CONF_UNIQUE_ID: discovery_info[ssdp.ATTR_UPNP_SERIAL_NUMBER],
+            CONF_HOST: hostname,
+            CONF_NAME: friendly_name,
+            CONF_UNIQUE_ID: unique_id,
+            ATTR_SSDP_USN: discovery_info.ssdp_usn,
+            ATTR_SSDP_UDN: discovery_info.ssdp_udn,
         }
-        self.context["title_placeholders"] = {"name": user_input[CONF_NAME]}
-        self._force_pairing = True
         return await self.async_step_user(user_input)
 
 
