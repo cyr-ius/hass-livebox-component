@@ -6,7 +6,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorDeviceClass,
 )
-from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, MISSED_ICON
 
@@ -27,7 +27,7 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
     """Wan status sensor."""
 
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
-    _attr_entity_category = ENTITY_CATEGORY_DIAGNOSTIC
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_name = "WAN Status"
 
     def __init__(self, coordinator, box_id):
