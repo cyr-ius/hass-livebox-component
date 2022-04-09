@@ -3,8 +3,10 @@ import logging
 from datetime import timedelta
 
 import voluptuous as vol
+from aiosysbus.exceptions import LiveboxException
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
@@ -13,7 +15,6 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .bridge import BridgeData
 from .const import (
     CALLID,
-    PLATFORMS,
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     COORDINATOR,
@@ -23,6 +24,7 @@ from .const import (
     DOMAIN,
     LIVEBOX_API,
     LIVEBOX_ID,
+    PLATFORMS,
     UNSUB_LISTENER,
 )
 
@@ -64,19 +66,7 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, config_entry):
     """Set up Livebox as config entry."""
-    bridge = BridgeData(hass, config_entry)
-    try:
-        await bridge.async_connect()
-    except Exception:  # pylint: disable=broad-except
-        return False
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name=DOMAIN,
-        update_method=bridge.async_fetch_datas,
-        update_interval=SCAN_INTERVAL,
-    )
+    coordinator = LiveboxDataUpdateCoordinator(hass, config_entry)
     await coordinator.async_config_entry_first_refresh()
 
     if (infos := coordinator.data.get("infos")) is None:
@@ -101,14 +91,14 @@ async def async_setup_entry(hass, config_entry):
         LIVEBOX_ID: config_entry.unique_id,
         UNSUB_LISTENER: unsub_listener,
         COORDINATOR: coordinator,
-        LIVEBOX_API: bridge.api,
+        LIVEBOX_API: coordinator.bridge.api,
         CONF_TRACKING_TIMEOUT: config_entry.options.get(CONF_TRACKING_TIMEOUT, 0),
     }
 
     hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
 
     async def async_remove_cmissed(call) -> None:
-        await bridge.async_remove_cmissed(call)
+        await coordinator.bridge.async_remove_cmissed(call)
         await coordinator.async_refresh()
 
     hass.services.async_register(
@@ -133,3 +123,37 @@ async def async_unload_entry(hass, config_entry):
 async def update_listener(hass, config_entry):
     """Reload device tracker if change option."""
     await hass.config_entries.async_reload(config_entry.entry_id)
+
+
+class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
+    """Define an object to fetch datas."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        config_entry,
+    ) -> None:
+        """Class to manage fetching data API."""
+        self.bridge = BridgeData(hass)
+        self.config_entry = config_entry
+        self.api = None
+        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
+
+    async def _async_update_data(self) -> dict:
+        """Fetch datas."""
+        try:
+            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
+            self.api = await self.bridge.async_connect(**self.config_entry.data)
+            return {
+                "cmissed": await self.bridge.async_get_caller_missed(),
+                "devices": await self.bridge.async_get_devices(lan_tracking),
+                "dsl_status": await self.bridge.async_get_dsl_status(),
+                "infos": await self.bridge.async_get_infos(),
+                "nmc": await self.bridge.async_get_nmc(),
+                "wan_status": await self.bridge.async_get_wan_status(),
+                "wifi": await self.bridge.async_get_wifi(),
+                "count_wired_devices": self.bridge.count_wired_devices,
+                "count_wireless_devices": self.bridge.count_wireless_devices,
+            }
+        except LiveboxException as error:
+            raise LiveboxException(error) from error

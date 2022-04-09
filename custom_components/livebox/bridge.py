@@ -22,29 +22,25 @@ _LOGGER = logging.getLogger(__name__)
 class BridgeData:
     """Simplification of API calls."""
 
-    def __init__(self, hass, config_entry=None, config_flow_data=None):
+    def __init__(self, hass):
         """Init parameters."""
-        self._hass = hass
-        self.config_entry = config_entry
-        if config_entry is not None:
-            self.data_config = config_entry.data
-        if config_flow_data is not None:
-            self.data_config = config_flow_data
+        self.hass = hass
         self.api = None
         self.count_wired_devices = 0
         self.count_wireless_devices = 0
 
-    async def async_connect(self):
+    async def async_connect(self, **kwargs):
         """Connect at livebox."""
         self.api = AIOSysbus(
-            username=self.data_config["username"],
-            password=self.data_config["password"],
-            host=self.data_config["host"],
-            port=self.data_config["port"],
+            username=kwargs.get("username"),
+            password=kwargs.get("password"),
+            host=kwargs.get("host"),
+            port=kwargs.get("port"),
         )
 
         try:
-            await self._hass.async_add_executor_job(self.api.connect)
+            await self.hass.async_add_executor_job(self.api.connect)
+            await self.hass.async_add_executor_job(self.api.get_permissions)
         except AuthorizationError as error:
             _LOGGER.error("Error Authorization (%s)", error)
             raise AuthorizationError from error
@@ -54,9 +50,6 @@ class BridgeData:
         except LiveboxException as error:
             _LOGGER.error("Error Unknown (%s)", error)
             raise LiveboxException from error
-
-        try:
-            await self._hass.async_add_executor_job(self.api.get_permissions)
         except InsufficientPermissionsError as error:
             _LOGGER.error("Error Insufficient Permissions (%s)", error)
             raise InsufficientPermissionsError from error
@@ -64,28 +57,15 @@ class BridgeData:
     async def async_make_request(self, call_api, **kwargs):
         """Make request for API."""
         try:
-            return await self._hass.async_add_executor_job(call_api, kwargs)
+            return await self.hass.async_add_executor_job(call_api, kwargs)
         except HttpRequestError as error:
             _LOGGER.error("HTTP Request (%s)", error)
+            raise LiveboxException from error
         except LiveboxException as error:
             _LOGGER.error("Error Unknown (%s)", error)
-        return {}
+            raise LiveboxException from error
 
-    async def async_fetch_datas(self):
-        """Fetch datas."""
-        return {
-            "cmissed": await self.async_get_caller_missed(),
-            "devices": await self.async_get_devices(),
-            "dsl_status": await self.async_get_dsl_status(),
-            "infos": await self.async_get_infos(),
-            "nmc": await self.async_get_nmc(),
-            "wan_status": await self.async_get_wan_status(),
-            "wifi": await self.async_get_wifi(),
-            "count_wired_devices": self.count_wired_devices,
-            "count_wireless_devices": self.count_wireless_devices,
-        }
-
-    async def async_get_devices(self):
+    async def async_get_devices(self, lan_tracking=False):
         """Get all devices."""
         devices_tracker = {}
         parameters = {
@@ -103,7 +83,7 @@ class BridgeData:
             if device.get("Key"):
                 devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
-        if self.config_entry.options.get(CONF_LAN_TRACKING, False):
+        if lan_tracking:
             devices_status_wired = devices.get("status", {}).get("eth", {})
             self.count_wired_devices = len(devices_status_wired)
             for device in devices_status_wired:
