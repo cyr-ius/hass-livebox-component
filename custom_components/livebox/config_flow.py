@@ -47,17 +47,6 @@ DATA_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(hass: core.HomeAssistant, data):
-    """Validate the user input allows us to connect.
-
-    Data has the keys from DATA_SCHEMA with values provided by the user.
-    """
-    bridge = BridgeData(hass=hass, config_flow_data=data)
-    await bridge.async_connect()
-
-    return await bridge.async_get_infos()
-
-
 class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
 
@@ -78,7 +67,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None and user_input.get(CONF_USERNAME) is not None:
             try:
-                infos = await validate_input(self.hass, user_input)
+                bridge = BridgeData(self.hass)
+                await bridge.async_connect(**user_input)
+                infos = await bridge.async_get_infos()
                 await self.async_set_unique_id(infos["SerialNumber"])
                 self._abort_if_unique_id_configured()
             except AuthorizationError:
