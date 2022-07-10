@@ -1,6 +1,6 @@
 {
   "name": "Orange Livebox routeur",
   "country": "FR",
-  "domains": ["device_tracker", "sensor", "binary_sensor", "switch"],
-  "homeassistant": "0.109"
+  "homeassistant": "0.109",
+  "render_readme": true
 }
