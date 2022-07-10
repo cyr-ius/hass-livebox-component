@@ -23,14 +23,9 @@ class RestartButton(ButtonEntity):
 
     def __init__(self, box_id, api):
         """Initialize the sensor."""
-        self.box_id = box_id
         self._api = api
         self._attr_unique_id = f"{self.box_id}_restart"
-
-    @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     async def async_press(self) -> None:
         """Handle the button press."""
@@ -45,14 +40,9 @@ class RingButton(ButtonEntity):
 
     def __init__(self, box_id, api):
         """Initialize the sensor."""
-        self.box_id = box_id
         self._api = api
-        self._attr_unique_id = f"{self.box_id}_ring"
-
-    @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
+        self._attr_unique_id = f"{box_id}_ring"
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     async def async_press(self) -> None:
         """Handle the button press."""

@@ -32,9 +32,9 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
 
     def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
-        self.box_id = box_id
-        self._attr_unique_id = f"{self.box_id}_connectivity"
-        self.coordinator = coordinator
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{box_id}_connectivity"
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     @property
     def is_on(self):
@@ -42,10 +42,6 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         return wstatus.get("WanState") == "up"
 
-    @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
     def extra_state_attributes(self):
@@ -80,19 +76,15 @@ class CallMissed(CoordinatorEntity, BinarySensorEntity):
 
     def __init__(self, coordinator, box_id):
         """Initialize the sensor."""
-        self.box_id = box_id
-        self._attr_unique_id = f"{self.box_id}_callmissed"
-        self.coordinator = coordinator
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{box_id}_callmissed"
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+
 
     @property
     def is_on(self):
         """Return true if the binary sensor is on."""
         return len(self.coordinator.data.get("cmissed").get("call missed")) > 0
-
-    @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
 
     @property
     def extra_state_attributes(self):

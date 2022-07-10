@@ -32,22 +32,16 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
 
     def __init__(self, key, bridge_id, coordinator, timeout):
         """Initialize the device tracker."""
+        super().__init__(coordinator)
         self.box_id = bridge_id
-        self.coordinator = coordinator
         self.key = key
-        self._device = self.coordinator.data.get("devices", {}).get(key, {})
+        self._device = coordinator.data.get("devices", {}).get(key, {})
         self._timeout_tracking = timeout
         self._old_status = datetime.today()
 
-    @property
-    def name(self):
-        """Return name of device."""
-        return self._device.get("Name")
+        self._attr_name = self._device.get("Name")
+        self._attr_unique_id = key
 
-    @property
-    def unique_id(self):
-        """Return unique_id."""
-        return self.key
 
     @property
     def is_connected(self):
