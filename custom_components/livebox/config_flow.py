@@ -80,8 +80,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             except LiveboxException:
                 errors["base"] = "unknown"
-
-            if "base" not in errors:
+            else:
                 return self.async_create_entry(
                     title=infos["ProductClass"], data=user_input
                 )
@@ -131,7 +130,6 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
                 ): int,
             },
         )
-
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
