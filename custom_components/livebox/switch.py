@@ -25,15 +25,10 @@ class WifiSwitch(CoordinatorEntity, SwitchEntity):
 
     def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""
-        self.coordinator = coordinator
-        self.box_id = box_id
+        super().__init__(coordinator)
         self._api = api
-        self._attr_unique_id = f"{self.box_id}_wifi"
-
-    @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
+        self._attr_unique_id = f"{box_id}_wifi"
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     @property
     def is_on(self):

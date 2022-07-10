@@ -32,17 +32,12 @@ class FlowSensor(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, box_id, description):
         """Initialize the sensor."""
-        self.box_id = box_id
-        self.coordinator = coordinator
+        super().__init__(coordinator)       
         self._attributs = description.attr
         self._current = description.current_rate
         self.entity_description = description
-
-    @property
-    def unique_id(self):
-        """Return unique_id."""
-        cr = self._current
-        return f"{self.box_id}_{cr}"
+        self._attr_unique_id = f"{box_id}_{self._current}"
+        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     @property
     def native_value(self):
@@ -55,14 +50,9 @@ class FlowSensor(CoordinatorEntity, SensorEntity):
         return None
 
     @property
-    def device_info(self):
-        """Return the device info."""
-        return {"identifiers": {(DOMAIN, self.box_id)}}
-
-    @property
     def extra_state_attributes(self):
         """Return the device state attributes."""
-        _attributs = {}
+        attributs = {}
         for key, value in self._attributs.items():
             _attributs[key] = self.coordinator.data["dsl_status"].get(value)
-        return _attributs
+        return attributs
