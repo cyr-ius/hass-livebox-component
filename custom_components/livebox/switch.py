@@ -39,8 +39,10 @@ class WifiSwitch(CoordinatorEntity, SwitchEntity):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
+        await self.coordinator.async_request_refresh()
