@@ -54,5 +54,5 @@ class FlowSensor(CoordinatorEntity, SensorEntity):
         """Return the device state attributes."""
         attributs = {}
         for key, value in self._attributs.items():
-            _attributs[key] = self.coordinator.data["dsl_status"].get(value)
+            attributs[key] = self.coordinator.data["dsl_status"].get(value)
         return attributs
