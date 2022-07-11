@@ -24,7 +24,7 @@ class RestartButton(ButtonEntity):
     def __init__(self, box_id, api):
         """Initialize the sensor."""
         self._api = api
-        self._attr_unique_id = f"{self.box_id}_restart"
+        self._attr_unique_id = f"{box_id}_restart"
         self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     async def async_press(self) -> None:
