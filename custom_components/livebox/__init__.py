@@ -64,38 +64,35 @@ async def async_setup(hass, config):
     return True
 
 
-async def async_setup_entry(hass, config_entry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Livebox as config entry."""
-    coordinator = LiveboxDataUpdateCoordinator(hass, config_entry)
+    coordinator = LiveboxDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
-
     if (infos := coordinator.data.get("infos")) is None:
         raise PlatformNotReady
 
-    unsub_listener = config_entry.add_update_listener(update_listener)
-
     device_registry = dr.async_get(hass)
     device_registry.async_get_or_create(
-        config_entry_id=config_entry.entry_id,
+        config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, infos.get("SerialNumber"))},
         manufacturer=infos.get("Manufacturer"),
         name=infos.get("ProductClass"),
         model=infos.get("ModelName"),
         sw_version=infos.get("SoftwareVersion"),
         configuration_url="http://{}:{}".format(
-            config_entry.data.get("host"), config_entry.data.get("port")
+            entry.data.get("host"), entry.data.get("port")
         ),
     )
 
-    hass.data[DOMAIN][config_entry.entry_id] = {
-        LIVEBOX_ID: config_entry.unique_id,
-        UNSUB_LISTENER: unsub_listener,
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    hass.data[DOMAIN][entry.entry_id] = {
+        LIVEBOX_ID: entry.unique_id,
         COORDINATOR: coordinator,
         LIVEBOX_API: coordinator.bridge.api,
-        CONF_TRACKING_TIMEOUT: config_entry.options.get(CONF_TRACKING_TIMEOUT, 0),
+        CONF_TRACKING_TIMEOUT: entry.options.get(CONF_TRACKING_TIMEOUT, 0),
     }
 
-    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_remove_cmissed(call) -> None:
         await coordinator.bridge.async_remove_cmissed(call)
@@ -108,21 +105,16 @@ async def async_setup_entry(hass, config_entry):
     return True
 
 
-async def async_unload_entry(hass, config_entry):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
-    )
-    hass.data[DOMAIN][config_entry.entry_id][UNSUB_LISTENER]()
-    if unload_ok:
-        hass.data[DOMAIN].pop(config_entry.entry_id)
-
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        hass.data[DOMAIN].pop(entry.entry_id)
     return unload_ok
 
 
-async def update_listener(hass, config_entry):
+async def _async_update_listener(hass, config_entry):
     """Reload device tracker if change option."""
-    await hass.config_entries.async_reload(config_entry.entry_id)
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
