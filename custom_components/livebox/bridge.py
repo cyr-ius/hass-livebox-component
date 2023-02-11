@@ -141,6 +141,11 @@ class BridgeData:
         wifi = await self.async_make_request(self.api.wifi.get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
+    async def async_get_guest_wifi(self):
+        """Get Guest Wifi status."""
+        guest_wifi = await self.async_make_request(self.api.guestwifi.get_guest_wifi)
+        return guest_wifi.get("status", {}).get("Enable") is True
+
     async def async_remove_cmissed(self, call) -> None:
         """Remove call missed."""
         await self.async_make_request(
