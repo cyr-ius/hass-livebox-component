@@ -13,5 +13,5 @@
         "friendlyName": "Orange Livebox"
     }],
     "loggers": ["aiosysbus"],
-    "version": "1.8.3"
+    "version": "1.8.4"
 }
