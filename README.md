@@ -9,7 +9,7 @@ There is currently support for the following device types within Home Assistant:
 * Sensor with traffic metrics
 * Binary Sensor with wan status , public ip , private ip
 * Device tracker for connected devices (via option add wired devices)
-* Switch for enable/disable Wireless
+* Switch for enable/disable Wireless and Guest Wifi
 * Press button to restart box
 * Press button to ring phone
 

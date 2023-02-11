@@ -144,6 +144,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "nmc": await self.bridge.async_get_nmc(),
                 "wan_status": await self.bridge.async_get_wan_status(),
                 "wifi": await self.bridge.async_get_wifi(),
+                "guest_wifi": await self.bridge.async_get_guest_wifi(),
                 "count_wired_devices": self.bridge.count_wired_devices,
                 "count_wireless_devices": self.bridge.count_wireless_devices,
             }
