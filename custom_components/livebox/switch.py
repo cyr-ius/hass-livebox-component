@@ -4,7 +4,7 @@ import logging
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID
+from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID, GUESTWIFI_ICON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,6 +52,7 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a livebox sensor."""
 
     _attr_name = "Guest Wifi switch"
+    _attr_icon = GUESTWIFI_ICON
 
     def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""
