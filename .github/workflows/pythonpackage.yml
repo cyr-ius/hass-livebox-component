@@ -36,3 +36,11 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Lint with pylint
+        run: |
+          pip install pylint
+          # stop the build if there are Pylint errors
+          # there is a bug with E1136 (https://github.com/PyCQA/pylint/issues/1498)
+          # so we temporarily disable it.
+          pylint --disable=I,C,R,E0401 --extension-pkg-whitelist=numpy custom_components
