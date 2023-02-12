@@ -48,6 +48,7 @@ class WifiSwitch(CoordinatorEntity, SwitchEntity):
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
         await self.coordinator.async_request_refresh()
 
+
 class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a livebox sensor."""
 
@@ -69,11 +70,15 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self.hass.async_add_executor_job(self._api.guestwifi.set_guest_wifi, parameters)
+        await self.hass.async_add_executor_job(
+            self._api.guestwifi.set_guest_wifi, parameters
+        )
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self.hass.async_add_executor_job(self._api.guestwifi.set_guest_wifi, parameters)
+        await self.hass.async_add_executor_job(
+            self._api.guestwifi.set_guest_wifi, parameters
+        )
         await self.coordinator.async_request_refresh()

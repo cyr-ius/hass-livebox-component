@@ -9,7 +9,7 @@ from aiosysbus.exceptions import (
     LiveboxException,
     NotOpenError,
 )
-from homeassistant import config_entries, core
+from homeassistant import config_entries
 from homeassistant.components import ssdp
 from homeassistant.components.ssdp import ATTR_SSDP_UDN, ATTR_SSDP_USN
 from homeassistant.const import (

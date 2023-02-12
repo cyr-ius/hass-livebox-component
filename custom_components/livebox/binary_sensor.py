@@ -42,7 +42,6 @@ class WanStatus(CoordinatorEntity, BinarySensorEntity):
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         return wstatus.get("WanState") == "up"
 
-
     @property
     def extra_state_attributes(self):
         """Return the device state attributes."""
@@ -79,7 +78,6 @@ class CallMissed(CoordinatorEntity, BinarySensorEntity):
         super().__init__(coordinator)
         self._attr_unique_id = f"{box_id}_callmissed"
         self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
-
 
     @property
     def is_on(self):

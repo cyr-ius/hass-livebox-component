@@ -25,7 +25,6 @@ from .const import (
     LIVEBOX_API,
     LIVEBOX_ID,
     PLATFORMS,
-    UNSUB_LISTENER,
 )
 
 CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
