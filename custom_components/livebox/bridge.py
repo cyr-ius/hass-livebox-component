@@ -14,7 +14,7 @@ from homeassistant.util.dt import (
     UTC,
     DEFAULT_TIME_ZONE,
 )
-from .const import CALLID, CONF_LAN_TRACKING
+from .const import CALLID
 
 _LOGGER = logging.getLogger(__name__)
 

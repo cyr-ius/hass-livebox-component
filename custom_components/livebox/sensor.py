@@ -32,7 +32,7 @@ class FlowSensor(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, box_id, description):
         """Initialize the sensor."""
-        super().__init__(coordinator)       
+        super().__init__(coordinator)
         self._attributs = description.attr
         self._current = description.current_rate
         self.entity_description = description

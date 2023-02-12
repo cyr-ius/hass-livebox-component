@@ -42,7 +42,6 @@ class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
         self._attr_name = self._device.get("Name")
         self._attr_unique_id = key
 
-
     @property
     def is_connected(self):
         """Return true if the device is connected to the network."""
