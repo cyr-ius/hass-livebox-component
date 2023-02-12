@@ -4,7 +4,7 @@ from datetime import timedelta
 
 import voluptuous as vol
 from aiosysbus.exceptions import LiveboxException
-from homeassistant.config_entries import SOURCE_IMPORT
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import PlatformNotReady
@@ -144,6 +144,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "nmc": await self.bridge.async_get_nmc(),
                 "wan_status": await self.bridge.async_get_wan_status(),
                 "wifi": await self.bridge.async_get_wifi(),
+                "guest_wifi": await self.bridge.async_get_guest_wifi(),
                 "count_wired_devices": self.bridge.count_wired_devices,
                 "count_wireless_devices": self.bridge.count_wireless_devices,
             }
