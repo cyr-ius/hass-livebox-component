@@ -4,7 +4,7 @@ import logging
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_API, LIVEBOX_ID, GUESTWIFI_ICON
+from .const import COORDINATOR, DOMAIN, GUESTWIFI_ICON, LIVEBOX_API, LIVEBOX_ID
 
 _LOGGER = logging.getLogger(__name__)
 
