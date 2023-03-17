@@ -1,13 +1,13 @@
 {
+    "domain": "livebox",
+    "name": "Orange Livebox",
     "codeowners": ["@cyr-ius"],
     "config_flow": true,
     "dependencies": ["ssdp"],
     "documentation": "https://github.com/cyr-ius/hass-livebox-component",
-    "domain": "livebox",
     "iot_class": "local_polling",
     "issue_tracker": "https://github.com/cyr-ius/hass-livebox-component/issues",
     "loggers": ["aiosysbus"],
-    "name": "Orange Livebox",
     "requirements": ["aiosysbus==0.2.1"],
     "ssdp": [{
         "st": "urn:schemas-upnp-org:device:InternetGatewayDevice:2",
