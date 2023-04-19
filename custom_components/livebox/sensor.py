@@ -5,6 +5,7 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, SENSOR_TYPES
+from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,8 +28,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         async_add_entities(entities, True)
 
 
-class FlowSensor(CoordinatorEntity, SensorEntity):
+class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
     """Representation of a livebox sensor."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, box_id, description):
         """Initialize the sensor."""

@@ -7,6 +7,7 @@ from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import CONF_TRACKING_TIMEOUT, COORDINATOR, DOMAIN, LIVEBOX_ID
+from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,8 +28,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(entities, True)
 
 
-class LiveboxDeviceScannerEntity(CoordinatorEntity, ScannerEntity):
+class LiveboxDeviceScannerEntity(
+    CoordinatorEntity[LiveboxDataUpdateCoordinator], ScannerEntity
+):
     """Represent a tracked device."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, key, bridge_id, coordinator, timeout):
         """Initialize the device tracker."""

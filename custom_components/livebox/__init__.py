@@ -1,70 +1,33 @@
 """Orange Livebox."""
 import logging
-from datetime import timedelta
 
 import voluptuous as vol
-from aiosysbus.exceptions import LiveboxException
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
+
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .bridge import BridgeData
 from .const import (
     CALLID,
-    CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     COORDINATOR,
-    DEFAULT_HOST,
-    DEFAULT_PORT,
-    DEFAULT_USERNAME,
     DOMAIN,
     LIVEBOX_API,
     LIVEBOX_ID,
     PLATFORMS,
 )
+from .coordinator import LiveboxDataUpdateCoordinator
 
 CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
-
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_HOST, default=DEFAULT_HOST): cv.string,
-                vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
-                vol.Optional(CONF_USERNAME, default=DEFAULT_USERNAME): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Required(CONF_LAN_TRACKING, default=False): cv.boolean,
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
-
-SCAN_INTERVAL = timedelta(minutes=1)
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass, config):
-    """Load configuration for Livebox component."""
-    hass.data.setdefault(DOMAIN, {})
-
-    if not hass.config_entries.async_entries(DOMAIN) and DOMAIN in config:
-        hass.async_create_task(
-            hass.config_entries.flow.async_init(
-                DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
-            )
-        )
-
-    return True
-
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Livebox as config entry."""
+    hass.data.setdefault(DOMAIN, {})
+
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
     if (infos := coordinator.data.get("infos")) is None:
@@ -114,38 +77,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Reload device tracker if change option."""
     await hass.config_entries.async_reload(entry.entry_id)
-
-
-class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
-    """Define an object to fetch datas."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        config_entry,
-    ) -> None:
-        """Class to manage fetching data API."""
-        self.bridge = BridgeData(hass)
-        self.config_entry = config_entry
-        self.api = None
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
-
-    async def _async_update_data(self) -> dict:
-        """Fetch datas."""
-        try:
-            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
-            self.api = await self.bridge.async_connect(**self.config_entry.data)
-            return {
-                "cmissed": await self.bridge.async_get_caller_missed(),
-                "devices": await self.bridge.async_get_devices(lan_tracking),
-                "dsl_status": await self.bridge.async_get_dsl_status(),
-                "infos": await self.bridge.async_get_infos(),
-                "nmc": await self.bridge.async_get_nmc(),
-                "wan_status": await self.bridge.async_get_wan_status(),
-                "wifi": await self.bridge.async_get_wifi(),
-                "guest_wifi": await self.bridge.async_get_guest_wifi(),
-                "count_wired_devices": self.bridge.count_wired_devices,
-                "count_wireless_devices": self.bridge.count_wireless_devices,
-            }
-        except LiveboxException as error:
-            raise LiveboxException(error) from error
