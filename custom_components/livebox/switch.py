@@ -5,6 +5,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import COORDINATOR, DOMAIN, GUESTWIFI_ICON, LIVEBOX_API, LIVEBOX_ID
+from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,10 +20,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities([GuestWifiSwitch(coordinator, box_id, api)], True)
 
 
-class WifiSwitch(CoordinatorEntity, SwitchEntity):
+class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
     """Representation of a livebox sensor."""
 
     _attr_name = "Wifi switch"
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""
@@ -54,6 +56,7 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
 
     _attr_name = "Guest Wifi switch"
     _attr_icon = GUESTWIFI_ICON
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, box_id, api):
         """Initialize the sensor."""

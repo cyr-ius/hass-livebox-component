@@ -20,6 +20,7 @@ class RestartButton(ButtonEntity):
 
     _attr_name = "Livebox restart"
     _attr_icon = RESTART_ICON
+    _attr_has_entity_name = True
 
     def __init__(self, box_id, api):
         """Initialize the sensor."""
@@ -37,6 +38,7 @@ class RingButton(ButtonEntity):
 
     _attr_name = "Ring your phone"
     _attr_icon = RING_ICON
+    _attr_has_entity_name = True
 
     def __init__(self, box_id, api):
         """Initialize the sensor."""
