@@ -57,6 +57,7 @@ class WanStatus(CoordinatorEntity[LiveboxDataUpdateCoordinator], BinarySensorEnt
             "last_connection_error": wstatus.get("LastConnectionError"),
             "wan_ipaddress": wstatus.get("IPAddress"),
             "wan_ipv6address": wstatus.get("IPv6Address"),
+            "wan_ipv6prefix": wstatus.get("IPv6DelegatedPrefix"),
             "uptime": uptime,
         }
         cwired = self.coordinator.data.get("count_wired_devices")
