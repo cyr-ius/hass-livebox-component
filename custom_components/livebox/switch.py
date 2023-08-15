@@ -38,13 +38,13 @@ class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
         """Return true if device is on."""
         return self.coordinator.data.get("wifi")
 
-    async def async_turn_on(self):
+    async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self):
+    async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
@@ -70,7 +70,7 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
         """Return true if device is on."""
         return self.coordinator.data.get("guest_wifi")
 
-    async def async_turn_on(self):
+    async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.hass.async_add_executor_job(
@@ -78,7 +78,7 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
         )
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self):
+    async def async_turn_off(self, **kwargs):
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.hass.async_add_executor_job(
