@@ -1,9 +1,5 @@
 # Livebox service entries description.
 
-reboot:
-  # Description of the service
-  description: Restart the Livebox.
-
 remove_call_missed:
   description: Remove call missed
   fields:
