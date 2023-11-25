@@ -45,8 +45,8 @@ class LiveboxDeviceScannerEntity(
         self._old_status = datetime.today()
 
         self._attr_name = self._device.get("Name")
-        self._attr_unique_id = key
-        self._attr_device_info = {
+        self._attr_unique_id = key 
+                self._attr_device_info = {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
             "via_device": (DOMAIN, self.box_id),
@@ -85,10 +85,87 @@ class LiveboxDeviceScannerEntity(
     def mac_address(self):
         """Return mac address."""
         return self.key
+# added LGO
+    @property
+    def link(self):
+        return (
+            self.coordinator.data.get("devices", {})
+            .get(self.unique_id, {})
+            .get("Interface")
+        )  
+
+    @property
+    def icon(self):
+        """Return icon."""       
+        match (
+            self.coordinator.data.get("devices", {})
+            .get(self.unique_id, {})
+            .get("DeviceType")
+        ) :
+            case "Computer":
+                return "mdi:desktop-tower-monitor"
+            case "Laptop"| "Laptop iOS":
+                return "mdi:laptop"
+            case "Switch4"| "Switch8" :
+                return "mdi:switch"
+            case "TV":
+                return "mdi:television"
+            case "HomePlug" :
+                return "mdi:network"
+            case "Printer" :
+                return "mdi:printer"
+            case "Set-top Box TV UHD"| "Set-top Box" :
+                return "mdi:dlna"
+            case "Mobile iOS"| "Mobile" |"Mobile Android":
+                return "mdi:cellphone"
+            case "Tablet iOS"| "Tablet Windows" |"Tablet Android"|"Tablet":
+                return "mdi:cellphone"
+            case "Homepoint":
+                return "mdi:home-automation"
 
     @property
     def extra_state_attributes(self):
         """Return the device state attributes."""
-        return {
-            "first_seen": self._device.get("FirstSeen"),
-        }
+        attrs = {}
+    #added by LGO    
+        attrs["scanner"] = "LiveboxDeviceScanner"
+        attrs["is_online"] = self._device.get("Active")
+        attrs["interface_name"] = self._device.get("InterfaceName")
+        attrs["ip_address"] = self._device.get("IPAddress")
+
+    #  connection ethernet wired or wifi      
+        if self._device.get("InterfaceName") in ["eth1" ,"eth2","eth3", "eth4", "eth5" ] :   
+            attrs["connection"] = "ethernet" 
+            attrs["is_wireless"] = False
+        else:    
+            if self._device.get("InterfaceName") in ["eth6","wlan0"]  :   
+                attrs["connection"] = "wifi" 
+                attrs["band"] = self._device.get("OperatingFrequencyBand")
+                attrs["signal_strength"] = self._device.get("SignalStrength")
+                attrs["is_wireless"] = True
+                # signal Quality
+                if self._device.get("SignalStrength") < -90 : 
+                    attrs["signal_quality"] ="very bad"
+                elif self._device.get("SignalStrength") <= -80 and self._device.get("SignalStrength") > -90 : 
+                    attrs["signal_quality"] =" bad"
+                elif self._device.get("SignalStrength") <= -70 and self._device.get("SignalStrength") > -80 : 
+                    attrs["signal_quality"] = "very low"
+                elif self._device.get("SignalStrength") <= -67 and self._device.get("SignalStrength") > -70 : 
+                    attrs["signal_quality"] = "low"
+                elif self._device.get("SignalStrength") <= -60 and self._device.get("SignalStrength") > -67 : 
+                    attrs["signal_quality"] = "good"
+                elif self._device.get("SignalStrength") <= -50 and self._device.get("SignalStrength") > -60 : 
+                    attrs["signal_quality"] = "very good"
+                elif self._device.get("SignalStrength") <= -30 and self._device.get("SignalStrength") > -50 : 
+                    attrs["signal_quality"] ="excellent"
+            else:
+                attrs["signal_quality"] ="unknown"  
+        
+        attrs["type"] = self._device.get("DeviceType")
+        attrs["vendor"] = self._device.get("VendorClassID")
+        attrs["manufacturer"] = self._device.get("Manufacturer")
+        attrs["first_seen"] = self._device.get("FirstSeen")
+        attrs["last_connection"] = self._device.get("LastConnection")
+        attrs["last_changed"] = self._device.get("LastChanged")
+
+        return attrs
