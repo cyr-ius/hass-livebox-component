@@ -46,7 +46,7 @@ class LiveboxDeviceScannerEntity(
 
         self._attr_name = self._device.get("Name")
         self._attr_unique_id = key 
-                self._attr_device_info = {
+        self._attr_device_info = {
             "name": self.name,
             "identifiers": {(DOMAIN, self.unique_id)},
             "via_device": (DOMAIN, self.box_id),
