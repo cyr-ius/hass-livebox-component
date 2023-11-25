@@ -122,6 +122,9 @@ class LiveboxDeviceScannerEntity(
                 return "mdi:cellphone"
             case "Homepoint":
                 return "mdi:home-automation"
+            case _:
+                return "mdi:devices"
+    
 
     @property
     def extra_state_attributes(self):
