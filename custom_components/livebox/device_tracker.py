@@ -45,12 +45,8 @@ class LiveboxDeviceScannerEntity(
         self._old_status = datetime.today()
 
         self._attr_name = self._device.get("Name")
-        self._attr_unique_id = key
-        self._attr_device_info = {
-            "name": self.name,
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "via_device": (DOMAIN, self.box_id),
-        }
+        self._attr_unique_id = key 
+        
 
     @property
     def is_connected(self):
@@ -96,36 +92,46 @@ class LiveboxDeviceScannerEntity(
 
     @property
     def icon(self):
-        """Return icon."""       
-        match (
-            self.coordinator.data.get("devices", {})
-            .get(self.unique_id, {})
-            .get("DeviceType")
-        ) :
-            case "Computer":
-                return "mdi:desktop-tower-monitor"
-            case "Laptop"| "Laptop iOS":
-                return "mdi:laptop"
-            case "Switch4"| "Switch8" :
-                return "mdi:switch"
-            case "TV":
-                return "mdi:television"
-            case "HomePlug" :
-                return "mdi:network"
-            case "Printer" :
-                return "mdi:printer"
-            case "Set-top Box TV UHD"| "Set-top Box" :
-                return "mdi:dlna"
-            case "Mobile iOS"| "Mobile" |"Mobile Android":
-                return "mdi:cellphone"
-            case "Tablet iOS"| "Tablet Windows" |"Tablet Android"|"Tablet":
-                return "mdi:cellphone"
-            case "Homepoint":
-                return "mdi:home-automation"
-            case _:
-                return "mdi:devices"
-    
+        """Return icon."""    
+        
+        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {}).get("DeviceType")   
+        if  device in ["Computer", "Desktop iOS","Desktop Windows","Desktop Linux" ]:
+            return "mdi:desktop-tower-monitor"    
+        elif device in ["Laptop", "Laptop iOS", "Laptop Windows","Laptop Linux"]:
+            return "mdi:laptop"
+        elif device in ["Switch4", "Switch8","Switch"  ]:
+            return "mdi:switch"
+        elif device in ["Acces Point",   ]:
+            return "mdi:access-point-network"
+        elif device in ["TV","TVKey","Apple TV" ]:
+            return "mdi:television"
+        elif device == "HomePlug":
+            return "mdi:network"    
+        elif device ==  "Printer":
+            return "mdi:printer"  
+        elif device in ["Set-top Box TV UHD", "Set-top Box"]:
+            return "mdi:dlna"          
+        elif device in ["Mobile iOS", "Mobile" ,"Mobile Android"]:
+            return "mdi:cellphone"    
+        elif device in ["Table iOS", "Tablet" ,"Tablet Android"]:
+            return "mdi:cellphone"   
+        elif device in ["Game Console", ]:
+            return "mdi:gamepad-square"   
+        elif device in  ["Homepoint"]:
+            return "mdi:home-automation"     
+        else:           
+            return "mdi:devices"                    
 
+    @property
+    def device_info(self):
+        """Return the device info."""
+        return {
+            "name": self.name,
+            "identifiers": {(DOMAIN, self.unique_id)},
+            "via_device": (DOMAIN, self.box_id),
+        }
+
+            
     @property
     def extra_state_attributes(self):
         """Return the device state attributes."""
