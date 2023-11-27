@@ -20,12 +20,10 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          name: ${{ github.ref }}
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
