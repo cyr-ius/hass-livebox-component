@@ -45,7 +45,7 @@ class LiveboxDeviceScannerEntity(
         self._old_status = datetime.today()
 
         self._attr_name = self._device.get("Name")
-        self._attr_unique_id = key 
+        self._attr_unique_id = key
         
 
     @property
@@ -88,15 +88,15 @@ class LiveboxDeviceScannerEntity(
             self.coordinator.data.get("devices", {})
             .get(self.unique_id, {})
             .get("Interface")
-        )  
+        )
 
     @property
     def icon(self):
-        """Return icon."""    
-        
-        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {}).get("DeviceType")   
+        """Return icon."""
+
+        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {}).get("DeviceType")
         if  device in ["Computer", "Desktop iOS","Desktop Windows","Desktop Linux" ]:
-            return "mdi:desktop-tower-monitor"    
+            return "mdi:desktop-tower-monitor"
         elif device in ["Laptop", "Laptop iOS", "Laptop Windows","Laptop Linux"]:
             return "mdi:laptop"
         elif device in ["Switch4", "Switch8","Switch"  ]:
@@ -106,21 +106,21 @@ class LiveboxDeviceScannerEntity(
         elif device in ["TV","TVKey","Apple TV" ]:
             return "mdi:television"
         elif device == "HomePlug":
-            return "mdi:network"    
+            return "mdi:network"
         elif device ==  "Printer":
-            return "mdi:printer"  
+            return "mdi:printer"
         elif device in ["Set-top Box TV UHD", "Set-top Box"]:
-            return "mdi:dlna"          
+            return "mdi:dlna"
         elif device in ["Mobile iOS", "Mobile" ,"Mobile Android"]:
-            return "mdi:cellphone"    
+            return "mdi:cellphone"
         elif device in ["Table iOS", "Tablet" ,"Tablet Android"]:
-            return "mdi:cellphone"   
+            return "mdi:cellphone"
         elif device in ["Game Console", ]:
-            return "mdi:gamepad-square"   
+            return "mdi:gamepad-square"
         elif device in  ["Homepoint"]:
-            return "mdi:home-automation"     
-        else:           
-            return "mdi:devices"                    
+            return "mdi:home-automation"
+        else:
+            return "mdi:devices"
 
     @property
     def device_info(self):
@@ -136,26 +136,26 @@ class LiveboxDeviceScannerEntity(
     def extra_state_attributes(self):
         """Return the device state attributes."""
         attrs = {}
-    #added by LGO    
+    #added by LGO
         attrs["scanner"] = "LiveboxDeviceScanner"
         attrs["is_online"] = self._device.get("Active")
         attrs["interface_name"] = self._device.get("InterfaceName")
         attrs["ip_address"] = self._device.get("IPAddress")
 
-    #  connection ethernet wired or wifi      
-        if self._device.get("InterfaceName") in ["eth1" ,"eth2","eth3", "eth4", "eth5" ] :   
-            attrs["connection"] = "ethernet" 
+    #  connection ethernet wired or wifi
+        if self._device.get("InterfaceName") in ["eth1" ,"eth2","eth3", "eth4", "eth5" ] :
+            attrs["connection"] = "ethernet"
             attrs["is_wireless"] = False
-        else:    
-            if self._device.get("InterfaceName") in ["eth6","wlan0"]  :   
-                attrs["connection"] = "wifi" 
+        else:
+            if self._device.get("InterfaceName") in ["eth6","wlan0"]  :
+                attrs["connection"] = "wifi"
                 attrs["band"] = self._device.get("OperatingFrequencyBand")
                 attrs["signal_strength"] = self._device.get("SignalStrength")
                 attrs["is_wireless"] = True
                 # signal Quality
-                if self._device.get("SignalStrength") < -90 : 
+                if self._device.get("SignalStrength") < -90 :
                     attrs["signal_quality"] ="very bad"
-                elif self._device.get("SignalStrength") <= -80 and self._device.get("SignalStrength") > -90 : 
+                elif self._device.get("SignalStrength") <= -80 and self._device.get("SignalStrength") > -90 :
                     attrs["signal_quality"] =" bad"
                 elif self._device.get("SignalStrength") <= -70 and self._device.get("SignalStrength") > -80 : 
                     attrs["signal_quality"] = "very low"
@@ -168,8 +168,8 @@ class LiveboxDeviceScannerEntity(
                 elif self._device.get("SignalStrength") <= -30 and self._device.get("SignalStrength") > -50 : 
                     attrs["signal_quality"] ="excellent"
             else:
-                attrs["signal_quality"] ="unknown"  
-        
+                attrs["signal_quality"] ="unknown"
+    
         attrs["type"] = self._device.get("DeviceType")
         attrs["vendor"] = self._device.get("VendorClassID")
         attrs["manufacturer"] = self._device.get("Manufacturer")
