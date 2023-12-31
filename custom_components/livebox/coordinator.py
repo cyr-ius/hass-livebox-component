@@ -35,9 +35,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
             self.api = await self.bridge.async_connect(**self.config_entry.data)
+            devices = await self.bridge.async_get_devices(lan_tracking)
             return {
                 "cmissed": await self.bridge.async_get_caller_missed(),
-                "devices": await self.bridge.async_get_devices(lan_tracking),
+                "devices": devices,
                 "dsl_status": await self.bridge.async_get_dsl_status(),
                 "infos": await self.bridge.async_get_infos(),
                 "nmc": await self.bridge.async_get_nmc(),
@@ -46,6 +47,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "guest_wifi": await self.bridge.async_get_guest_wifi(),
                 "count_wired_devices": self.bridge.count_wired_devices,
                 "count_wireless_devices": self.bridge.count_wireless_devices,
+                "devices_wan_access": {
+                    device_key: await self.bridge.async_get_device_schedule(device_key)
+                    for device_key in devices
+                },
             }
         except LiveboxException as error:
             raise LiveboxException(error) from error

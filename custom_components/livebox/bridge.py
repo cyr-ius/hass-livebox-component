@@ -152,3 +152,11 @@ class BridgeData:
             self.api.call.get_voiceapplication_clearlist,
             **{CALLID: call.data.get(CALLID)},
         )
+
+    async def async_get_device_schedule(self, device_key):
+        """Get device schedule"""
+        parameters = {"type": "ToD", "ID": device_key}
+        data = await self.async_make_request(self.api.schedule.get_schedule, **parameters)
+        if not isinstance(data, dict):
+            return False
+        return data.get("data", {}).get("scheduleInfo", {})
