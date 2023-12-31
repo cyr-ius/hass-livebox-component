@@ -36,6 +36,7 @@ MISSED_ICON = "mdi:phone-alert"
 RESTART_ICON = "mdi:restart-alert"
 RING_ICON = "mdi:phone-classic"
 GUESTWIFI_ICON = "mdi:wifi-lock-open"
+DEVICE_WANACCESS_ICON = "mdi:wan"
 
 
 @dataclass
