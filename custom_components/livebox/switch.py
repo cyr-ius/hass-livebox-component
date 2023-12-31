@@ -116,7 +116,6 @@ class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_device_info = {
             "name": self._device.get("Name"),
             "identifiers": {(DOMAIN, self._device_key)},
-            "connections": {(device_registry.CONNECTION_NETWORK_MAC, self._device_key)},
             "via_device": (DOMAIN, self._box_id),
         }
 
