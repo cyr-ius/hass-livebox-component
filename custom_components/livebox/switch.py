@@ -4,6 +4,7 @@ import logging
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers import device_registry
 
 from .const import COORDINATOR, DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON, LIVEBOX_API, LIVEBOX_ID
 from .coordinator import LiveboxDataUpdateCoordinator
@@ -115,6 +116,7 @@ class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_device_info = {
             "name": self._device.get("Name"),
             "identifiers": {(DOMAIN, self._device_key)},
+            "connections": {(device_registry.CONNECTION_NETWORK_MAC, self._device_key)},
             "via_device": (DOMAIN, self._box_id),
         }
 
