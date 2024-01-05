@@ -1,8 +1,9 @@
 """Diagnostics support for Livebox."""
 from __future__ import annotations
 
-from contextlib import suppress
-from typing import Any, Callable
+import logging
+from time import time
+from typing import Any
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
@@ -36,6 +37,8 @@ TO_REDACT = {
     "placeOfBirth",
 }
 
+_LOGGER = logging.getLogger(__name__)
+
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: ConfigEntry
@@ -46,102 +49,111 @@ async def async_get_config_entry_diagnostics(
     api = datas[LIVEBOX_API]
     coordinator = datas[COORDINATOR]
 
+    api_methods = [
+        api.get_permissions,
+        api.call.get_voiceapplication_calllist,
+        api.connection.get_lan_luckyAddrAddress,
+        api.connection.get_data_luckyAddrAddress,
+        # api.connection.get_lo_DHCPOption,  # Exception: [{'error': 196638, 'description': 'Mandatory argument missing', 'info': 'type'}, {'error': 196639, 'description': 'Function execution failed', 'info': 'getDHCPOption'}]
+        # api.connection.get_dsl0_DSLStats,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.dsl0'}]
+        # api.connection.get_dsl0_MIBS,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.dsl0'}]
+        api.connection.get_data_MIBS,
+        api.connection.get_lan_MIBS,
+        api.system.get_nmc,
+        api.wifi.get_wifi,
+        api.guestwifi.get_guest_wifi,
+        # api.schedule.get_schedule,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'type'}, {'error': 196640, 'description': 'Missing mandatory argument', 'info': 'ID'}]
+        api.devices.get_devices,
+        # api.devices.get_devices_config,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'module'}, {'error': 196640, 'description': 'Missing mandatory argument', 'info': 'option'}]
+        api.dhcp.get_dhcp_pool,
+        api.dhcp.get_dhcp_stats,
+        api.dhcp.get_dhcp_config,
+        api.dhcp.get_dhcp6_status,
+        api.dyndns.get_hosts,
+        api.dyndns.get_services,
+        api.dyndns.get_ddns,
+        # api.event.get_events,  # take 10s
+        api.userinterface.getLanguage,
+        api.userinterface.getState,
+        # api.userinterface.getDebugInformation,  Exception: [{'error': 196636, 'description': 'Function is not implemented', 'info': 'getDebugInformation'}]
+        api.nat.get_upnp_devices,
+        api.wifi.get_wifi,
+        api.wifi.get_wifi_Stats,
+        api.wifi.get_openmode_status,
+        api.wifi.get_securemode_status,
+        # api.lan.get_lan,  # take 5s
+        # api.lan.get_lan_interfaces,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getInterfacesName'}]
+        api.lan.get_lan_maxnumber,
+        api.lan.get_lan_interval,
+        api.lan.get_lan_status,
+        # api.lan.get_devices_results,  # take 13s
+        api.lan.get_lan_ip,
+        api.guestwifi.get_guest_wifi,
+        api.schedule.get_scheduletypes,
+        # api.schedule.get_schedules,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'type'}]
+        # api.schedule.get_completeschedules,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'type'}]
+        api.screen.getShowWifiPassword,
+        # api.profiles.get_profile,  # Exception: [{'error': 196635, 'description': 'Function can not be executed for the specified object', 'info': 'get'}]
+        # api.profiles.get_profile_data,  # Exception: [{'error': 196635, 'description': 'Function can not be executed for the specified object', 'info': 'getData'}]
+        # api.profiles.get_profile_current,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getCurrent'}]
+        api.datahub.get_datahub,
+        api.datahub.get_datahub_users,
+        # api.locations.get_locations_domain,  # Exception: Locations.get_locations_domain() missing 1 required positional argument: 'conf'
+        # api.locations.get_locations,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'location'}]
+        # api.locations.get_locations_composition,  #Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'location'}]
+        # api.usbhosts.get_usb_devices,  # Exception: [{'error': 13, 'description': 'Permission denied', 'info': 'USBHosts'}]
+        api.system.get_led,
+        api.system.get_pnp,
+        api.system.get_remoteaccess,
+        api.system.get_remoteaccess_timeleft,
+        api.system.get_iot_service,
+        # api.system.get_probe,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getStatus'}]
+        api.system.get_time,
+        api.system.get_utctime,
+        api.system.get_time_status,
+        api.system.get_time_ntp,
+        api.system.get_time_localtime_zonename,
+        api.system.get_nmc,
+        api.system.get_wanmodelist,
+        api.system.get_wanstatus,
+        api.system.get_versioninfo,
+        api.system.get_datatracking,
+        api.system.get_guest,
+        # api.system.get_led_status,  # Exception: [{'error': 196640, 'description': 'Missing mandatory argument', 'info': 'name'}]
+        api.system.get_networkconfig,
+        api.system.get_orangetv_IPTVStatus,
+        api.system.get_orangetv_IPTVConfig,
+        api.system.get_orangetv_IPTVMultiScreens,
+        api.system.get_profiles,
+        api.system.get_autodetect,
+        # api.system.get_acs,  # Exception: [{'error': 13, 'description': 'Permission denied', 'info': 'NMC.ACS'}]
+        # api.system.get_wlantimer,  # Exception: [{'error': 1245185, 'description': 'Interface name is not a valid name', 'info': ''}, {'error': 196639, 'description': 'Function execution failed', 'info': 'getActivationTimer'}]
+        api.system.get_hosts,
+        api.usermanagement.get_users,
+        api.usermanagement.get_groups,
+        # api.usermanagement.get_logincounters,  # Exception: [{'error': 13, 'description': 'Permission denied', 'info': 'UserManagement.LoginCounters'}]
+    ]
+
+    _LOGGER.debug("Start building diagnostics data...")
+    start_time = time()
     api_raw = {}
-
-    async def diag(func: Callable[..., Any], *args: Any) -> None:
-        rslt = {}
-        with suppress(Exception):
-            rsp = func(*args)
-            rslt = (
-                rsp
-                if isinstance(rsp, dict | list | set | float | int | str | tuple)
-                else vars(rsp)
+    for api_method in api_methods:
+        try:
+            _LOGGER.debug("Call API %s method...", api_method.__qualname__)
+            result = await hass.async_add_executor_job(api_method)
+            api_raw[api_method.__qualname__] = (
+                result
+                if isinstance(result, (dict, list, set, float, int, str, tuple))
+                or result is None
+                else (
+                    vars(result)
+                    if hasattr(result, "__dict__")
+                    else f"Can't dump {str(type(result))} data"
+                )
             )
-
-        api_raw.update({func.__name__: rslt})
-
-    diag(api.get_permissions)
-    diag(api.call.get_voiceapplication_calllist)
-    diag(api.connection.get_lan_luckyAddrAddress)
-    diag(api.connection.get_data_luckyAddrAddress)
-    diag(api.connection.get_lo_DHCPOption)
-    diag(api.connection.get_dsl0_DSLStats)
-    diag(api.connection.get_dsl0_MIBS)
-    diag(api.connection.get_data_MIBS)
-    diag(api.connection.get_lan_MIBS)
-    diag(api.system.get_nmc)
-    diag(api.wifi.get_wifi)
-    diag(api.guestwifi.get_guest_wifi)
-    diag(api.schedule.get_schedule)
-    diag(api.devices.get_devices)
-    diag(api.devices.get_devices_config1)
-    diag(api.dhcp.get_dhcp_pool)
-    diag(api.dhcp.get_dhcp_stats)
-    diag(api.dhcp.get_dhcp_config)
-    diag(api.dhcp.get_dhcp6_status)
-    diag(api.ddns.get_hosts)
-    diag(api.ddns.get_services)
-    diag(api.ddns.get_ddns)
-    diag(api.event.get_events)
-    diag(api.userinterface.getLanguage)
-    diag(api.userinterface.getState)
-    diag(api.userinterface.getDebugInformation)
-    diag(api.nat.get_upnp_devices)
-    diag(api.wifi.get_wifi)
-    diag(api.wifi.get_wifi_Stats)
-    diag(api.wifi.get_openmode_status)
-    diag(api.wifi.get_securemode_status)
-    diag(api.lan.get_lan)
-    diag(api.lan.get_lan_interfaces)
-    diag(api.lan.get_lan_maxnumber)
-    diag(api.lan.get_lan_interval)
-    diag(api.lan.get_lan_status)
-    diag(api.lan.get_devices_results)
-    diag(api.lan.get_lan_ip)
-    diag(api.guestwifi.get_guest_wifi)
-    diag(api.schedule.get_scheduletypes)
-    diag(api.schedule.get_schedules)
-    diag(api.schedule.get_completeschedules)
-    diag(api.screen.getShowWifiPassword)
-    diag(api.profile.get_profile)
-    diag(api.profile.get_profile_data)
-    diag(api.profile.get_profile_current)
-    diag(api.datahub.get_datahub)
-    diag(api.datahub.get_datahub_users)
-    diag(api.locations.get_locations_domain)
-    diag(api.locations.get_locations)
-    diag(api.locations.get_locations_composition)
-    diag(api.usbhosts.get_usb_devices)
-    diag(api.system.get_led)
-    diag(api.system.get_pnp)
-    diag(api.system.get_remoteaccess)
-    diag(api.system.get_remoteaccess_timeleft)
-    diag(api.system.get_iot_service)
-    diag(api.system.get_probe)
-    diag(api.system.get_time)
-    diag(api.system.get_utctime)
-    diag(api.system.get_time_status)
-    diag(api.system.get_time_ntp)
-    diag(api.system.get_time_localtime_zonename)
-    diag(api.system.get_nmc)
-    diag(api.system.get_wanmodelist)
-    diag(api.system.get_wanstatus)
-    diag(api.system.get_versioninfo)
-    diag(api.system.get_datatracking)
-    diag(api.system.get_guest)
-    diag(api.system.get_led_status)
-    diag(api.system.get_networkconfig)
-    diag(api.system.get_orangetv_IPTVStatus)
-    diag(api.system.get_orangetv_IPTVConfig)
-    diag(api.system.get_orangetv_IPTVMultiScreens)
-    diag(api.system.get_profiles)
-    diag(api.system.get_autodetect)
-    diag(api.system.get_acs)
-    diag(api.system.get_wlantimer)
-    diag(api.system.get_hosts)
-    diag(api.usermanagement.get_users)
-    diag(api.usermanagement.get_groups)
-    diag(api.usermanagement.get_logincounters)
+        except Exception as err:
+            api_raw[api_method.__qualname__] = f"Exception: {err}"
+    _LOGGER.debug("Diagnostics data builded in %0.1fs", time() - start_time)
 
     return {
         "box_id": box_id,
