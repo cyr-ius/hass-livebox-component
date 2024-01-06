@@ -35,6 +35,7 @@ TO_REDACT = {
     "dateOfBirth",
     "nickname",
     "placeOfBirth",
+    "KeyPassPhrase",
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ async def async_get_config_entry_diagnostics(
         # api.connection.get_dsl0_DSLStats,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.dsl0'}]
         # api.connection.get_dsl0_MIBS,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.dsl0'}]
         api.connection.get_data_MIBS,
-        api.connection.get_lan_MIBS,
+        api.connection.get_lan_MIBS,  # return WLANs passkey as KeyPassPhrase
         api.system.get_nmc,
         api.wifi.get_wifi,
         api.guestwifi.get_guest_wifi,
@@ -162,5 +163,5 @@ async def async_get_config_entry_diagnostics(
             "options": async_redact_data(entry.options, TO_REDACT),
         },
         "data": async_redact_data(coordinator.data, TO_REDACT),
-        "api_raw": api_raw,
+        "api_raw": async_redact_data(api_raw, TO_REDACT),
     }
