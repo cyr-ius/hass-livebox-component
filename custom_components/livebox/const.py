@@ -7,9 +7,6 @@ from typing import Final
 from homeassistant.components.sensor import SensorEntityDescription, SensorStateClass
 from homeassistant.const import UnitOfDataRate
 
-from homeassistant.components.sensor import SensorEntityDescription, SensorStateClass
-from homeassistant.const import UnitOfDataRate
-
 DOMAIN = "livebox"
 COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
