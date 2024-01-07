@@ -2,7 +2,7 @@
 import logging
 from datetime import datetime, timedelta
 
-from homeassistant.components.device_tracker import SOURCE_TYPE_ROUTER
+from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -73,7 +73,7 @@ class LiveboxDeviceScannerEntity(
     @property
     def source_type(self):
         """Return the source type, eg gps or router, of the device."""
-        return SOURCE_TYPE_ROUTER
+        return SourceType.ROUTER
 
     @property
     def ip_address(self):

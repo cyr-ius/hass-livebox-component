@@ -3,11 +3,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Final
-from homeassistant.const import DATA_RATE_MEGABITS_PER_SECOND
-from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
-    SensorEntityDescription,
-)
+
+from homeassistant.components.sensor import SensorEntityDescription, SensorStateClass
+from homeassistant.const import UnitOfDataRate
 
 DOMAIN = "livebox"
 COORDINATOR = "coordinator"
@@ -36,6 +34,7 @@ MISSED_ICON = "mdi:phone-alert"
 RESTART_ICON = "mdi:restart-alert"
 RING_ICON = "mdi:phone-classic"
 GUESTWIFI_ICON = "mdi:wifi-lock-open"
+DEVICE_WANACCESS_ICON = "mdi:wan"
 
 
 @dataclass
@@ -52,8 +51,8 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         name="Orange Livebox Download speed",
         icon=DOWNLOAD_ICON,
         current_rate="DownstreamCurrRate",
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
-        state_class=STATE_CLASS_MEASUREMENT,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
         attr={
             "downstream_maxrate": "DownstreamMaxRate",
             "downstream_lineattenuation": "DownstreamLineAttenuation",
@@ -66,8 +65,8 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         name="Orange Livebox Upload speed",
         icon=UPLOAD_ICON,
         current_rate="UpstreamCurrRate",
-        native_unit_of_measurement=DATA_RATE_MEGABITS_PER_SECOND,
-        state_class=STATE_CLASS_MEASUREMENT,
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
         attr={
             "upstream_maxrate": "UpstreamMaxRate",
             "upstream_lineattenuation": "UpstreamLineAttenuation",
