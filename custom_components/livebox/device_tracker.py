@@ -86,7 +86,6 @@ class LiveboxDeviceScannerEntity(
         """Return mac address."""
         return self.key
 
-# added LGO
     @property
     def link(self):
         return (
