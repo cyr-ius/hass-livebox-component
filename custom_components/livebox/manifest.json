@@ -13,5 +13,5 @@
         "st": "urn:schemas-upnp-org:device:InternetGatewayDevice:2",
         "friendlyName": "Orange Livebox"
     }],
-    "version": "1.9.0"
+    "version": "1.9.1"
 }
