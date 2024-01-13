@@ -1,8 +1,9 @@
 """Diagnostics support for Livebox."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from contextlib import suppress
-from typing import Any, Callable
+from typing import Any
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry

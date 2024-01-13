@@ -10,10 +10,7 @@ from aiosysbus.exceptions import (
     LiveboxException,
     NotOpenError,
 )
-from homeassistant.util.dt import (
-    DEFAULT_TIME_ZONE,
-    UTC,
-)
+from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
 from .const import CALLID
 

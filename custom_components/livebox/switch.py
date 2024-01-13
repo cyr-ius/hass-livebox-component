@@ -1,18 +1,34 @@
 """Sensor for Livebox router."""
 import logging
+from typing import Any
 
+from aiosysbus import AIOSysbus
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers import device_registry
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON, LIVEBOX_API, LIVEBOX_ID
+from .const import (
+    COORDINATOR,
+    DEVICE_WANACCESS_ICON,
+    DOMAIN,
+    GUESTWIFI_ICON,
+    LIVEBOX_API,
+    LIVEBOX_ID,
+)
 from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the sensors."""
     datas = hass.data[DOMAIN][config_entry.entry_id]
     box_id = datas[LIVEBOX_ID]
@@ -35,7 +51,9 @@ class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
     _attr_name = "Wifi switch"
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, box_id, api):
+    def __init__(
+        self, coordinator: LiveboxDataUpdateCoordinator, box_id: str, api: AIOSysbus
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._api = api
@@ -43,31 +61,33 @@ class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
         self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if device is on."""
-        return self.coordinator.data.get("wifi")
+        return self.coordinator.data.get("wifi") is True
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
         await self.coordinator.async_request_refresh()
 
 
-class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
+class GuestWifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
     """Representation of a livebox sensor."""
 
     _attr_name = "Guest Wifi switch"
     _attr_icon = GUESTWIFI_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, box_id, api):
+    def __init__(
+        self, coordinator: LiveboxDataUpdateCoordinator, box_id: str, api: AIOSysbus
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._api = api
@@ -75,11 +95,11 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if device is on."""
-        return self.coordinator.data.get("guest_wifi")
+        return self.coordinator.data.get("guest_wifi") is True
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.hass.async_add_executor_job(
@@ -87,7 +107,7 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
         )
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.hass.async_add_executor_job(
@@ -96,14 +116,23 @@ class GuestWifiSwitch(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
+class DeviceWANAccessSwitch(
+    CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity
+):
     """Representation of a livebox device WAN access switch."""
 
     _attr_name = "WAN access"
     _attr_icon = DEVICE_WANACCESS_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, box_id, api, device_key, device):
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        box_id: str,
+        api: AIOSysbus,
+        device_key: str,
+        device: dict[str, Any],
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._box_id = box_id
@@ -120,14 +149,14 @@ class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
             "via_device": (DOMAIN, self._box_id),
         }
 
-    def _get_device_schedule(self):
-        """Get device schedule"""
+    def _get_device_schedule(self) -> dict[str, Any]:
+        """Get device schedule."""
         return self.coordinator.data.get("devices_wan_access", {}).get(
             self._device_key, False
         )
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if device currently have WAN access."""
         schedule = self._get_device_schedule()
         _LOGGER.debug(
@@ -154,7 +183,7 @@ class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
         )
         return True
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         schedule = self._get_device_schedule()
         _LOGGER.debug(
@@ -192,7 +221,7 @@ class DeviceWANAccessSwitch(CoordinatorEntity, SwitchEntity):
                 self._device_key,
             )
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         schedule = self._get_device_schedule()
         _LOGGER.info(

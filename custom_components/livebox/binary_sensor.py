@@ -3,12 +3,13 @@ import logging
 from datetime import datetime, timedelta
 
 from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
     BinarySensorDeviceClass,
+    BinarySensorEntity,
 )
 from homeassistant.const import ENTITY_CATEGORY_DIAGNOSTIC
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, MISSED_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 

@@ -1,16 +1,15 @@
 """Corddinator for Livebox."""
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from aiosysbus.exceptions import LiveboxException
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .bridge import BridgeData
-from .const import DOMAIN, CONF_LAN_TRACKING
+from .const import CONF_LAN_TRACKING, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
