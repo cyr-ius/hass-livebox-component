@@ -1,14 +1,22 @@
 """Button for Livebox router."""
 import logging
 
+from aiosysbus import AIOSysbus
 from homeassistant.components.button import ButtonEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, LIVEBOX_API, LIVEBOX_ID, RESTART_ICON, RING_ICON
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the sensors."""
     box_id = hass.data[DOMAIN][config_entry.entry_id][LIVEBOX_ID]
     api = hass.data[DOMAIN][config_entry.entry_id][LIVEBOX_API]
@@ -22,7 +30,7 @@ class RestartButton(ButtonEntity):
     _attr_icon = RESTART_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, box_id, api):
+    def __init__(self, box_id: str, api: AIOSysbus) -> None:
         """Initialize the sensor."""
         self._api = api
         self._attr_unique_id = f"{box_id}_restart"
@@ -40,7 +48,7 @@ class RingButton(ButtonEntity):
     _attr_icon = RING_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, box_id, api):
+    def __init__(self, box_id: str, api: AIOSysbus) -> None:
         """Initialize the sensor."""
         self._api = api
         self._attr_unique_id = f"{box_id}_ring"
