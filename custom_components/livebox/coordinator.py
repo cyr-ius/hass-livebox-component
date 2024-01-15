@@ -1,10 +1,11 @@
 """Corddinator for Livebox."""
 from __future__ import annotations
 
-import logging
 from datetime import timedelta
+import logging
 
-from aiosysbus.exceptions import LiveboxException
+from aiosysbus.exceptions import AiosysbusException
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -51,5 +52,5 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     for device_key in devices
                 },
             }
-        except LiveboxException as error:
-            raise LiveboxException(error) from error
+        except AiosysbusException as error:
+            raise AiosysbusException(error) from error

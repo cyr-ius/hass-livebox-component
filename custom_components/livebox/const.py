@@ -21,7 +21,7 @@ DEFAULT_HOST = "192.168.1.1"
 DEFAULT_PORT = 80
 
 CALLID = "callId"
-
+CONF_USE_TLS = "use_tls"
 CONF_LAN_TRACKING = "lan_tracking"
 DEFAULT_LAN_TRACKING = False
 
