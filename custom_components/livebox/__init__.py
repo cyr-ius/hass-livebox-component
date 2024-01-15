@@ -11,6 +11,7 @@ from homeassistant.helpers import device_registry as dr
 from .const import (
     CALLID,
     CONF_TRACKING_TIMEOUT,
+    CONF_USE_TLS,
     COORDINATOR,
     DOMAIN,
     LIVEBOX_API,
@@ -27,9 +28,11 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Livebox as config entry."""
     hass.data.setdefault(DOMAIN, {})
+    scheme = "https" if entry.data.get(CONF_USE_TLS) else "http"
 
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
+
     if (infos := coordinator.data.get("infos")) is None:
         raise PlatformNotReady
 
@@ -41,12 +44,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=infos.get("ProductClass"),
         model=infos.get("ModelName"),
         sw_version=infos.get("SoftwareVersion"),
-        configuration_url="http://{}:{}".format(
-            entry.data.get("host"), entry.data.get("port")
-        ),
+        configuration_url=f"{scheme}://{entry.data.get('host')}:{entry.data.get('port')}",
     )
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+
     hass.data[DOMAIN][entry.entry_id] = {
         LIVEBOX_ID: entry.unique_id,
         COORDINATOR: coordinator,
@@ -57,7 +59,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_remove_cmissed(call) -> None:
-        await coordinator.bridge.async_remove_cmissed(call)
+        await coordinator.api.call.get_voiceapplication_clearlist(
+            **{CALLID: call.data.get(CALLID)}
+        )
         await coordinator.async_refresh()
 
     hass.services.async_register(
