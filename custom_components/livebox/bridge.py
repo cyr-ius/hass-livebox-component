@@ -1,15 +1,16 @@
 """Collect datas information from livebox."""
-import logging
 from datetime import datetime
+import logging
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
-    AuthorizationError,
-    HttpRequestError,
+    AiosysbusException,
+    AuthenticationFailed,
+    HttpRequestFailed,
     InsufficientPermissionsError,
-    LiveboxException,
     NotOpenError,
 )
+
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
 from .const import CALLID
@@ -39,15 +40,15 @@ class BridgeData:
         try:
             await self.hass.async_add_executor_job(self.api.connect)
             await self.hass.async_add_executor_job(self.api.get_permissions)
-        except AuthorizationError as error:
+        except AuthenticationFailed as error:
             _LOGGER.error("Error Authorization (%s)", error)
-            raise AuthorizationError from error
+            raise AuthenticationFailed from error
         except NotOpenError as error:
             _LOGGER.error("Error Not open (%s)", error)
             raise NotOpenError from error
-        except LiveboxException as error:
+        except AiosysbusException as error:
             _LOGGER.error("Error Unknown (%s)", error)
-            raise LiveboxException from error
+            raise AiosysbusException from error
         except InsufficientPermissionsError as error:
             _LOGGER.error("Error Insufficient Permissions (%s)", error)
             raise InsufficientPermissionsError from error
@@ -56,12 +57,12 @@ class BridgeData:
         """Make request for API."""
         try:
             return await self.hass.async_add_executor_job(call_api, kwargs)
-        except HttpRequestError as error:
+        except HttpRequestFailed as error:
             _LOGGER.error("HTTP Request (%s)", error)
-            raise LiveboxException from error
-        except LiveboxException as error:
+            raise AiosysbusException from error
+        except AiosysbusException as error:
             _LOGGER.error("Error Unknown (%s)", error)
-            raise LiveboxException from error
+            raise AiosysbusException from error
 
     async def async_get_devices(self, lan_tracking=False):
         """Get all devices."""
