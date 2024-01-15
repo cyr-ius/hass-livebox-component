@@ -7,7 +7,8 @@
                     "host": "IP Address",
                     "username": "Brukernavn",
                     "password": "Passord",
-                    "port": "Port"                    
+                    "port": "Port",
+                    "verify_ssl":"SSL/TLS"
                 }
             }
         },

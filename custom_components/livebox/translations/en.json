@@ -7,7 +7,8 @@
                     "host": "IP Address",
                     "username": "Username",
                     "password": "Password",
-                    "port": "Port"
+                    "port": "Port",
+                    "use_tls":"Use SSL"
                 }
             }
         },

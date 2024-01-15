@@ -1,17 +1,22 @@
 """Config flow to configure Livebox."""
+from collections.abc import Mapping
 import logging
+from typing import Any
 from urllib.parse import urlparse
 
-import voluptuous as vol
+from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
-    AuthorizationError,
+    AiosysbusException,
+    AuthenticationFailed,
     InsufficientPermissionsError,
-    LiveboxException,
     NotOpenError,
 )
+import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.components import ssdp
 from homeassistant.components.ssdp import ATTR_SSDP_UDN, ATTR_SSDP_USN
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
     CONF_NAME,
@@ -21,12 +26,13 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import callback
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 
-from .bridge import BridgeData
 from .const import (
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
+    CONF_USE_TLS,
     DEFAULT_HOST,
     DEFAULT_LAN_TRACKING,
     DEFAULT_PORT,
@@ -41,6 +47,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_USERNAME, default=DEFAULT_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): cv.port,
+        vol.Required(CONF_USE_TLS, default=False): bool,
     }
 )
 
@@ -54,42 +61,52 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(config_entry: ConfigEntry):
         """Get option flow."""
         return LiveboxOptionsFlowHandler(config_entry)
 
-    async def async_step_import(self, import_config):
+    async def async_step_import(self, import_config) -> FlowResult:
         """Import a config entry from configuration.yaml."""
         return await self.async_step_user(import_config)
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> FlowResult:
         """Handle a flow initialized by the user."""
         errors = {}
         if user_input is not None and user_input.get(CONF_USERNAME) is not None:
             try:
-                bridge = BridgeData(self.hass)
-                await bridge.async_connect(**user_input)
-                infos = await bridge.async_get_infos()
-                await self.async_set_unique_id(infos["SerialNumber"])
+                api = AIOSysbus(
+                    username=user_input["username"],
+                    password=user_input["password"],
+                    host=user_input["host"],
+                    port=user_input["port"],
+                )
+                await api.async_connect()
+                await api.get_permissions()
+                infos = await api.deviceinfo.get_deviceinfo()
+                if sn := infos.get("SerialNumber") is None:
+                    raise NotOpenError("Serial number of device not found")
+                await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
-            except AuthorizationError:
+            except AuthenticationFailed:
                 errors["base"] = "login_inccorect"
             except InsufficientPermissionsError:
                 errors["base"] = "insufficient_permission"
             except NotOpenError:
                 errors["base"] = "cannot_connect"
-            except LiveboxException:
+            except AiosysbusException:
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=infos["ProductClass"], data=user_input
+                    title=infos.get("ProductClass", DOMAIN), data=user_input
                 )
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_step_ssdp(self, discovery_info):
+    async def async_step_ssdp(self, discovery_info: ssdp.SsdpServiceInfo) -> FlowResult:
         """Handle a discovered device."""
         hostname = urlparse(discovery_info.ssdp_location).hostname
         friendly_name = discovery_info.upnp[ssdp.ATTR_UPNP_FRIENDLY_NAME]
@@ -110,7 +127,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle option."""
 
-    def __init__(self, config_entry):
+    def __init__(self, config_entry: ConfigEntry):
         """Initialize the options flow."""
         self.config_entry = config_entry
         self._lan_tracking = self.config_entry.options.get(
@@ -120,7 +137,9 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
             CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
         )
 
-    async def async_step_init(self, user_input=None):
+    async def async_step_init(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> FlowResult:
         """Handle a flow initialized by the user."""
         options_schema = vol.Schema(
             {
