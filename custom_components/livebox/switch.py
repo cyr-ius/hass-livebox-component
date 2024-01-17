@@ -45,13 +45,13 @@ class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
         """Return true if device is on."""
         return self.coordinator.data.get("wifi") is True
 
-    async def async_turn_on(self) -> None:
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
         await self.coordinator.api.wifi.async_set_wifi(parameters)
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self) -> None:
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.coordinator.api.wifi.async_set_wifi(parameters)
@@ -76,13 +76,13 @@ class GuestWifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEnt
         """Return true if device is on."""
         return self.coordinator.data.get("guest_wifi") is True
 
-    async def async_turn_on(self) -> None:
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self.coordinator.api.guestwifi.async_set_guest_wifi, parameters()
+        await self.coordinator.api.guestwifi.async_set_guest_wifi(parameters)
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self) -> None:
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
         await self.coordinator.api.guestwifi.async_set_guest_wifi(parameters)
@@ -151,7 +151,7 @@ class DeviceWANAccessSwitch(
         )
         return True
 
-    async def async_turn_on(self) -> None:
+    async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         schedule = self._get_device_schedule()
         _LOGGER.debug(
@@ -187,7 +187,7 @@ class DeviceWANAccessSwitch(
                 self._device_key,
             )
 
-    async def async_turn_off(self) -> None:
+    async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         schedule = self._get_device_schedule()
         _LOGGER.info(
