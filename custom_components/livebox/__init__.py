@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_remove_cmissed(call) -> None:
-        await coordinator.api.call.get_voiceapplication_clearlist(
+        await coordinator.api.call.async_get_voiceapplication_clearlist(
             **{CALLID: call.data.get(CALLID)}
         )
         await coordinator.async_refresh()
