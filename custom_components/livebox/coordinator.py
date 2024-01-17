@@ -82,7 +82,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
-        devices = await self.api.devices.get_devices(**parameters)
+        devices = await self.api.devices.async_get_devices(**parameters)
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
         count_wireless_devices = len(devices_status_wireless)
         for device in devices_status_wireless:
@@ -101,7 +101,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_caller_missed(self) -> dict[str, Any]:
         """Get caller missed."""
         cmisseds = []
-        calls = await self.api.call.get_voiceapplication_calllist()
+        calls = await self.api.call.async_get_voiceapplication_calllist()
         for call in calls.get("status", {}):
             if call["callType"] != "succeeded":
                 utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
@@ -119,35 +119,35 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl_status = await self.api.connection.get_data_MIBS(**parameters)
+        dsl_status = await self.api.async_connection.get_data_MIBS(**parameters)
         return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
 
     async def async_get_infos(self) -> dict[str, Any]:
         """Get router infos."""
-        infos = await self.api.deviceinfo.get_deviceinfo()
+        infos = await self.api.deviceinfo.async_get_deviceinfo()
         return infos.get("status", {})
 
     async def async_get_wan_status(self):
         """Get status."""
-        return await self.api.system.get_wanstatus()
+        return await self.api.system.async_get_wanstatus()
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        nmc = await self.api.system.get_nmc()
+        nmc = await self.api.system.async_get_nmc()
         return nmc.get("status", {})
 
     async def async_get_wifi(self) -> bool:
         """Get dsl status."""
-        wifi = await self.api.wifi.get_wifi()
+        wifi = await self.api.wifi.async_get_wifi()
         return wifi.get("status", {}).get("Enable") is True
 
     async def async_get_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
-        guest_wifi = await self.api.guestwifi.get_guest_wifi()
+        guest_wifi = await self.api.guestwifi.async_get_guest_wifi()
         return guest_wifi.get("status", {}).get("Enable") is True
 
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""
         parameters = {"type": "ToD", "ID": device_key}
-        data = await self.api.schedule.get_schedule(**parameters)
+        data = await self.api.schedule.async_get_schedule(**parameters)
         return data.get("data", {}).get("scheduleInfo", {})
