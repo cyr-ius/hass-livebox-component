@@ -85,8 +85,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     port=user_input["port"],
                 )
                 await api.async_connect()
-                await api.get_permissions()
-                infos = await api.deviceinfo.get_deviceinfo()
+                await api.async_get_permissions()
+                infos = await api.deviceinfo.async_get_deviceinfo()
                 if sn := infos.get("SerialNumber") is None:
                     raise NotOpenError("Serial number of device not found")
                 await self.async_set_unique_id(sn)
