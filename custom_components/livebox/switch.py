@@ -227,7 +227,7 @@ class DeviceWANAccessSwitch(
                     "override": "Disable",
                 },
             }
-            result = await self.coordinator.api.schedule.add_schedule(parameters)
+            result = await self.coordinator.api.schedule.async_add_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
