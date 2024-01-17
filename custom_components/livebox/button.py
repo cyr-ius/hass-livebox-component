@@ -35,7 +35,7 @@ class RestartButton(ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.coordinator.api.system.reboot()
+        await self.coordinator.api.system.async_reboot()
 
 
 class RingButton(ButtonEntity):
@@ -53,4 +53,4 @@ class RingButton(ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.coordinator.api.call.set_voiceapplication_ring()
+        await self.coordinator.api.call.async_set_voiceapplication_ring()
