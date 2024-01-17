@@ -48,13 +48,13 @@ class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
     async def async_turn_on(self) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self.coordinator.api.wifi.set_wifi(parameters)
+        await self.coordinator.api.wifi.async_set_wifi(parameters)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self.coordinator.api.wifi.set_wifi(parameters)
+        await self.coordinator.api.wifi.async_set_wifi(parameters)
         await self.coordinator.async_request_refresh()
 
 
@@ -79,13 +79,13 @@ class GuestWifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEnt
     async def async_turn_on(self) -> None:
         """Turn the switch on."""
         parameters = {"Enable": "true", "Status": "true"}
-        await self.coordinator.api.guestwifi.set_guest_wifi, parameters()
+        await self.coordinator.api.guestwifi.async_set_guest_wifi, parameters()
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self) -> None:
         """Turn the switch off."""
         parameters = {"Enable": "false", "Status": "false"}
-        await self.coordinator.api.guestwifi.set_guest_wifi(parameters)
+        await self.coordinator.api.guestwifi.async_set_guest_wifi(parameters)
         await self.coordinator.async_request_refresh()
 
 
@@ -173,7 +173,7 @@ class DeviceWANAccessSwitch(
                 self._device_key,
                 parameters,
             )
-            result = await self.coordinator.api.schedule.set_schedule(parameters)
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
@@ -202,7 +202,7 @@ class DeviceWANAccessSwitch(
                 self._device_key,
             )
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Disable"}
-            result = await self.coordinator.api.schedule.set_schedule(parameters)
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
