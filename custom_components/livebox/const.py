@@ -10,7 +10,6 @@ from homeassistant.const import UnitOfDataRate
 DOMAIN = "livebox"
 COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
-LIVEBOX_ID = "id"
 LIVEBOX_API = "api"
 PLATFORMS = ["sensor", "binary_sensor", "device_tracker", "switch", "button"]
 

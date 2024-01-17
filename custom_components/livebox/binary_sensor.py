@@ -1,28 +1,30 @@
 """Livebox binary sensor entities."""
-import logging
 from datetime import datetime, timedelta
+import logging
+from typing import Any
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
 )
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, MISSED_ICON
+from .const import DOMAIN, MISSED_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     """Defer binary sensor setup to the shared sensor module."""
-    datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[LIVEBOX_ID]
-    coordinator = datas[COORDINATOR]
-    async_add_entities(
-        [WanStatus(coordinator, box_id), CallMissed(coordinator, box_id)], True
-    )
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities([WanStatus(coordinator), CallMissed(coordinator)], True)
 
 
 class WanStatus(CoordinatorEntity[LiveboxDataUpdateCoordinator], BinarySensorEntity):
@@ -33,20 +35,20 @@ class WanStatus(CoordinatorEntity[LiveboxDataUpdateCoordinator], BinarySensorEnt
     _attr_has_entity_name = True
     _attr_name = "WAN Status"
 
-    def __init__(self, coordinator, box_id):
+    def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._attr_unique_id = f"{box_id}_connectivity"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        self._attr_unique_id = f"{coordinator.unique_id}_connectivity"
+        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         return wstatus.get("WanState") == "up"
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
         wstatus = self.coordinator.data.get("wan_status", {}).get("data", {})
         uptime = datetime.today() - timedelta(
@@ -78,18 +80,18 @@ class CallMissed(CoordinatorEntity[LiveboxDataUpdateCoordinator], BinarySensorEn
     _attr_icon = MISSED_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, box_id):
+    def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._attr_unique_id = f"{box_id}_callmissed"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        self._attr_unique_id = f"{coordinator.unique_id}_callmissed"
+        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
-        return len(self.coordinator.data.get("cmissed").get("call missed")) > 0
+        return len(self.coordinator.data.get("cmissed", {}).get("call missed", [])) > 0
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Return attributs."""
         return self.coordinator.data.get("cmissed")

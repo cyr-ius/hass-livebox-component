@@ -1,30 +1,27 @@
 """Sensor for Livebox router."""
 import logging
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, SENSOR_TYPES
+from .const import DOMAIN, SENSOR_TYPES
 from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     """Set up the sensors."""
-    datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[LIVEBOX_ID]
-    coordinator = datas[COORDINATOR]
-    nmc = coordinator.data["nmc"]
-    entities = [
-        FlowSensor(
-            coordinator,
-            box_id,
-            description,
-        )
-        for description in SENSOR_TYPES
-    ]
-    if nmc.get("WanMode") is not None and "ETHERNET" not in nmc["WanMode"].upper():
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    entities = [FlowSensor(coordinator, description) for description in SENSOR_TYPES]
+
+    nmc = coordinator.data.get("nmc", {})
+    if nmc.get("WanMode") and "ETHERNET" not in nmc["WanMode"].upper():
         async_add_entities(entities, True)
 
 
@@ -33,17 +30,21 @@ class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, box_id, description):
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        description: SensorEntityDescription,
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._attributs = description.attr
         self._current = description.current_rate
         self.entity_description = description
-        self._attr_unique_id = f"{box_id}_{self._current}"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        self._attr_unique_id = f"{coordinator.unique_id}_{self._current}"
+        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
 
     @property
-    def native_value(self):
+    def native_value(self) -> float | None:
         """Return the native value of the device."""
         if self.coordinator.data["dsl_status"].get(self._current):
             return round(
@@ -53,7 +54,7 @@ class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
         return None
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, any]:
         """Return the device state attributes."""
         attributs = {}
         for key, value in self._attributs.items():

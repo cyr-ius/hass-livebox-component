@@ -1,26 +1,23 @@
 """Button for Livebox router."""
 import logging
 
-from aiosysbus import AIOSysbus
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, LIVEBOX_API, LIVEBOX_ID, RESTART_ICON, RING_ICON
+from .const import DOMAIN, RESTART_ICON, RING_ICON
+from .coordinator import LiveboxDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the sensors."""
-    box_id = hass.data[DOMAIN][config_entry.entry_id][LIVEBOX_ID]
-    api = hass.data[DOMAIN][config_entry.entry_id][LIVEBOX_API]
-    async_add_entities([RestartButton(box_id, api), RingButton(box_id, api)], True)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities([RestartButton(coordinator), RingButton(coordinator)], True)
 
 
 class RestartButton(ButtonEntity):
@@ -30,15 +27,15 @@ class RestartButton(ButtonEntity):
     _attr_icon = RESTART_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, box_id: str, api: AIOSysbus) -> None:
+    def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
-        self._api = api
-        self._attr_unique_id = f"{box_id}_restart"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        self.coordinator = coordinator
+        self._attr_unique_id = f"{coordinator.unique_id}_restart"
+        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.hass.async_add_executor_job(self._api.system.reboot)
+        await self.coordinator.api.system.reboot()
 
 
 class RingButton(ButtonEntity):
@@ -48,12 +45,12 @@ class RingButton(ButtonEntity):
     _attr_icon = RING_ICON
     _attr_has_entity_name = True
 
-    def __init__(self, box_id: str, api: AIOSysbus) -> None:
+    def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
-        self._api = api
-        self._attr_unique_id = f"{box_id}_ring"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        self.coordinator = coordinator
+        self._attr_unique_id = f"{coordinator.unique_id}_ring"
+        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.hass.async_add_executor_job(self._api.call.set_voiceapplication_ring)
+        await self.coordinator.api.call.set_voiceapplication_ring()
