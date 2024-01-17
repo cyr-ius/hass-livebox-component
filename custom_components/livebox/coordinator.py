@@ -11,6 +11,7 @@ from aiosysbus.exceptions import AiosysbusException, AuthenticationFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
@@ -34,6 +35,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self.api = AIOSysbus(
             username=config_entry.data["username"],
             password=config_entry.data["password"],
+            session=async_create_clientsession(hass),
             host=config_entry.data["host"],
             port=config_entry.data["port"],
             use_tls=config_entry.data.get("use_tls", False),

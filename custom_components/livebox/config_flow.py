@@ -28,6 +28,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .const import (
     CONF_LAN_TRACKING,
@@ -79,6 +80,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 api = AIOSysbus(
                     username=user_input["username"],
                     password=user_input["password"],
+                    session=async_create_clientsession(self.hass),
                     host=user_input["host"],
                     port=user_input["port"],
                 )
