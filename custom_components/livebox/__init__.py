@@ -8,16 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers import device_registry as dr
 
-from .const import (
-    CALLID,
-    CONF_TRACKING_TIMEOUT,
-    CONF_USE_TLS,
-    COORDINATOR,
-    DOMAIN,
-    LIVEBOX_API,
-    LIVEBOX_ID,
-    PLATFORMS,
-)
+from .const import CALLID, CONF_USE_TLS, DOMAIN, PLATFORMS
 from .coordinator import LiveboxDataUpdateCoordinator
 
 CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
@@ -36,25 +27,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if (infos := coordinator.data.get("infos")) is None:
         raise PlatformNotReady
 
+    hass.data[DOMAIN][entry.entry_id] = coordinator
+
     device_registry = dr.async_get(hass)
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
-        identifiers={(DOMAIN, infos.get("SerialNumber"))},
+        identifiers={(DOMAIN, coordinator.unique_id)},
         manufacturer=infos.get("Manufacturer"),
-        name=infos.get("ProductClass"),
+        name=infos.get("ProductClass", DOMAIN.capitalize()),
         model=infos.get("ModelName"),
         sw_version=infos.get("SoftwareVersion"),
         configuration_url=f"{scheme}://{entry.data.get('host')}:{entry.data.get('port')}",
     )
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
-
-    hass.data[DOMAIN][entry.entry_id] = {
-        LIVEBOX_ID: entry.unique_id,
-        COORDINATOR: coordinator,
-        LIVEBOX_API: coordinator.bridge.api,
-        CONF_TRACKING_TIMEOUT: entry.options.get(CONF_TRACKING_TIMEOUT, 0),
-    }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -81,3 +67,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Reload device tracker if change option."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,  # pylint: disable=unused-argument
+    config_entry: ConfigEntry,  # pylint: disable=unused-argument
+    device_entry: dr.DeviceEntry,  # pylint: disable=unused-argument
+) -> bool:
+    """Remove config entry from a device."""
+    return True
