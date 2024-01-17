@@ -173,7 +173,7 @@ class DeviceWANAccessSwitch(
                 self._device_key,
                 parameters,
             )
-            result = await self.coordinator.api.schedule.set_schedule, parameters()
+            result = await self.coordinator.api.schedule.set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
@@ -202,7 +202,7 @@ class DeviceWANAccessSwitch(
                 self._device_key,
             )
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Disable"}
-            result = await self.coordinator.api.schedule.set_schedule, parameters()
+            result = await self.coordinator.api.schedule.set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
