@@ -53,7 +53,7 @@ class LiveboxDeviceScannerEntity(
     @property
     def is_connected(self) -> bool:
         """Return true if the device is connected to the network."""
-        _timeout_tracking = self.coordinator.config_entry.options.get(
+        timeout_tracking = self.coordinator.config_entry.options.get(
             CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
         )
         status = (
@@ -62,7 +62,7 @@ class LiveboxDeviceScannerEntity(
             .get("Active")
         )
         if status is True:
-            self._old_status = datetime.today() + timedelta(seconds=_timeout_tracking)
+            self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
         if status is False and self._old_status > datetime.today():
             _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
             return True
