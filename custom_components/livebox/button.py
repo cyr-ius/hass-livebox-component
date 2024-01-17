@@ -29,6 +29,7 @@ class RestartButton(ButtonEntity):
 
     def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
+        super().__init__(coordinator)
         self.coordinator = coordinator
         self._attr_unique_id = f"{coordinator.unique_id}_restart"
         self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
@@ -47,6 +48,7 @@ class RingButton(ButtonEntity):
 
     def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize the sensor."""
+        super().__init__(coordinator)
         self.coordinator = coordinator
         self._attr_unique_id = f"{coordinator.unique_id}_ring"
         self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
