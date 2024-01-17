@@ -62,9 +62,7 @@ class LiveboxDeviceScannerEntity(
             .get("Active")
         )
         if status is True:
-            self._old_status = datetime.today() + timedelta(
-                seconds=self._timeout_tracking
-            )
+            self._old_status = datetime.today() + timedelta(seconds=_timeout_tracking)
         if status is False and self._old_status > datetime.today():
             _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
             return True
