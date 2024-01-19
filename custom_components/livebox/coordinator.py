@@ -82,7 +82,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
-        devices = await self.api.devices.async_get_devices({"parameters":parameters})
+        devices = await self.api.devices.async_get_devices(parameters)
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
         count_wireless_devices = len(devices_status_wireless)
         for device in devices_status_wireless:
@@ -119,7 +119,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl_status = await self.api.async_connection.async_get_data_MIBS({"parameters":parameters})
+        dsl_status = await self.api.async_connection.async_get_data_MIBS(parameters)
         return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
 
     async def async_get_infos(self) -> dict[str, Any]:
@@ -149,5 +149,5 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""
         parameters = {"type": "ToD", "ID": device_key}
-        data = await self.api.schedule.async_get_schedule({"parameters":parameters})
+        data = await self.api.schedule.async_get_schedule(parameters)
         return data.get("data", {}).get("scheduleInfo", {})
