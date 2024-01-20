@@ -62,8 +62,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "count_wired_devices": device_counters["wired"],
                 "count_wireless_devices": device_counters["wireless"],
                 "devices_wan_access": {
-                    device_key: await self.async_get_device_schedule(device_key)
-                    for device_key in devices
+                    key: await self.async_get_device_schedule(key) for key in devices
                 },
             }
         except AuthenticationFailed as error:
