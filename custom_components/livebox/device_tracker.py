@@ -1,6 +1,6 @@
 """Support for the Livebox platform."""
-import logging
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -89,10 +89,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         """Return the device state attributes."""
         device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
         attrs = {
-            "scanner": "LiveboxDeviceScanner",
-            "is_online": device.get("Active"),
             "interface_name": device.get("InterfaceName"),
-            "ip_address": device.get("IPAddress"),
             "type": device.get("DeviceType"),
             "vendor": device.get("VendorClassID"),
             "manufacturer": device.get("Manufacturer"),
@@ -108,9 +105,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
             "eth4",
             "eth5",
         ]:
-            attrs.update(
-                {"connection": "ethernet", "is_wireless": False, "band": "Wired"}
-            )
+            attrs.update({"is_wireless": False, "band": "Wired"})
 
         if device.get("InterfaceName") in ["eth6", "wlan0", "wl0"]:
             match device.get("SignalStrength", 0) * -1:
@@ -132,10 +127,9 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     signal_quality = "unknown"
             attrs.update(
                 {
-                    "connection": "wifi",
                     "is_wireless": True,
-                    "signal_strength": self._device.get("SignalStrength"),
                     "band": self._device.get("OperatingFrequencyBand"),
+                    "signal_strength": self._device.get("SignalStrength"),
                     "signal_quality": signal_quality,
                 }
             )
