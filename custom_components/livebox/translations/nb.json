@@ -1,34 +1,34 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Sjekk liveboxen din",
-                "data": {
-                    "host": "IP Address",
-                    "username": "Brukernavn",
-                    "password": "Passord",
-                    "port": "Port",
-                    "verify_ssl":"SSL/TLS"
-                }
-            }
-        },
-        "error": {
-            "login_inccorect": "Feil bruker eller passord",
-            "insufficient_permission": "Utilstrekkelig tillatelse.",
-            "unknown": "Det oppstod en ukjent feil",
-            "cannot_connect": "Kan ikke koble til liveboxen"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sjekk liveboxen din",
+        "data": {
+          "host": "IP Address",
+          "username": "Brukernavn",
+          "password": "Passord",
+          "port": "Port",
+          "verify_ssl": "SSL/TLS"
         }
+      }
     },
-    "options": {
-        "step": {
-            "init": {
-                "title": "Enhetssporing - Spor enheter på lan",
-                "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
-                "data": {
-                    "lan_tracking": "Kablet sporing",
-                    "timeout_tracking": "Tid før overvejelse om manglende udstyr"
-                }
-            }
-        }
+    "error": {
+      "login_incorrect": "Feil bruker eller passord",
+      "insufficient_permission": "Utilstrekkelig tillatelse.",
+      "unknown": "Det oppstod en ukjent feil",
+      "cannot_connect": "Kan ikke koble til liveboxen"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Enhetssporing - Spor enheter på lan",
+        "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
+        "data": {
+          "lan_tracking": "Kablet sporing",
+          "timeout_tracking": "Tid før overvejelse om manglende udstyr"
+        }
+      }
+    }
+  }
 }

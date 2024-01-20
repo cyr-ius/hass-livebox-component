@@ -1,34 +1,34 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Check your livebox",
-                "data": {
-                    "host": "IP Address",
-                    "username": "Username",
-                    "password": "Password",
-                    "port": "Port",
-                    "use_tls":"Use SSL"
-                }
-            }
-        },
-        "error": {
-            "login_inccorect": "User or password inccorect",
-            "insufficient_permission": "Insufficient permission.",
-            "unknown": "Unknown error occurred",
-            "cannot_connect": "Unable to connect to the livebox"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Check your livebox",
+        "data": {
+          "host": "IP Address",
+          "username": "Username",
+          "password": "Password",
+          "port": "Port",
+          "use_tls": "Use SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "init": {
-                "title": "Device Tracking - Track devices on lan",
-                "description": "you want tracking  yours wired devices in addition to wireless devices",
-                "data": {
-                    "lan_tracking": "Wired tracking", 
-                    "timeout_tracking": "Timeout tracking"
-                }
-            }
-        }
+    "error": {
+      "login_incorrect": "User or password incorrect",
+      "insufficient_permission": "Insufficient permission.",
+      "unknown": "Unknown error occurred",
+      "cannot_connect": "Unable to connect to the livebox"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Device Tracking - Track devices on lan",
+        "description": "you want tracking  yours wired devices in addition to wireless devices",
+        "data": {
+          "lan_tracking": "Wired tracking",
+          "timeout_tracking": "Timeout tracking"
+        }
+      }
+    }
+  }
 }
