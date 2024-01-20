@@ -137,7 +137,7 @@ async def async_get_config_entry_diagnostics(
     for api_method in api_methods:
         try:
             _LOGGER.debug("Call API %s method...", api_method.__qualname__)
-            result = await api_method
+            result = await api_method()
             api_raw[api_method.__qualname__] = (
                 result
                 if isinstance(result, (dict, list, set, float, int, str, tuple))
