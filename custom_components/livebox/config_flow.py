@@ -91,13 +91,20 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     raise NotOpenError("Serial number of device not found")
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
-            except AuthenticationFailed:
+            except AuthenticationFailed as err:
+                _LOGGER.warning("Fail to authenticate to the Livebox: %s", err)
                 errors["base"] = "login_incorrect"
-            except InsufficientPermissionsError:
+            except InsufficientPermissionsError as err:
+                _LOGGER.warning(
+                    "Insufficient permissions error occurred connecting to the Livebox: %s",
+                    err,
+                )
                 errors["base"] = "insufficient_permission"
-            except NotOpenError:
+            except NotOpenError as err:
+                _LOGGER.warning("Fail to connect to the Livebox: %s", err)
                 errors["base"] = "cannot_connect"
-            except AiosysbusException:
+            except AiosysbusException as err:
+                _LOGGER.exception("Unknown error connecting to the Livebox: %s", err)
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
