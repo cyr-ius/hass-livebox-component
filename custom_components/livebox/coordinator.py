@@ -119,7 +119,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl_status = await self.api.async_connection.async_get_data_MIBS(parameters)
+        dsl_status = await self.api.connection.async_get_data_MIBS(parameters)
         return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
 
     async def async_get_infos(self) -> dict[str, Any]:
