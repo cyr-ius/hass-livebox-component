@@ -87,4 +87,89 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        return {"first_seen": self._device.get("FirstSeen")}
+        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        attrs = {
+            "scanner": "LiveboxDeviceScanner",
+            "is_online": device.get("Active"),
+            "interface_name": device.get("InterfaceName"),
+            "ip_address": device.get("IPAddress"),
+            "type": device.get("DeviceType"),
+            "vendor": device.get("VendorClassID"),
+            "manufacturer": device.get("Manufacturer"),
+            "first_seen": device.get("FirstSeen"),
+            "last_connection": device.get("LastConnection"),
+            "last_changed": device.get("LastChanged"),
+        }
+
+        if self._device.get("InterfaceName") in [
+            "eth1",
+            "eth2",
+            "eth3",
+            "eth4",
+            "eth5",
+        ]:
+            attrs.update(
+                {"connection": "ethernet", "is_wireless": False, "band": "Wired"}
+            )
+
+        if self._device.get("InterfaceName") in ["eth6", "wlan0", "wl0"]:
+            signal_db = self._device.get("SignalStrength") * -1
+            match signal_db:
+                case x if x > 90:
+                    signal_quality = "very bad"
+                case x if 80 <= x < 90:
+                    signal_quality = "bad"
+                case x if 70 <= x < 80:
+                    signal_quality = "very low"
+                case x if 67 <= x < 70:
+                    signal_quality = "low"
+                case x if 60 <= x < 67:
+                    signal_quality = "good"
+                case x if 50 <= x < 60:
+                    signal_quality = "very good"
+                case x if 30 <= x < 50:
+                    signal_quality = "excellent"
+                case _:
+                    signal_quality = "unknown"
+            attrs.update(
+                {
+                    "connection": "wifi",
+                    "is_wireless": True,
+                    "signal_strength": self._device.get("SignalStrength"),
+                    "band": self._device.get("OperatingFrequencyBand"),
+                    "signal_quality": signal_quality,
+                }
+            )
+
+        return attrs
+
+    @property
+    def icon(self):
+        """Return icon."""
+        match self._device.get("DeviceType"):
+            case ["Computer", "Desktop iOS", "Desktop Windows", "Desktop Linux"]:
+                return "mdi:desktop-tower-monitor"
+            case ["Laptop", "Laptop iOS", "Laptop Windows", "Laptop Linux"]:
+                return "mdi:laptop"
+            case ["Switch4", "Switch8", "Switch"]:
+                return "mdi:switch"
+            case ["Acces Point"]:
+                return "mdi:access-point-network"
+            case ["TV", "TVKey", "Apple TV"]:
+                return "mdi:television"
+            case "HomePlug":
+                return "mdi:network"
+            case "Printer":
+                return "mdi:printer"
+            case ["Set-top Box TV UHD", "Set-top Box"]:
+                return "mdi:dlna"
+            case ["Mobile iOS", "Mobile", "Mobile Android"]:
+                return "mdi:cellphone"
+            case ["Tablet iOS", "Tablet", "Tablet Android", "Tablet Windows"]:
+                return "mdi:cellphone"
+            case ["Game Console"]:
+                return "mdi:gamepad-square"
+            case ["Homepoint"]:
+                return "mdi:home-automation"
+            case _:
+                return "mdi:devices"
