@@ -101,8 +101,8 @@ async def async_get_config_entry_diagnostics(
         # coordinator.api.usbhosts.async_get_usb_devices,  # Exception: [{'error': 13, 'description': 'Permission denied', 'info': 'USBHosts'}]
         coordinator.api.system.async_get_led,
         coordinator.api.system.async_get_pnp,
-        # coordinator.api.system.async_get_remoteaccess,
-        # coordinator.api.system.async_get_remoteaccess_timeleft,
+        coordinator.api.system.async_get_remoteaccess,
+        coordinator.api.system.async_get_remoteaccess_timeleft,
         coordinator.api.system.async_get_iot_service,
         # coordinator.api.system.async_get_probe,  # Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getStatus'}]
         coordinator.api.system.async_get_time,
@@ -137,7 +137,7 @@ async def async_get_config_entry_diagnostics(
     for api_method in api_methods:
         try:
             _LOGGER.debug("Call API %s method...", api_method.__qualname__)
-            result = await api_method
+            result = await api_method()
             api_raw[api_method.__qualname__] = (
                 result
                 if isinstance(result, (dict, list, set, float, int, str, tuple))
