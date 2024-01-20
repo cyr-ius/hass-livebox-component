@@ -127,7 +127,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         infos = await self.api.deviceinfo.async_get_deviceinfo()
         return infos.get("status", {})
 
-    async def async_get_wan_status(self):
+    async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
         return await self.api.system.async_get_wanstatus()
 
