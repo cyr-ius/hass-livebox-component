@@ -22,7 +22,7 @@ SCAN_INTERVAL = timedelta(minutes=1)
 
 
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
-    """Define an object to fetch datas."""
+    """Define an object to fetch data."""
 
     def __init__(
         self,
@@ -43,7 +43,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self.unique_id: str | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Fetch datas."""
+        """Fetch data."""
         try:
             await self.api.async_connect()
             lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
