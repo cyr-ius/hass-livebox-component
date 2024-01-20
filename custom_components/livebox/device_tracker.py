@@ -140,29 +140,29 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     def icon(self) -> str:
         """Return icon."""
         match self._device.get("DeviceType"):
-            case ["Computer", "Desktop iOS", "Desktop Windows", "Desktop Linux"]:
+            case "Computer" | "Desktop iOS" | "Desktop Windows" | "Desktop Linux":
                 return "mdi:desktop-tower-monitor"
-            case ["Laptop", "Laptop iOS", "Laptop Windows", "Laptop Linux"]:
+            case "Laptop" | "Laptop iOS" | "Laptop Windows" | "Laptop Linux":
                 return "mdi:laptop"
-            case ["Switch4", "Switch8", "Switch"]:
+            case "Switch4" | "Switch8" | "Switch":
                 return "mdi:switch"
-            case ["Acces Point"]:
+            case "Acces Point":
                 return "mdi:access-point-network"
-            case ["TV", "TVKey", "Apple TV"]:
+            case "TV" | "TVKey" | "Apple TV":
                 return "mdi:television"
             case "HomePlug":
                 return "mdi:network"
             case "Printer":
                 return "mdi:printer"
-            case ["Set-top Box TV UHD", "Set-top Box"]:
+            case "Set-top Box TV UHD" | "Set-top Box":
                 return "mdi:dlna"
-            case ["Mobile iOS", "Mobile", "Mobile Android"]:
+            case "Mobile iOS" | "Mobile" | "Mobile Android":
                 return "mdi:cellphone"
-            case ["Tablet iOS", "Tablet", "Tablet Android", "Tablet Windows"]:
+            case "Tablet iOS" | "Tablet" | "Tablet Android" | "Tablet Windows":
                 return "mdi:cellphone"
-            case ["Game Console"]:
+            case "Game Console":
                 return "mdi:gamepad-square"
-            case ["Homepoint"]:
+            case "Homepoint":
                 return "mdi:home-automation"
             case _:
                 return "mdi:devices"
