@@ -37,7 +37,7 @@ class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._attributs = description.attr
+        self._attr = description.attr
         self._current = description.current_rate
         self.entity_description = description
         self._attr_unique_id = f"{coordinator.unique_id}_{self._current}"
@@ -56,7 +56,7 @@ class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the device state attributes."""
-        attributs = {}
-        for key, value in self._attributs.items():
-            attributs[key] = self.coordinator.data["dsl_status"].get(value)
-        return attributs
+        attr = {}
+        for key, value in self._attr.items():
+            attr[key] = self.coordinator.data["dsl_status"].get(value)
+        return attr

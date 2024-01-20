@@ -150,7 +150,7 @@ async def async_get_config_entry_diagnostics(
             )
         except Exception as err:  # pylint: disable=broad-exception-caught
             api_raw[api_method.__qualname__] = f"Exception: {err}"
-    _LOGGER.debug("Diagnostics data builded in %0.1fs", time() - start_time)
+    _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
 
     return {
         "entry": {

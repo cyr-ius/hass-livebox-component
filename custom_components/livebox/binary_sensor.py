@@ -93,5 +93,5 @@ class CallMissed(CoordinatorEntity[LiveboxDataUpdateCoordinator], BinarySensorEn
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return attributs."""
+        """Return attributes."""
         return self.coordinator.data.get("cmissed")
