@@ -47,20 +47,20 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self.api.async_connect()
             lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
-            devices = await self.async_get_devices(lan_tracking)
+            devices, device_counters = await self.async_get_devices(lan_tracking)
             infos = await self.async_get_infos()
             self.unique_id = infos["SerialNumber"]
             return {
                 "cmissed": await self.async_get_caller_missed(),
-                "devices": devices[0],
+                "devices": devices,
                 "dsl_status": await self.async_get_dsl_status(),
                 "infos": infos,
                 "nmc": await self.async_get_nmc(),
                 "wan_status": await self.async_get_wan_status(),
                 "wifi": await self.async_get_wifi(),
                 "guest_wifi": await self.async_get_guest_wifi(),
-                "count_wired_devices": devices[2],
-                "count_wireless_devices": devices[1],
+                "count_wired_devices": device_counters["wired"],
+                "count_wireless_devices": device_counters["wireless"],
                 "devices_wan_access": {
                     device_key: await self.async_get_device_schedule(device_key)
                     for device_key in devices
@@ -73,12 +73,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_devices(
         self, lan_tracking=False
-    ) -> tuple[dict[str, Any], str, str]:
+    ) -> tuple[dict[str, Any], dict[str, int]]:
         """Get all devices."""
         devices_tracker = {}
-        count_wireless_devices = 0
-        count_wired_devices = 0
-
+        device_counters = {"wireless": 0, "wired": 0}
         parameters = {
             "expression": {
                 "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
@@ -87,19 +85,19 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         }
         devices = await self.api.devices.async_get_devices(parameters)
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
-        count_wireless_devices = len(devices_status_wireless)
+        device_counters["wireless"] = len(devices_status_wireless)
         for device in devices_status_wireless:
             if device.get("Key"):
                 devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if lan_tracking:
             devices_status_wired = devices.get("status", {}).get("eth", {})
-            count_wired_devices = len(devices_status_wired)
+            device_counters["wired"] = len(devices_status_wired)
             for device in devices_status_wired:
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
-        return devices_tracker, count_wireless_devices, count_wired_devices
+        return devices_tracker, device_counters
 
     async def async_get_caller_missed(self) -> dict[str, Any]:
         """Get caller missed."""
