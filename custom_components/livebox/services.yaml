@@ -1,10 +1,13 @@
 # Livebox service entries description.
-
+---
 remove_call_missed:
   name: Remove call missed
   description: Remove a missed call or all if not any specified
   fields:
     callId:
       name: Call Id
-      description: ID of the call (information in the attribute field of the binary sensor). Value to put in quotation marks. If you omit so that it deletes all calls
+      description: >
+        ID of the call (information in the attribute field of the binary
+        sensor). Value to put in quotation marks. If you omit so that it
+        deletes all calls.
       example: '"666"'

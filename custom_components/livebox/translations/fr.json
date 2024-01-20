@@ -8,27 +8,27 @@
           "username": "Utilisateur",
           "password": "Mot de passe",
           "port": "Port",
-          "use_tls":"Utiliser SSL/TLS"
+          "use_tls": "Utiliser SSL/TLS"
         }
       }
     },
     "error": {
       "login_incorrect": "Utilisateur ou mot de passe incorrect.",
-      "insufficient_permission": "Permission insuffisante.",      
+      "insufficient_permission": "Permission insuffisante.",
       "unknown": "Erreur inconnue.",
       "cannot_connect": "Impossible de se connecter à la Livebox."
     }
   },
   "options": {
     "step": {
-        "init": {
-            "title": "Suivre les équipements filaires",
-            "description": "Pour suivre les équipements filaires en plus des équipements Wifi",
-            "data": {
-                "lan_tracking": "Equipements Filaires",
-                "timeout_tracking": "Délai avant de considérer un équipement absent"
-            }
+      "init": {
+        "title": "Suivre les équipements filaires",
+        "description": "Pour suivre les équipements filaires en plus des équipements Wifi",
+        "data": {
+          "lan_tracking": "Equipements Filaires",
+          "timeout_tracking": "Délai avant de considérer un équipement absent"
         }
+      }
     }
   }
 }
