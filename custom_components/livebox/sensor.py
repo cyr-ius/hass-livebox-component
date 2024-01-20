@@ -1,16 +1,67 @@
 """Sensor for Livebox router."""
-import logging
+from __future__ import annotations
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from dataclasses import dataclass
+import logging
+from typing import Final
+
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfDataRate
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, SENSOR_TYPES
+from .const import DOMAIN, DOWNLOAD_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
+from .entity import LiveboxEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class FlowSensorEntityDescription(SensorEntityDescription):
+    """Represents an Flow Sensor."""
+
+    current_rate: str | None = None
+    attr: dict | None = None
+
+
+SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
+    FlowSensorEntityDescription(
+        key="down",
+        name="Orange Livebox Download speed",
+        icon=DOWNLOAD_ICON,
+        translation_key="down_rate",
+        current_rate="DownstreamCurrRate",
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        attr={
+            "downstream_maxrate": "DownstreamMaxRate",
+            "downstream_lineattenuation": "DownstreamLineAttenuation",
+            "downstream_noisemargin": "DownstreamNoiseMargin",
+            "downstream_power": "DownstreamPower",
+        },
+    ),
+    FlowSensorEntityDescription(
+        key="up",
+        name="Orange Livebox Upload speed",
+        icon=UPLOAD_ICON,
+        translation_key="up_rate",
+        current_rate="UpstreamCurrRate",
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        attr={
+            "upstream_maxrate": "UpstreamMaxRate",
+            "upstream_lineattenuation": "UpstreamLineAttenuation",
+            "upstream_noisemargin": "UpstreamNoiseMargin",
+            "upstream_power": "UpstreamPower",
+        },
+    ),
+)
 
 
 async def async_setup_entry(
@@ -25,10 +76,8 @@ async def async_setup_entry(
         async_add_entities(entities, True)
 
 
-class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
+class FlowSensor(LiveboxEntity, SensorEntity):
     """Representation of a livebox sensor."""
-
-    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -36,27 +85,20 @@ class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
         description: SensorEntityDescription,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._attr = description.attr
-        self._current = description.current_rate
-        self.entity_description = description
-        self._attr_unique_id = f"{coordinator.unique_id}_{self._current}"
-        self._attr_device_info = {"identifiers": {(DOMAIN, coordinator.unique_id)}}
+        super().__init__(coordinator, description)
 
     @property
     def native_value(self) -> float | None:
         """Return the native value of the device."""
-        if self.coordinator.data["dsl_status"].get(self._current):
-            return round(
-                self.coordinator.data["dsl_status"][self._current] / 1000,
-                2,
-            )
+        current_rate = self.entity_description.current_rate
+        if val_rate := self.coordinator.data["dsl_status"].get(current_rate):
+            return round(val_rate / 1000, 2)
         return None
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the device state attributes."""
-        attr = {}
-        for key, value in self._attr.items():
-            attr[key] = self.coordinator.data["dsl_status"].get(value)
-        return attr
+        attributes = {}
+        for key, value in self.entity_description.attr.items():
+            attributes[key] = self.coordinator.data["dsl_status"].get(value)
+        return attributes

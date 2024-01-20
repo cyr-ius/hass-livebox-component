@@ -5,13 +5,14 @@ from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
 from .coordinator import LiveboxDataUpdateCoordinator
+from .entity import LiveboxEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,33 +23,35 @@ async def async_setup_entry(
     """Set up device tracker from config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities = [
-        LiveboxDeviceScannerEntity(coordinator, mac_address)
-        for mac_address, device in coordinator.data.get("devices", {}).items()
+        LiveboxDeviceScannerEntity(
+            coordinator, SensorEntityDescription(key=f"{uid}_tracker"), device
+        )
+        for uid, device in coordinator.data.get("devices", {}).items()
         if "IPAddress" and "PhysAddress" in device
     ]
     async_add_entities(entities, True)
 
 
-class LiveboxDeviceScannerEntity(
-    CoordinatorEntity[LiveboxDataUpdateCoordinator], ScannerEntity
-):
+class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     """Represent a tracked device."""
 
-    _attr_has_entity_name = True
-
-    def __init__(self, coordinator: LiveboxDataUpdateCoordinator, uid: str) -> None:
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        description: SensorEntityDescription,
+        device: dict[str, Any],
+    ) -> None:
         """Initialize the device tracker."""
-        super().__init__(coordinator)
-        self._device = coordinator.data.get("devices", {}).get(uid, {})
+        super().__init__(coordinator, description)
+        self._device = device
         self._old_status = datetime.today()
-        self._attr_name = self._device.get("Name")
-        self._attr_unique_id = uid
+        self._attr_name = device.get("Name")
+        self._attr_unique_id = device.get("Key")
         self._attr_device_info = {
-            "name": self.name,
-            "identifiers": {(DOMAIN, uid)},
+            "name": device.get("Name"),
+            "identifiers": {(DOMAIN, device.get("Key"))},
             "via_device": (DOMAIN, coordinator.unique_id),
         }
-        self._mac_address = uid
 
     @property
     def is_connected(self) -> bool:
@@ -56,11 +59,8 @@ class LiveboxDeviceScannerEntity(
         timeout_tracking = self.coordinator.config_entry.options.get(
             CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
         )
-        status = (
-            self.coordinator.data.get("devices", {})
-            .get(self.unique_id, {})
-            .get("Active")
-        )
+        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        status = device.get("Active", False)
         if status is True:
             self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
         if status is False and self._old_status > datetime.today():
@@ -77,17 +77,14 @@ class LiveboxDeviceScannerEntity(
     @property
     def ip_address(self) -> str:
         """Return ip address."""
-        device = self.coordinator.data["devices"].get(self.unique_id, {})
-        return device.get("IPAddress")
+        return self._device.get("IPAddress")
 
     @property
     def mac_address(self) -> str:
         """Return mac address."""
-        return self._mac_address
+        return self._device.get("Key")
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        return {
-            "first_seen": self._device.get("FirstSeen"),
-        }
+        return {"first_seen": self._device.get("FirstSeen")}
