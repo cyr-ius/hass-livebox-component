@@ -1,6 +1,6 @@
 """Support for the Livebox platform."""
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -101,7 +101,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
             "last_changed": device.get("LastChanged"),
         }
 
-        if self._device.get("InterfaceName") in [
+        if device.get("InterfaceName") in [
             "eth1",
             "eth2",
             "eth3",
@@ -112,9 +112,8 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                 {"connection": "ethernet", "is_wireless": False, "band": "Wired"}
             )
 
-        if self._device.get("InterfaceName") in ["eth6", "wlan0", "wl0"]:
-            signal_db = self._device.get("SignalStrength") * -1
-            match signal_db:
+        if device.get("InterfaceName") in ["eth6", "wlan0", "wl0"]:
+            match device.get("SignalStrength", 0) * -1:
                 case x if x > 90:
                     signal_quality = "very bad"
                 case x if 80 <= x < 90:
@@ -144,7 +143,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         return attrs
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return icon."""
         match self._device.get("DeviceType"):
             case ["Computer", "Desktop iOS", "Desktop Windows", "Desktop Linux"]:
