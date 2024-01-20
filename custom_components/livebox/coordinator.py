@@ -76,6 +76,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> tuple[dict[str, Any], str, str]:
         """Get all devices."""
         devices_tracker = {}
+        count_wireless_devices = 0
+        count_wired_devices = 0
+
         parameters = {
             "expression": {
                 "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
