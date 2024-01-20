@@ -92,7 +92,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
             except AuthenticationFailed:
-                errors["base"] = "login_inccorect"
+                errors["base"] = "login_incorrect"
             except InsufficientPermissionsError:
                 errors["base"] = "insufficient_permission"
             except NotOpenError:

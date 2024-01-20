@@ -13,7 +13,7 @@
             }
         },
         "error": {
-            "login_inccorect": "[%key:components::livebox::config::error::login_inccorect%]",
+            "login_incorrect": "[%key:components::livebox::config::error::login_incorrect%]",
             "insufficient_permission": "[%key:components::livebox::config::error::insufficient_permission%]",
             "unknown": "[%key:common::config_flow::error::unknown%]",
             "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
