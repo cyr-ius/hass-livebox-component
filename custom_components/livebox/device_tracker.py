@@ -1,6 +1,8 @@
 """Support for the Livebox platform."""
-import logging
+from __future__ import annotations
+
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
