@@ -1,6 +1,6 @@
 """Support for the Livebox platform."""
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -107,7 +107,13 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         ]:
             attrs.update({"is_wireless": False, "band": "Wired"})
 
-        if device.get("InterfaceName") in ["eth6", "wlan0", "wl0"]:
+        if (iname := device.get("InterfaceName")) in [
+            "eth6",
+            "wlan0",
+            "wl0",
+            "wlguest2",
+            "wlguest5",
+        ]:
             match device.get("SignalStrength", 0) * -1:
                 case x if x > 90:
                     signal_quality = "very bad"
@@ -131,6 +137,9 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     "band": self._device.get("OperatingFrequencyBand"),
                     "signal_strength": self._device.get("SignalStrength"),
                     "signal_quality": signal_quality,
+                    "connection": "wifi"
+                    if iname not in ["wlguest2", "wlguest5"]
+                    else "guest_wifi",
                 }
             )
 
