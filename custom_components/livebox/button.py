@@ -51,7 +51,7 @@ async def async_setup_entry(
     """Set up the sensors."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities = [Button(coordinator, description) for description in BUTTON_TYPES]
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class Button(LiveboxEntity, ButtonEntity):

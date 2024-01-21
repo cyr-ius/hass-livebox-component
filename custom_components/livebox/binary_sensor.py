@@ -73,7 +73,7 @@ async def async_setup_entry(
         LiveboxBinarySensor(coordinator, description)
         for description in BINARYSENSOR_TYPES
     ]
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):

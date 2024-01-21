@@ -92,7 +92,7 @@ async def async_setup_entry(
 
     nmc = coordinator.data.get("nmc", {})
     if nmc.get("WanMode") and "ETHERNET" not in nmc["WanMode"].upper():
-        async_add_entities(entities, True)
+        async_add_entities(entities)
 
 
 class LiveboxSensor(LiveboxEntity, SensorEntity):
