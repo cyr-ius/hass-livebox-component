@@ -157,7 +157,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                 return "mdi:laptop"
             case "Switch4" | "Switch8" | "Switch":
                 return "mdi:switch"
-            case "Acces Point":
+            case "Access Point":
                 return "mdi:access-point-network"
             case "TV" | "TVKey" | "Apple TV":
                 return "mdi:television"
