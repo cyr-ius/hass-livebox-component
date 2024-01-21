@@ -1,4 +1,6 @@
 """Config flow to configure Livebox."""
+from __future__ import annotations
+
 from collections.abc import Mapping
 import logging
 from typing import Any
@@ -108,7 +110,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=infos.get("ProductClass", DOMAIN), data=user_input
+                    title=infos.get("ProductClass", DOMAIN.capitalize()),
+                    data=user_input,
                 )
 
         return self.async_show_form(
