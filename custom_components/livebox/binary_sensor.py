@@ -44,13 +44,13 @@ class WanStatus(LiveboxEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
-        wan_status = self.coordinator.data.get("wan_status", {}).get("data", {})
+        wan_status = self.coordinator.data.get("wan_status", {})
         return wan_status.get("WanState") == "up"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        wan_status = self.coordinator.data.get("wan_status", {}).get("data", {})
+        wan_status = self.coordinator.data.get("wan_status", {})
         uptime = datetime.today() - timedelta(
             seconds=self.coordinator.data["infos"].get("UpTime", 0)
         )
