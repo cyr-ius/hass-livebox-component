@@ -1,9 +1,10 @@
 """Sensor for Livebox router."""
+from __future__ import annotations
+
+from collections.abc import Callable
 from dataclasses import dataclass
 import logging
 from typing import Any, Final
-
-from aiosysbus import AiosysbusException
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
@@ -24,8 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 class LiveboxSwitchEntityDescription(SwitchEntityDescription):
     """Class describing Livebox button entities."""
 
-    sub_api: str | None = None
-    value_fn: str | None = None
+    value_fn: Callable[..., Any] | None = None
     tunr_on_parameters: dict[str, Any] | None = None
     tunr_off_parameters: dict[str, Any] | None = None
 
@@ -35,8 +35,7 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
         key="wifi",
         name="Wifi switch",
         translation_key="wifi_switch",
-        sub_api="wifi",
-        value_fn="async_set_wifi",
+        value_fn=lambda x: getattr(getattr(x, "wifi"), "async_set_wifi"),
         tunr_on_parameters={"Enable": "true", "Status": "true"},
         tunr_off_parameters={"Enable": "false", "Status": "false"},
     ),
@@ -45,8 +44,7 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
         name="Guest Wifi switch",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
-        sub_api="guestwifi",
-        value_fn="async_set_guest_wifi",
+        value_fn=lambda x: getattr(getattr(x, "guestwifi"), "async_set_guest_wifi"),
         tunr_on_parameters={"Enable": "true", "Status": "true"},
         tunr_off_parameters={"Enable": "false", "Status": "false"},
     ),
@@ -84,31 +82,17 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        api = self.coordinator.api
-        if sub_api := self.entity_description.sub_api:
-            api = getattr(api, sub_api)
-        try:
-            await getattr(api, self.entity_description.value_fn)(
-                self.entity_description.tunr_on_parameters
-            )
-        except AiosysbusException as error:
-            _LOGGER.error(error)
-        else:
-            await self.coordinator.async_request_refresh()
+        await self.entity_description.value_fn(self.coordinator.api)(
+            self.entity_description.tunr_on_parameters
+        )
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
-        """Turn the switch on."""
-        api = self.coordinator.api
-        if sub_api := self.entity_description.sub_api:
-            api = getattr(api, sub_api)
-        try:
-            await getattr(api, self.entity_description.value_fn)(
-                self.entity_description.tunr_off_parameters
-            )
-        except AiosysbusException as error:
-            _LOGGER.error(error)
-        else:
-            await self.coordinator.async_request_refresh()
+        """Turn the switch off."""
+        await self.entity_description.value_fn(self.coordinator.api)(
+            self.entity_description.tunr_off_parameters
+        )
+        await self.coordinator.async_request_refresh()
 
 
 class DeviceWANAccessSwitch(
@@ -161,71 +145,44 @@ class DeviceWANAccessSwitch(
         """Turn the switch on."""
         schedule = self._get_device_schedule()
         if schedule:
-            try:
-                parameters = {
-                    "type": "ToD",
-                    "ID": self._device_key,
-                    "override": "Enable",
-                }
-                result = await self.coordinator.api.schedule.async_set_schedule(
-                    parameters
+            parameters = {"type": "ToD", "ID": self._device_key, "override": "Enable"}
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
+            if not isinstance(result, dict) or not result.get("status"):
+                raise HomeAssistantError(
+                    f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
+                    "WAN access"
                 )
-                if not isinstance(result, dict) or not result.get("status"):
-                    raise HomeAssistantError(
-                        f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
-                        "WAN access"
-                    )
-            except AiosysbusException as error:
-                _LOGGER.error(error)
-            else:
-                await self.coordinator.async_request_refresh()
+            await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         schedule = self._get_device_schedule()
         if schedule:
-            try:
-                parameters = {
-                    "type": "ToD",
-                    "ID": self._device_key,
-                    "override": "Disable",
-                }
-                result = await self.coordinator.api.schedule.async_set_schedule(
-                    parameters
+            parameters = {"type": "ToD", "ID": self._device_key, "override": "Disable"}
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
+            if not isinstance(result, dict) or not result.get("status"):
+                raise HomeAssistantError(
+                    f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
+                    "WAN access"
                 )
-                if not isinstance(result, dict) or not result.get("status"):
-                    raise HomeAssistantError(
-                        f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
-                        "WAN access"
-                    )
-            except AiosysbusException as error:
-                _LOGGER.error(error)
-            else:
-                await self.coordinator.async_request_refresh()
+            await self.coordinator.async_request_refresh()
         else:
-            try:
-                parameters = {
-                    "type": "ToD",
+            parameters = {
+                "type": "ToD",
+                "ID": self._device_key,
+                "info": {
+                    "base": "Weekly",
+                    "def": "Enable",
                     "ID": self._device_key,
-                    "info": {
-                        "base": "Weekly",
-                        "def": "Enable",
-                        "ID": self._device_key,
-                        "schedule": [],
-                        "enable": True,
-                        "override": "Disable",
-                    },
-                }
-                result = await self.coordinator.api.schedule.async_add_schedule(
-                    parameters
+                    "schedule": [],
+                    "enable": True,
+                    "override": "Disable",
+                },
+            }
+            result = await self.coordinator.api.schedule.async_add_schedule(parameters)
+            if not isinstance(result, dict) or not result.get("status"):
+                raise HomeAssistantError(
+                    f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
+                    "WAN access"
                 )
-                if not isinstance(result, dict) or not result.get("status"):
-                    raise HomeAssistantError(
-                        f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
-                        "WAN access"
-                    )
-
-            except AiosysbusException as error:
-                _LOGGER.error(error)
-            else:
-                await self.coordinator.async_request_refresh()
+            await self.coordinator.async_request_refresh()

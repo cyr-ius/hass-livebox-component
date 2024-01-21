@@ -1,9 +1,10 @@
 """Button for Livebox router."""
+from __future__ import annotations
+
+from collections.abc import Callable
 from dataclasses import dataclass
 import logging
-from typing import Final
-
-from aiosysbus import AiosysbusException
+from typing import Any, Final
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.config_entries import ConfigEntry
@@ -21,8 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 class LiveboxButtonEntityDescription(ButtonEntityDescription):
     """Class describing Livebox button entities."""
 
-    sub_api: str | None = None
-    value_fn: str | None = None
+    value_fn: Callable[..., Any] | None = None
 
 
 BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
@@ -31,16 +31,16 @@ BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
         name="Livebox restart",
         icon=RESTART_ICON,
         translation_key="restart_btn",
-        sub_api="system",
-        value_fn="async_reboot",
+        value_fn=lambda x: getattr(getattr(x, "system"), "async_reboot"),
     ),
     LiveboxButtonEntityDescription(
         key="ring",
         name="Ring your phone",
         icon=RING_ICON,
         translation_key="ring_btn",
-        sub_api="call",
-        value_fn="async_set_voiceapplication_ring",
+        value_fn=lambda x: getattr(
+            getattr(x, "call"), "async_set_voiceapplication_ring"
+        ),
     ),
 )
 
@@ -69,11 +69,4 @@ class Button(LiveboxEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Triggers the button press service."""
-        api = self.coordinator.api
-        if sub_api := self.entity_description.sub_api:
-            api = getattr(api, sub_api)
-
-        try:
-            await getattr(api, self.entity_description.value_fn)()
-        except AiosysbusException as error:
-            _LOGGER.error(error)
+        await self.entity_description.value_fn(self.coordinator.api)()
