@@ -1,4 +1,3 @@
-
 # Orange Livebox Router
 
 This a _custom component_ for [Home Assistant](https://www.home-assistant.io/).
