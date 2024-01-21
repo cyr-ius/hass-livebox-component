@@ -68,7 +68,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         if status is False and self._old_status > datetime.today():
             _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
             return True
-
+        _LOGGER.debug("Is Connected: %s", status)
         return status
 
     @property
@@ -90,6 +90,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
         device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        _LOGGER.debug("Extra attributes: %s", device)
         attrs = {
             "interface_name": device.get("InterfaceName"),
             "type": device.get("DeviceType"),
@@ -144,7 +145,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     else "guestwifi",
                 }
             )
-
+        _LOGGER.debug("Extra attributes return: %s", attrs)
         return attrs
 
     @property
