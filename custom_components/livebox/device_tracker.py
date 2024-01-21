@@ -105,7 +105,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
             "eth4",
             "eth5",
         ]:
-            attrs.update({"is_wireless": False, "band": "Wired"})
+            attrs.update({"connection": "ethernet", "band": "Wired"})
 
         if (iname := device.get("InterfaceName")) in [
             "eth6",
@@ -139,7 +139,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     "signal_quality": signal_quality,
                     "connection": "wifi"
                     if iname not in ["wlguest2", "wlguest5"]
-                    else "guest_wifi",
+                    else "guestwifi",
                 }
             )
 
