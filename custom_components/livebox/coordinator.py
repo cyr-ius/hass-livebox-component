@@ -1,12 +1,13 @@
 """Coordinator for Livebox."""
 from __future__ import annotations
 
-import logging
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException, AuthenticationFailed
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -65,8 +66,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 },
             }
         except AuthenticationFailed as error:
+            _LOGGER.error(error)
             raise ConfigEntryAuthFailed from error
         except AiosysbusException as error:
+            _LOGGER.error(error)
             raise UpdateFailed(error) from error
 
     async def async_get_devices(
