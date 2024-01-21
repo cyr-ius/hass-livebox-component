@@ -63,7 +63,7 @@ async def async_setup_entry(
     for key, device in coordinator.data["devices"].items():
         entities.append(DeviceWANAccessSwitch(coordinator, key, device))
 
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class LiveboxSwitch(LiveboxEntity, SwitchEntity):

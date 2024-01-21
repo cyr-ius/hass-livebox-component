@@ -1,6 +1,6 @@
 """Support for the Livebox platform."""
-import logging
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -29,7 +29,7 @@ async def async_setup_entry(
         for uid, device in coordinator.data.get("devices", {}).items()
         if "IPAddress" and "PhysAddress" in device
     ]
-    async_add_entities(entities, True)
+    async_add_entities(entities)
 
 
 class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
@@ -131,9 +131,9 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     signal_quality = "excellent"
                 case _:
                     signal_quality = "unknown"
+
             attrs.update(
                 {
-                    "is_wireless": True,
                     "band": self._device.get("OperatingFrequencyBand"),
                     "signal_strength": self._device.get("SignalStrength"),
                     "signal_quality": signal_quality,
