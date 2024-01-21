@@ -15,6 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 class LiveboxEntity(CoordinatorEntity[LiveboxDataUpdateCoordinator], Entity):
     """Base class for all entities."""
 
+    entity_description: EntityDescription
     _attr_has_entity_name = True
 
     def __init__(
