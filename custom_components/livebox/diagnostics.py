@@ -36,6 +36,22 @@ TO_REDACT = {
     "nickname",
     "placeOfBirth",
     "KeyPassPhrase",
+    "phone_number",
+    "IPAddress",
+    "MACAddress",
+    "IPv6Address",
+    "IPv6DelegatedPrefix",
+    "RemoteGateway",
+    "ExternalIPAddress",
+    "MacAddress",
+    "Username",
+    "MobilePhoneNumber",
+    "FirstName",
+    "LastName",
+    "Address",
+    "DestinationMACAddress",
+    "SourceMACAddress",
+    "DestinationIPAddress",
 }
 
 _LOGGER = logging.getLogger(__name__)
