@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import CONF_USE_TLS, DOMAIN
@@ -18,7 +18,9 @@ class LiveboxEntity(CoordinatorEntity[LiveboxDataUpdateCoordinator], Entity):
     _attr_has_entity_name = True
 
     def __init__(
-        self, coordinator: LiveboxDataUpdateCoordinator, entity_description
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        entity_description: EntityDescription,
     ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
