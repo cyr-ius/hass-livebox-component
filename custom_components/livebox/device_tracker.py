@@ -1,13 +1,13 @@
 """Support for the Livebox platform."""
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
-from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
@@ -24,7 +24,9 @@ async def async_setup_entry(
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities = [
         LiveboxDeviceScannerEntity(
-            coordinator, SensorEntityDescription(key=f"{uid}_tracker"), device
+            coordinator,
+            EntityDescription(key=f"{uid}_tracker", name=device.get("Name")),
+            device,
         )
         for uid, device in coordinator.data.get("devices", {}).items()
         if "IPAddress" and "PhysAddress" in device
@@ -38,17 +40,15 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        description: SensorEntityDescription,
+        description: EntityDescription,
         device: dict[str, Any],
     ) -> None:
         """Initialize the device tracker."""
         super().__init__(coordinator, description)
         self._device = device
         self._old_status = datetime.today()
-        self._attr_name = device.get("Name")
-        self._attr_unique_id = device.get("Key")
         self._attr_device_info = {
-            "name": device.get("Name"),
+            "name": self.name,
             "identifiers": {(DOMAIN, device.get("Key"))},
             "via_device": (DOMAIN, coordinator.unique_id),
         }
