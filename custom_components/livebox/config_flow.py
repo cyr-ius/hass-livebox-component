@@ -80,17 +80,20 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None and user_input.get(CONF_USERNAME) is not None:
             try:
                 api = AIOSysbus(
-                    username=user_input["username"],
-                    password=user_input["password"],
+                    username=user_input[CONF_USERNAME],
+                    password=user_input[CONF_PASSWORD],
                     session=async_create_clientsession(self.hass),
-                    host=user_input["host"],
-                    port=user_input["port"],
+                    host=user_input[CONF_HOST],
+                    port=user_input[CONF_PORT],
+                    use_tls=user_input[CONF_USE_TLS],
                 )
                 await api.async_connect()
                 await api.async_get_permissions()
+
                 infos = await api.deviceinfo.async_get_deviceinfo()
                 if sn := infos.get("status", {}).get("SerialNumber") is None:
                     raise NotOpenError("Serial number of device not found")
+
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
             except AuthenticationFailed as err:
