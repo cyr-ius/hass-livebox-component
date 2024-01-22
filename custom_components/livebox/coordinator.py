@@ -1,6 +1,7 @@
 """Coordinator for Livebox."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timedelta
 import logging
 from typing import Any
@@ -45,11 +46,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
         try:
-            await self.api.async_connect()
-            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
-            devices, device_counters = await self.async_get_devices(lan_tracking)
+            # Mandatory informations
             infos = await self.async_get_infos()
             self.unique_id = infos["SerialNumber"]
+
+            # Optionals
+            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
+            devices, device_counters = await self.async_get_devices(lan_tracking)
             return {
                 "cmissed": await self.async_get_caller_missed(),
                 "devices": devices,
@@ -66,8 +69,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 },
             }
         except AiosysbusException as error:
-            _LOGGER.error(error)
+            _LOGGER.error("Error while fetch data information: %s", error)
             raise UpdateFailed(error) from error
+
+    async def async_get_infos(self) -> dict[str, Any]:
+        """Get router infos."""
+        infos = await self.api.deviceinfo.async_get_deviceinfo()
+        return infos.get("status", {})
 
     async def async_get_devices(
         self, lan_tracking=False
@@ -81,7 +89,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
-        devices = await self.api.devices.async_get_devices(parameters)
+        devices = await self._make_request(
+            self.api.devices.async_get_devices, parameters
+        )
         devices_status_wireless = devices.get("status", {}).get("wifi", {})
         device_counters["wireless"] = len(devices_status_wireless)
         for device in devices_status_wireless:
@@ -100,7 +110,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_caller_missed(self) -> dict[str, Any]:
         """Get caller missed."""
         cmisseds = []
-        calls = await self.api.call.async_get_voiceapplication_calllist()
+        calls = await self._make_request(
+            self.api.call.async_get_voiceapplication_calllist
+        )
         for call in calls.get("status", {}):
             if call["callType"] != "succeeded":
                 utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
@@ -118,36 +130,45 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl_status = await self.api.connection.async_get_data_MIBS(parameters)
+        dsl_status = await self._make_request(
+            self.api.connection.async_get_data_MIBS, parameters
+        )
         return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
-
-    async def async_get_infos(self) -> dict[str, Any]:
-        """Get router infos."""
-        infos = await self.api.deviceinfo.async_get_deviceinfo()
-        return infos.get("status", {})
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        wan_status = await self.api.system.async_get_wanstatus()
+        wan_status = await self._make_request(self.api.system.async_get_wanstatus)
         return wan_status.get("data", {})
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        nmc = await self.api.system.async_get_nmc()
+        nmc = await self._make_request(self.api.system.async_get_nmc)
         return nmc.get("status", {})
 
     async def async_get_wifi(self) -> bool:
         """Get dsl status."""
-        wifi = await self.api.wifi.async_get_wifi()
+        wifi = await self._make_request(self.api.wifi.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
     async def async_get_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
-        guest_wifi = await self.api.guestwifi.async_get_guest_wifi()
+        guest_wifi = await self._make_request(self.api.guestwifi.async_get_guest_wifi)
         return guest_wifi.get("status", {}).get("Enable") is True
 
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""
         parameters = {"type": "ToD", "ID": device_key}
-        data = await self.api.schedule.async_get_schedule(parameters)
+        data = await self._make_request(
+            self.api.schedule.async_get_schedule, parameters
+        )
         return data.get("data", {}).get("scheduleInfo", {})
+
+    async def _make_request(
+        self, func: Callable[..., Any], *args: Any
+    ) -> dict[str, Any]:
+        """Execute request."""
+        try:
+            return await func(*args)
+        except AiosysbusException as error:
+            _LOGGER.error("Error while execute: %s (%s)", func.__name__, error)
+        return {}
