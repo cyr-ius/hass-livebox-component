@@ -77,7 +77,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle a flow initialized by the user."""
         errors = {}
-        if user_input is not None and user_input.get(CONF_USERNAME) is not None:
+        if user_input:
             try:
                 api = AIOSysbus(
                     username=user_input[CONF_USERNAME],
@@ -164,7 +164,7 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
                 ): int,
             },
         )
-        if user_input is not None:
+        if user_input:
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="init", data_schema=options_schema)
