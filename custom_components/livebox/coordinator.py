@@ -107,7 +107,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return devices_tracker, device_counters
 
-    async def async_get_caller_missed(self) -> dict[str, Any]:
+    async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
         """Get caller missed."""
         cmisseds = []
         calls = await self._make_request(
@@ -125,7 +125,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     }
                 )
 
-        return {"call missed": cmisseds}
+        return cmisseds
 
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
