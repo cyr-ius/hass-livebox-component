@@ -9,13 +9,14 @@ from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException, AuthenticationFailed
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
-from .const import CONF_LAN_TRACKING, DOMAIN
+from .const import CONF_LAN_TRACKING, CONF_USE_TLS, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
@@ -33,12 +34,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
         self.config_entry = config_entry
         self.api = AIOSysbus(
-            username=config_entry.data["username"],
-            password=config_entry.data["password"],
+            username=config_entry.data[CONF_USERNAME],
+            password=config_entry.data[CONF_PASSWORD],
             session=async_create_clientsession(hass),
-            host=config_entry.data["host"],
-            port=config_entry.data["port"],
-            use_tls=config_entry.data.get("use_tls", False),
+            host=config_entry.data[CONF_HOST],
+            port=config_entry.data[CONF_PORT],
+            use_tls=config_entry.data.get(CONF_USE_TLS, False),
         )
         self.unique_id: str | None = None
 
