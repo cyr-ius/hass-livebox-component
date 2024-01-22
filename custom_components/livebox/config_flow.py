@@ -10,8 +10,9 @@ from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
     AuthenticationFailed,
+    HttpRequestFailed,
     InsufficientPermissionsError,
-    NotOpenError,
+    RetrieveFailed,
 )
 import voluptuous as vol
 
@@ -92,7 +93,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
                 infos = await api.deviceinfo.async_get_deviceinfo()
                 if sn := infos.get("status", {}).get("SerialNumber") is None:
-                    raise NotOpenError("Serial number of device not found")
+                    raise RetrieveFailed("Serial number of device not found")
 
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
@@ -105,7 +106,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     err,
                 )
                 errors["base"] = "insufficient_permission"
-            except NotOpenError as err:
+            except (RetrieveFailed, HttpRequestFailed) as err:
                 _LOGGER.warning("Fail to connect to the Livebox: %s", err)
                 errors["base"] = "cannot_connect"
             except AiosysbusException as err:
