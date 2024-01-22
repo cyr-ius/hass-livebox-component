@@ -60,7 +60,7 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         key="callmissed",
         icon=MISSED_ICON,
         name="Call missed",
-        value_fn=lambda x: len(x.get("cmissed", {}).get("call missed", [])) > 0,
+        value_fn=lambda x: len(x.get("cmissed", [])) > 0,
         attrs={"missed_calls": lambda x: x.get("cmissed", [])},
     ),
 )
