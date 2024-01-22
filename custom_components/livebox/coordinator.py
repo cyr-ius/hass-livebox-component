@@ -6,12 +6,11 @@ import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
-from aiosysbus.exceptions import AiosysbusException, AuthenticationFailed
+from aiosysbus.exceptions import AiosysbusException
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
@@ -66,9 +65,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     key: await self.async_get_device_schedule(key) for key in devices
                 },
             }
-        except AuthenticationFailed as error:
-            _LOGGER.error(error)
-            raise ConfigEntryAuthFailed from error
         except AiosysbusException as error:
             _LOGGER.error(error)
             raise UpdateFailed(error) from error
