@@ -29,7 +29,7 @@ class LiveboxEntity(CoordinatorEntity[LiveboxDataUpdateCoordinator], Entity):
         infos = coordinator.data.get("infos", {})
         scheme = "https" if config_entry.data.get(CONF_USE_TLS) else "http"
 
-        self._attr_unique_id = f"{coordinator.unique_id}-{description.key}"
+        self._attr_unique_id = f"{coordinator.unique_id}_{description.key}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, coordinator.unique_id)},
             "manufacturer": infos.get("Manufacturer"),
