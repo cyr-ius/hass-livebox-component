@@ -38,7 +38,7 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         name="WAN Status",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda x: x.get("wan_status", {}).get("WanState") == "Up",
+        value_fn=lambda x: x.get("wan_status", {}).get("WanState", "").lower() == "up",
         attrs={
             "link_type": lambda x: x.get("wan_status", {}).get("LinkType"),
             "link_state": lambda x: x.get("wan_status", {}).get("LinkState"),
