@@ -43,6 +43,7 @@ TO_REDACT = {
     "ConnectionIPv6Address",
     "DHCPv4ServerMinAddress",
     "DHCPv4ServerMaxAddress",
+    "DHCPServer",
     "MinAddress",
     "MaxAddress",
     "SubnetMask",
@@ -99,6 +100,9 @@ TO_REDACT = {
     "DestinationMACAddress",
     "SourceMACAddress",
     "DestinationIPAddress",
+    "SAEPassphrase",
+    "RadiusSecret",
+    "SelfPIN",
 }
 
 _LOGGER = logging.getLogger(__name__)
