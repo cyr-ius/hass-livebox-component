@@ -8,7 +8,7 @@ from typing import Any
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -61,8 +61,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         timeout_tracking = self.coordinator.config_entry.options.get(
             CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
         )
-        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
-        status = device.get("Active", False)
+        status = self._device.get("Active", False)
         if status is True:
             self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
         if status is False and self._old_status > datetime.today():
@@ -89,19 +88,17 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
-        _LOGGER.debug("Extra attributes: %s", device)
         attrs = {
-            "interface_name": device.get("InterfaceName"),
-            "type": device.get("DeviceType"),
-            "vendor": device.get("VendorClassID"),
-            "manufacturer": device.get("Manufacturer"),
-            "first_seen": device.get("FirstSeen"),
-            "last_connection": device.get("LastConnection"),
-            "last_changed": device.get("LastChanged"),
+            "interface_name": self._device.get("InterfaceName"),
+            "type": self._device.get("DeviceType"),
+            "vendor": self._device.get("VendorClassID"),
+            "manufacturer": self._device.get("Manufacturer"),
+            "first_seen": self._device.get("FirstSeen"),
+            "last_connection": self._device.get("LastConnection"),
+            "last_changed": self._device.get("LastChanged"),
         }
 
-        if device.get("InterfaceName") in [
+        if self._device.get("InterfaceName") in [
             "eth1",
             "eth2",
             "eth3",
@@ -110,14 +107,14 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         ]:
             attrs.update({"connection": "ethernet", "band": "Wired"})
 
-        if (iname := device.get("InterfaceName")) in [
+        if (iname := self._device.get("InterfaceName")) in [
             "eth6",
             "wlan0",
             "wl0",
             "wlguest2",
             "wlguest5",
         ]:
-            match device.get("SignalStrength", 0) * -1:
+            match self._device.get("SignalStrength", 0) * -1:
                 case x if x > 90:
                     signal_quality = "very bad"
                 case x if 80 <= x < 90:
@@ -145,7 +142,6 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     else "guestwifi",
                 }
             )
-        _LOGGER.debug("Extra attributes return: %s", attrs)
         return attrs
 
     @property
@@ -178,3 +174,9 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                 return "mdi:home-automation"
             case _:
                 return "mdi:devices"
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Respond to a DataUpdateCoordinator update."""
+        self._device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        self.async_write_ha_state()
