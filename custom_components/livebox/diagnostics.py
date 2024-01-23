@@ -100,7 +100,6 @@ TO_REDACT = {
     "DestinationMACAddress",
     "SourceMACAddress",
     "DestinationIPAddress",
-    "SAEPassphrase",
     "RadiusSecret",
     "SelfPIN",
 }
