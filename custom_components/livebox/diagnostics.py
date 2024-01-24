@@ -218,6 +218,9 @@ async def async_get_config_entry_diagnostics(
             api_raw[api_method.__qualname__] = f"Exception: {err}"
     _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
 
+    if api_raw.get("Connection.async_get_data_luckyAddrAddress", {}).get("status"):
+        api_raw["Connection.async_get_data_luckyAddrAddress"]["status"] = "**REDACTED**"
+
     return {
         "entry": {
             "data": async_redact_data(entry.data, TO_REDACT),
