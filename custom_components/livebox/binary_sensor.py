@@ -55,6 +55,7 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
             "uptime": lambda x: datetime.today()
             - timedelta(seconds=x.get("infos", {}).get("UpTime", 0)),
         },
+        translation_key="connectivity",
     ),
     LiveboxBinarySensorEntityDescription(
         key="callmissed",
@@ -62,12 +63,15 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         name="Call missed",
         value_fn=lambda x: len(x.get("cmissed", [])) > 0,
         attrs={"missed_calls": lambda x: x.get("cmissed", [])},
+        translation_key="callmissed",
     ),
     LiveboxBinarySensorEntityDescription(
         key="ddns",
         device_class=BinarySensorDeviceClass.PROBLEM,
+        name="Dynamic DNS",
         value_fn=lambda x: x.get("ddns", {}).get("status", "").lower() != "updated",
         attrs={"last_update": lambda x: x.get("ddns", {}).get("last_update", "")},
+        translation_key="ddns",
     ),
 )
 

@@ -1,9 +1,9 @@
 """Sensor for Livebox router."""
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -87,6 +87,8 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
             x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
         ),
         native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="wifi_rx",
     ),
     LiveboxSensorEntityDescription(
         key="wifi_tx",
@@ -95,6 +97,8 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
             x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
         ),
         native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="wifi_tx",
     ),
 )
 
@@ -130,8 +134,9 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the device state attributes."""
-        attributes = {
-            key: attr(self.coordinator.data)
-            for key, attr in self.entity_description.attrs.items()
-        }
-        return attributes
+        if self.entity_description.attrs:
+            attributes = {
+                key: attr(self.coordinator.data)
+                for key, attr in self.entity_description.attrs.items()
+            }
+            return attributes
