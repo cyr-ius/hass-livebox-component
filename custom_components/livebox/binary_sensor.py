@@ -1,10 +1,10 @@
 """Livebox binary sensor entities."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import logging
 from typing import Any, Final
 
 from homeassistant.components.binary_sensor import (
@@ -62,6 +62,12 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         name="Call missed",
         value_fn=lambda x: len(x.get("cmissed", [])) > 0,
         attrs={"missed_calls": lambda x: x.get("cmissed", [])},
+    ),
+    LiveboxBinarySensorEntityDescription(
+        key="ddns",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        value_fn=lambda x: x.get("ddns", {}).get("status", "").lower() != "updated",
+        attrs={"last_update": lambda x: x.get("ddns", {}).get("last_update", "")},
     ),
 )
 
