@@ -1,9 +1,9 @@
 """Sensor for Livebox router."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -89,6 +89,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_rx",
+        entity_registry_enabled_default=False,
     ),
     LiveboxSensorEntityDescription(
         key="wifi_tx",
@@ -99,6 +100,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_tx",
+        entity_registry_enabled_default=False,
     ),
 )
 
