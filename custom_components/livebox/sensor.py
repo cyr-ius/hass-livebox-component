@@ -1,9 +1,9 @@
 """Sensor for Livebox router."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -12,7 +12,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfDataRate
+from homeassistant.const import UnitOfDataRate, UnitOfInformation
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -24,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class FlowSensorEntityDescription(SensorEntityDescription):
+class LiveboxSensorEntityDescription(SensorEntityDescription):
     """Represents an Flow Sensor."""
 
     value_fn: Callable[..., Any] | None = None
@@ -32,7 +32,7 @@ class FlowSensorEntityDescription(SensorEntityDescription):
 
 
 SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
-    FlowSensorEntityDescription(
+    LiveboxSensorEntityDescription(
         key="down",
         name="Orange Livebox Download speed",
         icon=DOWNLOAD_ICON,
@@ -57,7 +57,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
             ),
         },
     ),
-    FlowSensorEntityDescription(
+    LiveboxSensorEntityDescription(
         key="up",
         name="Orange Livebox Upload speed",
         icon=UPLOAD_ICON,
@@ -80,6 +80,22 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
             "upstream_power": lambda x: x.get("dsl_status", {}).get("UpstreamPower"),
         },
     ),
+    LiveboxSensorEntityDescription(
+        key="wifi_rx",
+        name="Wifif Rx",
+        value_fn=lambda x: round(
+            x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+    ),
+    LiveboxSensorEntityDescription(
+        key="wifi_tx",
+        name="Wifif Tx",
+        value_fn=lambda x: round(
+            x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+    ),
 )
 
 
@@ -101,7 +117,7 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        description: SensorEntityDescription,
+        description: LiveboxSensorEntityDescription,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, description)
