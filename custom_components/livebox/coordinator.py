@@ -1,14 +1,13 @@
 """Coordinator for Livebox."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -150,10 +149,20 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         wifi = await self._make_request(self.api.wifi.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
+    async def async_get_wifi_Stats(self) -> bool:
+        """Get wifi stats."""
+        stats = await self._make_request(self.api.wifi.async_get_wifi_Stats)
+        return stats.get("data", {})
+
     async def async_get_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
         guest_wifi = await self._make_request(self.api.guestwifi.async_get_guest_wifi)
         return guest_wifi.get("status", {}).get("Enable") is True
+
+    async def async_get_ddns(self) -> bool:
+        """Get DDNS status."""
+        ddns = await self._make_request(self.api.dyndns.async_get_hosts)
+        return ddns.get("status", {})
 
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""
