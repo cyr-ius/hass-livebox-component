@@ -66,6 +66,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "devices_wan_access": {
                     key: await self.async_get_device_schedule(key) for key in devices
                 },
+                "ddns": await self.async_get_ddns(),
+                "wifi_stats": await self.async_get_wifi_stats(),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -149,7 +151,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         wifi = await self._make_request(self.api.wifi.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
-    async def async_get_wifi_Stats(self) -> bool:
+    async def async_get_wifi_stats(self) -> bool:
         """Get wifi stats."""
         stats = await self._make_request(self.api.wifi.async_get_wifi_Stats)
         return stats.get("data", {})
