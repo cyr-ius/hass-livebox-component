@@ -45,7 +45,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
         try:
-            # Mandatory informations
+            # Mandatory information
             infos = await self.async_get_infos()
             self.unique_id = infos["SerialNumber"]
 
