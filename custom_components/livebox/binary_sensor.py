@@ -72,6 +72,7 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         value_fn=lambda x: x.get("ddns", {}).get("status", "").lower() != "updated",
         attrs={"last_update": lambda x: x.get("ddns", {}).get("last_update", "")},
         translation_key="ddns",
+        entity_registry_enabled_default=False,
     ),
 )
 
