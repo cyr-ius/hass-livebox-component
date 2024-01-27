@@ -1,33 +1,34 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "[%key:components::livebox::config::step::user::title%]",
-                "data": {
-                    "host": "[%key:common::config_flow::data::host%]",
-                    "username": "[%key:common::config_flow::data::username%]",
-                    "password": "[%key:common::config_flow::data::password%]",
-                    "port": "[%key:common::config_flow::data::port%]"            
-                }
-            }
-        },
-        "error": {
-            "login_inccorect": "[%key:components::livebox::config::error::login_inccorect%]",
-            "insufficient_permission": "[%key:components::livebox::config::error::insufficient_permission%]",
-            "unknown": "[%key:common::config_flow::error::unknown%]",
-            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
+  "config": {
+    "step": {
+      "user": {
+        "title": "[%key:components::livebox::config::step::user::title%]",
+        "data": {
+          "host": "[%key:common::config_flow::data::host%]",
+          "username": "[%key:common::config_flow::data::username%]",
+          "password": "[%key:common::config_flow::data::password%]",
+          "port": "[%key:common::config_flow::data::port%]",
+          "use_tls": "Use TLS"
         }
+      }
     },
-    "options": {
-        "step": {
-            "init": {
-                "title": "[%key:components::livebox::options::step::init::title%]",
-                "description": "[%key:components::livebox::options::step::init::description%]",
-                "data": {
-                    "lan_tracking": "[%key:components::livebox::options::step::init::data::lan_tracking%]",
-                    "timeout_tracking": "[%key:components::livebox::options::step::init::data::timeout_tracking%]"
-                }
-            }
-        }
+    "error": {
+      "login_incorrect": "[%key:components::livebox::config::error::login_incorrect%]",
+      "insufficient_permission": "[%key:components::livebox::config::error::insufficient_permission%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]",
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "[%key:components::livebox::options::step::init::title%]",
+        "description": "[%key:components::livebox::options::step::init::description%]",
+        "data": {
+          "lan_tracking": "[%key:components::livebox::options::step::init::data::lan_tracking%]",
+          "timeout_tracking": "[%key:components::livebox::options::step::init::data::timeout_tracking%]"
+        }
+      }
+    }
+  }
 }

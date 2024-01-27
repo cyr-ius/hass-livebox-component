@@ -1,61 +1,144 @@
 """Sensor for Livebox router."""
+from __future__ import annotations
+
 import logging
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any, Final
 
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfDataRate, UnitOfInformation
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import COORDINATOR, DOMAIN, LIVEBOX_ID, SENSOR_TYPES
+from .const import DOMAIN, DOWNLOAD_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
+from .entity import LiveboxEntity
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+@dataclass(frozen=True)
+class LiveboxSensorEntityDescription(SensorEntityDescription):
+    """Represents an Flow Sensor."""
+
+    value_fn: Callable[..., Any] | None = None
+    attrs: dict[str, Callable[..., Any]] | None = None
+
+
+SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
+    LiveboxSensorEntityDescription(
+        key="down",
+        name="Orange Livebox Download speed",
+        icon=DOWNLOAD_ICON,
+        translation_key="down_rate",
+        value_fn=lambda x: round(
+            x.get("dsl_status", {}).get("DownstreamCurrRate", 0) / 100, 2
+        ),
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        attrs={
+            "downstream_maxrate": lambda x: x.get("dsl_status", {}).get(
+                "DownstreamMaxRate"
+            ),
+            "downstream_lineattenuation": lambda x: x.get("", {}).get(
+                "DownstreamLineAttenuation"
+            ),
+            "downstream_noisemargin": lambda x: x.get("dsl_status", {}).get(
+                "DownstreamNoiseMargin"
+            ),
+            "downstream_power": lambda x: x.get("dsl_status", {}).get(
+                "DownstreamPower"
+            ),
+        },
+    ),
+    LiveboxSensorEntityDescription(
+        key="up",
+        name="Orange Livebox Upload speed",
+        icon=UPLOAD_ICON,
+        translation_key="up_rate",
+        value_fn=lambda x: round(
+            x.get("dsl_status", {}).get("UpstreamCurrRate", 0) / 100, 2
+        ),
+        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        attrs={
+            "upstream_maxrate": lambda x: x.get("dsl_status", {}).get(
+                "UpstreamMaxRate"
+            ),
+            "upstream_lineattenuation": lambda x: x.get("dsl_status", {}).get(
+                "UpstreamLineAttenuation"
+            ),
+            "upstream_noisemargin": lambda x: x.get("dsl_status", {}).get(
+                "UpstreamNoiseMargin"
+            ),
+            "upstream_power": lambda x: x.get("dsl_status", {}).get("UpstreamPower"),
+        },
+    ),
+    LiveboxSensorEntityDescription(
+        key="wifi_rx",
+        name="Wifif Rx",
+        value_fn=lambda x: round(
+            x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="wifi_rx",
+        entity_registry_enabled_default=False,
+    ),
+    LiveboxSensorEntityDescription(
+        key="wifi_tx",
+        name="Wifif Tx",
+        value_fn=lambda x: round(
+            x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="wifi_tx",
+        entity_registry_enabled_default=False,
+    ),
+)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     """Set up the sensors."""
-    datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[LIVEBOX_ID]
-    coordinator = datas[COORDINATOR]
-    nmc = coordinator.data["nmc"]
-    entities = [
-        FlowSensor(
-            coordinator,
-            box_id,
-            description,
-        )
-        for description in SENSOR_TYPES
-    ]
-    if nmc.get("WanMode") is not None and "ETHERNET" not in nmc["WanMode"].upper():
-        async_add_entities(entities, True)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    entities = [LiveboxSensor(coordinator, description) for description in SENSOR_TYPES]
+
+    nmc = coordinator.data.get("nmc", {})
+    if nmc.get("WanMode") and "ETHERNET" not in nmc["WanMode"].upper():
+        async_add_entities(entities)
 
 
-class FlowSensor(CoordinatorEntity[LiveboxDataUpdateCoordinator], SensorEntity):
+class LiveboxSensor(LiveboxEntity, SensorEntity):
     """Representation of a livebox sensor."""
 
-    _attr_has_entity_name = True
-
-    def __init__(self, coordinator, box_id, description):
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        description: LiveboxSensorEntityDescription,
+    ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._attributs = description.attr
-        self._current = description.current_rate
-        self.entity_description = description
-        self._attr_unique_id = f"{box_id}_{self._current}"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        super().__init__(coordinator, description)
 
     @property
-    def native_value(self):
+    def native_value(self) -> float | None:
         """Return the native value of the device."""
-        if self.coordinator.data["dsl_status"].get(self._current):
-            return round(
-                self.coordinator.data["dsl_status"][self._current] / 1000,
-                2,
-            )
-        return None
+        return self.entity_description.value_fn(self.coordinator.data)
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, any]:
         """Return the device state attributes."""
-        attributs = {}
-        for key, value in self._attributs.items():
-            attributs[key] = self.coordinator.data["dsl_status"].get(value)
-        return attributs
+        if self.entity_description.attrs:
+            attributes = {
+                key: attr(self.coordinator.data)
+                for key, attr in self.entity_description.attrs.items()
+            }
+            return attributes

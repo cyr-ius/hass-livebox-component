@@ -1,117 +1,96 @@
 """Sensor for Livebox router."""
-import logging
-from typing import Any
+from __future__ import annotations
 
-from aiosysbus import AIOSysbus
-from homeassistant.components.switch import SwitchEntity
+from collections.abc import Callable
+from dataclasses import dataclass
+import logging
+from typing import Any, Final
+
+from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import (
-    COORDINATOR,
-    DEVICE_WANACCESS_ICON,
-    DOMAIN,
-    GUESTWIFI_ICON,
-    LIVEBOX_API,
-    LIVEBOX_ID,
-)
+from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
+from .entity import LiveboxEntity
 
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class LiveboxSwitchEntityDescription(SwitchEntityDescription):
+    """Class describing Livebox button entities."""
+
+    value_fn: Callable[..., Any] | None = None
+    tunr_on_parameters: dict[str, Any] | None = None
+    tunr_off_parameters: dict[str, Any] | None = None
+
+
+SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
+    LiveboxSwitchEntityDescription(
+        key="wifi",
+        name="Wifi switch",
+        translation_key="wifi_switch",
+        value_fn=lambda x: getattr(getattr(x, "wifi"), "async_set_wifi"),
+        tunr_on_parameters={"Enable": "true", "Status": "true"},
+        tunr_off_parameters={"Enable": "false", "Status": "false"},
+    ),
+    LiveboxSwitchEntityDescription(
+        key="guest_wifi",
+        name="Guest Wifi switch",
+        icon=GUESTWIFI_ICON,
+        translation_key="guest_wifi",
+        value_fn=lambda x: getattr(getattr(x, "guestwifi"), "async_set_guest_wifi"),
+        tunr_on_parameters={"Enable": "true", "Status": "true"},
+        tunr_off_parameters={"Enable": "false", "Status": "false"},
+    ),
+)
+
+
 async def async_setup_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the sensors."""
-    datas = hass.data[DOMAIN][config_entry.entry_id]
-    box_id = datas[LIVEBOX_ID]
-    api = datas[LIVEBOX_API]
-    coordinator = datas[COORDINATOR]
-    async_add_entities([WifiSwitch(coordinator, box_id, api)], True)
-    async_add_entities([GuestWifiSwitch(coordinator, box_id, api)], True)
-    async_add_entities(
-        [
-            DeviceWANAccessSwitch(coordinator, box_id, api, key, device)
-            for key, device in coordinator.data["devices"].items()
-        ],
-        True,
-    )
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    entities = [LiveboxSwitch(coordinator, description) for description in SWITCH_TYPES]
+
+    for key, device in coordinator.data["devices"].items():
+        entities.append(DeviceWANAccessSwitch(coordinator, key, device))
+
+    async_add_entities(entities)
 
 
-class WifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
-    """Representation of a livebox sensor."""
-
-    _attr_name = "Wifi switch"
-    _attr_has_entity_name = True
+class LiveboxSwitch(LiveboxEntity, SwitchEntity):
+    """Representation of a livebox switch."""
 
     def __init__(
-        self, coordinator: LiveboxDataUpdateCoordinator, box_id: str, api: AIOSysbus
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        descrîption: SwitchEntityDescription,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._api = api
-        self._attr_unique_id = f"{box_id}_wifi"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
+        super().__init__(coordinator, descrîption)
 
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        return self.coordinator.data.get("wifi") is True
+        return self.coordinator.data.get(self.entity_description.key) is True
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        parameters = {"Enable": "true", "Status": "true"}
-        await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
-        await self.coordinator.async_request_refresh()
-
-    async def async_turn_off(self, **kwargs) -> None:
-        """Turn the switch off."""
-        parameters = {"Enable": "false", "Status": "false"}
-        await self.hass.async_add_executor_job(self._api.wifi.set_wifi, parameters)
-        await self.coordinator.async_request_refresh()
-
-
-class GuestWifiSwitch(CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity):
-    """Representation of a livebox sensor."""
-
-    _attr_name = "Guest Wifi switch"
-    _attr_icon = GUESTWIFI_ICON
-    _attr_has_entity_name = True
-
-    def __init__(
-        self, coordinator: LiveboxDataUpdateCoordinator, box_id: str, api: AIOSysbus
-    ) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._api = api
-        self._attr_unique_id = f"{box_id}_guest_wifi"
-        self._attr_device_info = {"identifiers": {(DOMAIN, box_id)}}
-
-    @property
-    def is_on(self) -> bool:
-        """Return true if device is on."""
-        return self.coordinator.data.get("guest_wifi") is True
-
-    async def async_turn_on(self, **kwargs) -> None:
-        """Turn the switch on."""
-        parameters = {"Enable": "true", "Status": "true"}
-        await self.hass.async_add_executor_job(
-            self._api.guestwifi.set_guest_wifi, parameters
+        await self.entity_description.value_fn(self.coordinator.api)(
+            self.entity_description.tunr_on_parameters
         )
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
-        parameters = {"Enable": "false", "Status": "false"}
-        await self.hass.async_add_executor_job(
-            self._api.guestwifi.set_guest_wifi, parameters
+        await self.entity_description.value_fn(self.coordinator.api)(
+            self.entity_description.tunr_off_parameters
         )
         await self.coordinator.async_request_refresh()
 
@@ -128,25 +107,20 @@ class DeviceWANAccessSwitch(
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        box_id: str,
-        api: AIOSysbus,
         device_key: str,
         device: dict[str, Any],
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._box_id = box_id
-        self._api = api
         self._device_key = device_key
         self._device = device
-
         self._attr_name = "WAN access"
         self._attr_unique_id = f"{self._device_key}_wan_access"
         self._attr_device_info = {
             "name": self._device.get("Name"),
             "identifiers": {(DOMAIN, self._device_key)},
-            "connections": {(device_registry.CONNECTION_NETWORK_MAC, self._device_key)},
-            "via_device": (DOMAIN, self._box_id),
+            "connections": {(dr.CONNECTION_NETWORK_MAC, self._device_key)},
+            "via_device": (DOMAIN, coordinator.unique_id),
         }
 
     def _get_device_schedule(self) -> dict[str, Any]:
@@ -159,86 +133,33 @@ class DeviceWANAccessSwitch(
     def is_on(self) -> bool:
         """Return true if device currently have WAN access."""
         schedule = self._get_device_schedule()
-        _LOGGER.debug(
-            "Device %s (%s) schedule: %s",
-            self._device.get("Name"),
-            self._device_key,
-            schedule,
-        )
         if (
             schedule
             and (schedule.get("override") == "Disable")
             and (schedule.get("value") == "Disable")
         ):
-            _LOGGER.debug(
-                "Locking schedule found for device %s (%s), WAN access OFF",
-                self._device.get("Name"),
-                self._device_key,
-            )
             return False
-        _LOGGER.debug(
-            "No locking schedule found for device %s (%s), WAN access is ON",
-            self._device.get("Name"),
-            self._device_key,
-        )
         return True
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         schedule = self._get_device_schedule()
-        _LOGGER.debug(
-            "Unlock WAN access of device %s (%s)",
-            self._device.get("Name"),
-            self._device_key,
-        )
         if schedule:
-            _LOGGER.debug(
-                "Schedule found for device %s (%s): %s",
-                self._device.get("Name"),
-                self._device_key,
-                schedule,
-            )
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Enable"}
-            _LOGGER.debug(
-                "Set device %s (%s) schedule: %s",
-                self._device.get("Name"),
-                self._device_key,
-                parameters,
-            )
-            result = await self.hass.async_add_executor_job(
-                self._api.schedule.set_schedule, parameters
-            )
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
                     "WAN access"
                 )
             await self.coordinator.async_request_refresh()
-        else:
-            _LOGGER.debug(
-                "No schedule found for device %s (%s), WAN access is already unlocked",
-                self._device.get("Name"),
-                self._device_key,
-            )
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         schedule = self._get_device_schedule()
-        _LOGGER.info(
-            "Lock WAN access of device %s (%s)",
-            self._device.get("Name"),
-            self._device_key,
-        )
         if schedule:
-            _LOGGER.debug(
-                "Schedule found for device %s (%s), update it to lock WAN access",
-                self._device.get("Name"),
-                self._device_key,
-            )
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Disable"}
-            result = await self.hass.async_add_executor_job(
-                self._api.schedule.set_schedule, parameters
-            )
+            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
@@ -246,11 +167,6 @@ class DeviceWANAccessSwitch(
                 )
             await self.coordinator.async_request_refresh()
         else:
-            _LOGGER.debug(
-                "No schedule found for device %s (%s), add one to lock WAN access",
-                self._device.get("Name"),
-                self._device_key,
-            )
             parameters = {
                 "type": "ToD",
                 "ID": self._device_key,
@@ -263,9 +179,7 @@ class DeviceWANAccessSwitch(
                     "override": "Disable",
                 },
             }
-            result = await self.hass.async_add_executor_job(
-                self._api.schedule.add_schedule, parameters
-            )
+            result = await self.coordinator.api.schedule.async_add_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "

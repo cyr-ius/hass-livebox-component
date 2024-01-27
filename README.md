@@ -1,17 +1,16 @@
-
 # Orange Livebox Router
 
-This a *custom component* for [Home Assistant](https://www.home-assistant.io/).
+This a _custom component_ for [Home Assistant](https://www.home-assistant.io/).
 The `livebox` integration allows you to observe and control [Livebox router](http://www.orange.fr/).
 
 There is currently support for the following device types within Home Assistant:
 
-* Sensor with traffic metrics
-* Binary Sensor with wan status , public ip , private ip
-* Device tracker for connected devices (via option add wired devices)
-* Switch for enable/disable Wireless and Guest Wifi
-* Press button to restart box
-* Press button to ring phone
+- Sensor with traffic metrics
+- Binary Sensor with wan status , public ip , private ip
+- Device tracker for connected devices (via option add wired devices)
+- Switch for enable/disable Wireless and Guest Wifi
+- Press button to restart box
+- Press button to ring phone
 
 ![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
@@ -30,7 +29,7 @@ Add your device via the Integration menu
 
 ### Initial setup
 
-You must have set a password for your Livebox router web administration page. 
+You must have set a password for your Livebox router web administration page.
 
 The first time Home Assistant will connect to your Livebox, you will need to specify the password of livebox.
 
@@ -38,10 +37,12 @@ The first time Home Assistant will connect to your Livebox, you will need to spe
 
 Only the routers with Livebox OS are supported:
 
-* Livebox v3
-* Livebox v4 (not tested)
-* Livebox v5 (not tested)
-* KPN Box 12 (Firmware: V12.C.23.04.36)
+- Livebox v3
+- Livebox v4
+- Livebox v5
+- Livebox v6
+- Livebox v7 (not tested)
+- KPN Box 12 (Firmware: V12.C.23.04.36)
 
 ## Presence Detection
 

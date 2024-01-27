@@ -1,3 +1,4 @@
+---
 name: Check Lint
 
 on: [push, pull_request]
@@ -19,22 +20,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install flake8 pylint homeassistant
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pylint
 
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-      - name: Lint with pylint
-        run: |
-          # stop the build if there are Pylint errors
-          # there is a bug with E1136 (https://github.com/PyCQA/pylint/issues/1498)
-          # so we temporarily disable it.
-          pylint --disable=I,C,R,E0401 --extension-pkg-whitelist=numpy custom_components
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.0
