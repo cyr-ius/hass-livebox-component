@@ -164,7 +164,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_ddns(self) -> bool:
         """Get DDNS status."""
         ddns = await self._make_request(self.api.dyndns.async_get_hosts)
-        return ddns.get("status", {})
+        return ddns.get("status") if isinstance(ddns.get("status"), list) else []
 
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""

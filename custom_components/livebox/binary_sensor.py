@@ -1,10 +1,10 @@
 """Livebox binary sensor entities."""
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import logging
 from typing import Any, Final
 
 from homeassistant.components.binary_sensor import (
@@ -30,6 +30,7 @@ class LiveboxBinarySensorEntityDescription(BinarySensorEntityDescription):
 
     value_fn: Callable[..., Any] | None = None
     attrs: dict[str, Callable[..., Any]] | None = None
+    index: int | None = None
 
 
 BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
@@ -65,15 +66,6 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         attrs={"missed_calls": lambda x: x.get("cmissed", [])},
         translation_key="callmissed",
     ),
-    LiveboxBinarySensorEntityDescription(
-        key="ddns",
-        device_class=BinarySensorDeviceClass.PROBLEM,
-        name="Dynamic DNS",
-        value_fn=lambda x: x.get("ddns", {}).get("status", "").lower() != "updated",
-        attrs={"last_update": lambda x: x.get("ddns", {}).get("last_update", "")},
-        translation_key="ddns",
-        entity_registry_enabled_default=False,
-    ),
 )
 
 
@@ -86,6 +78,18 @@ async def async_setup_entry(
         LiveboxBinarySensor(coordinator, description)
         for description in BINARYSENSOR_TYPES
     ]
+
+    for item in coordinator.data.get("ddns", []):
+        idx = coordinator.data["ddns"].index(item)
+        description = LiveboxBinarySensorEntityDescription(
+            key=f"ddns_{idx}",
+            index=idx,
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            name=f"Dynamic DNS ({item.get('service')})",
+            translation_key=f"ddns_{idx}",
+        )
+        entities.append(DDNSBinarySensor(coordinator, description))
+
     async_add_entities(entities)
 
 
@@ -113,3 +117,29 @@ class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
             for key, attr in self.entity_description.attrs.items()
         }
         return attributes
+
+
+class DDNSBinarySensor(LiveboxEntity, BinarySensorEntity):
+    """DynamicDNS sensor."""
+
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        description: LiveboxBinarySensorEntityDescription,
+    ) -> None:
+        """Initialize."""
+        super().__init__(coordinator, description)
+
+    @property
+    def is_on(self) -> bool:
+        """Return state."""
+        ddns = self.coordinator.data.get("ddns", [])
+        return (
+            ddns[self.entity_description.index].get("status", "").lower() != "updated"
+        )
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the device state attributes."""
+        ddns = self.coordinator.data.get("ddns", [])
+        return {"last_update": ddns[self.entity_description.index].get("last_update")}
