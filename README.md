@@ -38,8 +38,11 @@ The first time Home Assistant will connect to your Livebox, you will need to spe
 Only the routers with Livebox OS are supported:
 
 - Livebox v3
-- Livebox v4 (not tested)
-- Livebox v5 (not tested)
+- Livebox v4
+- Livebox v5
+- Livebox v6
+- Livebox v7 (not tested)
+- KPN Box 12 (Firmware: V12.C.23.04.36)
 
 ## Presence Detection
 
