@@ -41,6 +41,7 @@ Only the routers with Livebox OS are supported:
 * Livebox v3
 * Livebox v4 (not tested)
 * Livebox v5 (not tested)
+* KPN Box 12 (Firmware: V12.C.23.04.36)
 
 ## Presence Detection
 
