@@ -38,7 +38,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         icon=DOWNLOAD_ICON,
         translation_key="down_rate",
         value_fn=lambda x: round(
-            x.get("dsl_status", {}).get("DownstreamCurrRate", 0) / 100, 2
+            x.get("dsl_status", {}).get("DownstreamCurrRate", 0) / 1024, 2
         ),
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
@@ -63,7 +63,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         icon=UPLOAD_ICON,
         translation_key="up_rate",
         value_fn=lambda x: round(
-            x.get("dsl_status", {}).get("UpstreamCurrRate", 0) / 100, 2
+            x.get("dsl_status", {}).get("UpstreamCurrRate", 0) / 1024, 2
         ),
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
@@ -86,7 +86,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         value_fn=lambda x: round(
             x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
         ),
-        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_rx",
         entity_registry_enabled_default=False,
@@ -97,7 +97,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         value_fn=lambda x: round(
             x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
         ),
-        native_unit_of_measurement=UnitOfInformation.MEBIBYTES,
+        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_tx",
         entity_registry_enabled_default=False,
