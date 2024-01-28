@@ -1,9 +1,9 @@
 """Sensor for Livebox router."""
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -110,11 +110,15 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensors."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    entities = [LiveboxSensor(coordinator, description) for description in SENSOR_TYPES]
+    entities = []
+    wanmode = coordinator.data.get("nmc", {}).get("WanMode", "").upper()
 
-    nmc = coordinator.data.get("nmc", {})
-    if nmc.get("WanMode") and "ETHERNET" not in nmc["WanMode"].upper():
-        async_add_entities(entities)
+    for description in SENSOR_TYPES:
+        if description.key in ["up", "down"] and "ETHERNET" in wanmode:
+            continue
+        entities.append(LiveboxSensor(coordinator, description))
+
+    async_add_entities(entities)
 
 
 class LiveboxSensor(LiveboxEntity, SensorEntity):
