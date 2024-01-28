@@ -86,9 +86,11 @@ async def async_setup_entry(
             index=idx,
             device_class=BinarySensorDeviceClass.PROBLEM,
             name=f"Dynamic DNS ({item.get('service')})",
+            value_fn=lambda x, y: x["ddns"][y].get("status", "").lower() != "updated",
+            attrs={"last_update": lambda x, y: x["ddns"][y].get("last_update")},
             translation_key=f"ddns_{idx}",
         )
-        entities.append(DDNSBinarySensor(coordinator, description))
+        entities.append(LiveboxBinarySensor(coordinator, description))
 
     async_add_entities(entities)
 
@@ -107,39 +109,17 @@ class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return state."""
+        if (idx := self.entity_description.index) is not None:
+            return self.entity_description.value_fn(self.coordinator.data, idx)
         return self.entity_description.value_fn(self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        attributes = {
-            key: attr(self.coordinator.data)
-            for key, attr in self.entity_description.attrs.items()
-        }
+        attributes = {}
+        for key, attr in self.entity_description.attrs.items():
+            if (idx := self.entity_description.index) is not None:
+                attributes.update({key: attr(self.coordinator.data, idx)})
+            else:
+                attributes.update({key: attr(self.coordinator.data)})
         return attributes
-
-
-class DDNSBinarySensor(LiveboxEntity, BinarySensorEntity):
-    """DynamicDNS sensor."""
-
-    def __init__(
-        self,
-        coordinator: LiveboxDataUpdateCoordinator,
-        description: LiveboxBinarySensorEntityDescription,
-    ) -> None:
-        """Initialize."""
-        super().__init__(coordinator, description)
-
-    @property
-    def is_on(self) -> bool:
-        """Return state."""
-        ddns = self.coordinator.data.get("ddns", [])
-        return (
-            ddns[self.entity_description.index].get("status", "").lower() != "updated"
-        )
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return the device state attributes."""
-        ddns = self.coordinator.data.get("ddns", [])
-        return {"last_update": ddns[self.entity_description.index].get("last_update")}
