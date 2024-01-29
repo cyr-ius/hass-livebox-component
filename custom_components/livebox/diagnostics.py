@@ -173,6 +173,7 @@ async def async_get_config_entry_diagnostics(
     _LOGGER.debug("Start building diagnostics data...")
     start_time = time()
     api_raw = {}
+    params = None
     for api_method in api_methods:
         params = None
         try:
