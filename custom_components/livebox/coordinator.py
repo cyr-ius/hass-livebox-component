@@ -111,9 +111,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
         """Get caller missed."""
         cmisseds = []
-        calls = await self._make_request(
-            self.api.call.async_get_voiceapplication_calllist
-        )
+        calls = await self._make_request(self.api.voiceservice.async_get_calllist)
         for call in calls.get("status", {}):
             if call["callType"] != "succeeded":
                 utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
@@ -132,33 +130,33 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
         dsl_status = await self._make_request(
-            self.api.connection.async_get_data_MIBS, parameters
+            self.api.nemo.async_get_MIBs, "data", parameters
         )
         return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        wan_status = await self._make_request(self.api.system.async_get_wanstatus)
+        wan_status = await self._make_request(self.api.nmc.async_get_wanstatus)
         return wan_status.get("data", {})
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        nmc = await self._make_request(self.api.system.async_get_nmc)
+        nmc = await self._make_request(self.api.nmc.async_get)
         return nmc.get("status", {})
 
     async def async_get_wifi(self) -> bool:
         """Get dsl status."""
-        wifi = await self._make_request(self.api.wifi.async_get_wifi)
+        wifi = await self._make_request(self.api.nmc.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
     async def async_get_wifi_stats(self) -> bool:
         """Get wifi stats."""
-        stats = await self._make_request(self.api.wifi.async_get_wifi_Stats)
+        stats = await self._make_request(self.api.nmc.async_get_wifi_stats)
         return stats.get("data", {})
 
     async def async_get_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
-        guest_wifi = await self._make_request(self.api.guestwifi.async_get_guest_wifi)
+        guest_wifi = await self._make_request(self.api.nmc.async_get_guest_wifi)
         return guest_wifi.get("status", {}).get("Enable") is True
 
     async def async_get_ddns(self) -> bool:
