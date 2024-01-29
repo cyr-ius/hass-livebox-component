@@ -1,9 +1,9 @@
 """Button for Livebox router."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
@@ -31,16 +31,14 @@ BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
         name="Livebox restart",
         icon=RESTART_ICON,
         translation_key="restart_btn",
-        value_fn=lambda x: getattr(getattr(x, "system"), "async_reboot"),
+        value_fn=lambda x: getattr(getattr(x, "nmc"), "async_reboot"),
     ),
     LiveboxButtonEntityDescription(
         key="ring",
         name="Ring your phone",
         icon=RING_ICON,
         translation_key="ring_btn",
-        value_fn=lambda x: getattr(
-            getattr(x, "call"), "async_set_voiceapplication_ring"
-        ),
+        value_fn=lambda x: getattr(getattr(x, "voiceservice"), "async_ring"),
     ),
 )
 
