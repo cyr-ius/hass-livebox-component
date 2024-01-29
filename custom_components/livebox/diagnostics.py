@@ -114,17 +114,17 @@ async def async_get_config_entry_diagnostics(
     coordinator = hass.data[DOMAIN][entry.entry_id]
     api_methods = [
         coordinator.api.async_get_permissions,
+        coordinator.api.deviceinfo.async_get_deviceinfo,
+        coordinator.api.devices.async_get_devices,        
         coordinator.api.voiceservice.async_get_calllist,
         (coordinator.api.nemo.async_lucky_addr_address, ["lan"]),
         (coordinator.api.nemo.async_lucky_addr_address, ["data"]),
-        (coordinator.api.nemo.async_get_data_MIBS, ["data"]),
-        (coordinator.api.nemo.async_get_data_MIBS, ["lan"]),
+        (coordinator.api.nemo.async_get_MIBs, ["data"]),
+        (coordinator.api.nemo.async_get_MIBs, ["lan"]),
         coordinator.api.schedule.async_get_schedules,
         coordinator.api.schedule.async_get_scheduletypes,
-        coordinator.api.devices.async_get_devices,
         coordinator.api.dhcp.async_get_dhcp_pool,
         coordinator.api.dhcp.async_get_dhcp_stats,
-        coordinator.api.dhcp.async_get_dhcp_config,
         coordinator.api.dhcp.async_get_dhcp6_status,
         coordinator.api.dyndns.async_get_hosts,
         coordinator.api.dyndns.async_get_services,
@@ -151,7 +151,6 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.nmc.async_get_guest_wifi,
         coordinator.api.nmc.async_get_wifi_stats,
         coordinator.api.nmc.async_get_lan_ip,
-        coordinator.api.nmc.async_get_led,
         coordinator.api.nmc.async_get_wanmodelist,
         coordinator.api.nmc.async_get_wan_status,
         coordinator.api.nmc.async_update_versioninfo,
@@ -160,6 +159,7 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.nmc.async_get_iptv_config,
         coordinator.api.nmc.async_get_iptv_multi_screens,
         coordinator.api.nmc.async_autodetect,
+        coordinator.api.nmc.async_get_wanstatus,
         coordinator.api.usermanagement.async_get_users,
         coordinator.api.usermanagement.async_get_groups,
     ]
@@ -167,13 +167,14 @@ async def async_get_config_entry_diagnostics(
     _LOGGER.debug("Start building diagnostics data...")
     start_time = time()
     api_raw = {}
+    params = None
     for api_method in api_methods:
         try:
-            _LOGGER.debug("Call API %s method...", api_method.__qualname__)
             if isinstance(api_method, tuple):
-                result = await api_method[0](*api_method[1])
-            else:
-                result = await api_method()
+                api_method, params = api_method
+
+            _LOGGER.debug("Call API %s method...", api_method.__qualname__)
+            result = await api_method(*params) if params else await api_method()
             api_raw[api_method.__qualname__] = (
                 result
                 if isinstance(result, (dict, list, set, float, int, str, tuple))
@@ -188,8 +189,8 @@ async def async_get_config_entry_diagnostics(
             api_raw[api_method.__qualname__] = f"Exception: {err}"
     _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
 
-    if api_raw.get("Connection.async_get_data_luckyAddrAddress", {}).get("status"):
-        api_raw["Connection.async_get_data_luckyAddrAddress"]["status"] = "**REDACTED**"
+    if api_raw.get("NeMo.async_lucky_addr_address", {}).get("status"):
+        api_raw["NeMo.async_lucky_addr_address"]["status"] = "**REDACTED**"
 
     return {
         "entry": {
