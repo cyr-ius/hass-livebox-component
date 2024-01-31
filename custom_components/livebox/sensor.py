@@ -82,7 +82,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     ),
     LiveboxSensorEntityDescription(
         key="wifi_rx",
-        name="Wifif Rx",
+        name="Wifi Rx",
         value_fn=lambda x: round(
             x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
         ),
@@ -93,7 +93,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     ),
     LiveboxSensorEntityDescription(
         key="wifi_tx",
-        name="Wifif Tx",
+        name="Wifi Tx",
         value_fn=lambda x: round(
             x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
         ),
