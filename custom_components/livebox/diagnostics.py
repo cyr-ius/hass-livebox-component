@@ -115,13 +115,14 @@ async def async_get_config_entry_diagnostics(
     api_methods = [
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
-        coordinator.api.devices.async_get_devices,        
+        coordinator.api.devices.async_get_devices,
         coordinator.api.voiceservice.async_get_calllist,
         (coordinator.api.nemo.async_lucky_addr_address, ["lan"]),
         (coordinator.api.nemo.async_lucky_addr_address, ["data"]),
         (coordinator.api.nemo.async_get_MIBs, ["data"]),
         (coordinator.api.nemo.async_get_MIBs, ["lan"]),
-        coordinator.api.schedule.async_get_schedules,
+        (coordinator.api.nemo.async_get_net_dev_stats, ["data"]),
+        coordinator.api.nemo.async_get_dsl0_line_stats,
         coordinator.api.schedule.async_get_scheduletypes,
         coordinator.api.dhcp.async_get_dhcp_pool,
         coordinator.api.dhcp.async_get_dhcp_stats,
@@ -159,23 +160,31 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.nmc.async_get_iptv_config,
         coordinator.api.nmc.async_get_iptv_multi_screens,
         coordinator.api.nmc.async_autodetect,
-        coordinator.api.nmc.async_get_wanstatus,
+        coordinator.api.nmc.async_get_wan_status,
+        coordinator.api.nmc.async_get_remote_access,
         coordinator.api.usermanagement.async_get_users,
         coordinator.api.usermanagement.async_get_groups,
+        coordinator.api.remoteaccess.async_get,
+        coordinator.api.orangeremoteaccess.async_get,
+        coordinator.api.speedtest.async_get_wan_results,
     ]
 
     _LOGGER.debug("Start building diagnostics data...")
     start_time = time()
     api_raw = {}
-    params = None
     for api_method in api_methods:
+        params = None
         try:
             if isinstance(api_method, tuple):
                 api_method, params = api_method
+                str_p = "_".join(str(e) for e in params)
+                qualified_name = f"{api_method.__qualname__}::{str_p}"
+            else:
+                qualified_name = api_method.__qualname__
 
-            _LOGGER.debug("Call API %s method...", api_method.__qualname__)
+            _LOGGER.debug("Call API %s method...", qualified_name)
             result = await api_method(*params) if params else await api_method()
-            api_raw[api_method.__qualname__] = (
+            api_raw[qualified_name] = (
                 result
                 if isinstance(result, (dict, list, set, float, int, str, tuple))
                 or result is None
@@ -186,10 +195,11 @@ async def async_get_config_entry_diagnostics(
                 )
             )
         except Exception as err:  # pylint: disable=broad-exception-caught
-            api_raw[api_method.__qualname__] = f"Exception: {err}"
+            api_raw[qualified_name] = f"Exception: {err}"
     _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
 
-    if api_raw.get("NeMo.async_lucky_addr_address", {}).get("status"):
+    lucky_address = api_raw.get("NeMo.async_lucky_addr_address", {})
+    if isinstance(lucky_address, dict) and lucky_address.get("status"):
         api_raw["NeMo.async_lucky_addr_address"]["status"] = "**REDACTED**"
 
     return {
