@@ -1,13 +1,14 @@
 """Coordinator for Livebox."""
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -136,7 +137,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        wan_status = await self._make_request(self.api.nmc.async_get_wanstatus)
+        wan_status = await self._make_request(self.api.nmc.async_get_wan_status)
         return wan_status.get("data", {})
 
     async def async_get_nmc(self) -> dict[str, Any]:
