@@ -198,9 +198,13 @@ async def async_get_config_entry_diagnostics(
             api_raw[qualified_name] = f"Exception: {err}"
     _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
 
-    lucky_address = api_raw.get("NeMo.async_lucky_addr_address", {})
+    lucky_address = api_raw.get("NeMo.async_lucky_addr_address::lan", {})
     if isinstance(lucky_address, dict) and lucky_address.get("status"):
-        api_raw["NeMo.async_lucky_addr_address"]["status"] = "**REDACTED**"
+        api_raw["NeMo.async_lucky_addr_address::lan"]["status"] = "**REDACTED**"
+
+    lucky_address = api_raw.get("NeMo.async_lucky_addr_address::data", {})
+    if isinstance(lucky_address, dict) and lucky_address.get("status"):
+        api_raw["NeMo.async_lucky_addr_address::data"]["status"] = "**REDACTED**"
 
     return {
         "entry": {
