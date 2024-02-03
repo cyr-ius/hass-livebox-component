@@ -109,7 +109,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     LiveboxSensorEntityDescription(
         key="fiber_power_rx",
         name="Fiber Power Rx",
-        value_fn=lambda x: x.get("fiber_status", {}).get("SignalRxPower"),
+        value_fn=lambda x: x.get("fiber_status", {}).get("SignalRxPower", 0),
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_power_rx",
