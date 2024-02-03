@@ -162,6 +162,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     LiveboxSensorEntityDescription(
         key="fiber_tx",
         name="Fiber Tx",
+        icon=UPLOAD_ICON,
         value_fn=lambda x: round(
             x.get("fiber_stats", {}).get("TxBytes", 0) / 1048576, 2
         ),
@@ -173,6 +174,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     LiveboxSensorEntityDescription(
         key="fiber_rx",
         name="Fiber Rx",
+        icon=DOWNLOAD_ICON,
         value_fn=lambda x: round(
             x.get("fiber_stats", {}).get("RxBytes", 0) / 1048576, 2
         ),
