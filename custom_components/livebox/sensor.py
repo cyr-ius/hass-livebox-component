@@ -1,9 +1,9 @@
 """Sensor for Livebox router."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -179,6 +179,9 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     ),
 )
 
+FIBER_MODE = ["fiber_power_rx", "fiber_power_tx", "fiber_rx", "fiber_tx"]
+ADSL_MODE = ["up", "down"]
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -187,9 +190,12 @@ async def async_setup_entry(
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities = []
     wanmode = coordinator.data.get("nmc", {}).get("WanMode", "").upper()
+    linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").upper()
 
     for description in SENSOR_TYPES:
-        if description.key in ["up", "down"] and "ETHERNET" in wanmode:
+        if description.key in ADSL_MODE and "ETHERNET" in wanmode:
+            continue
+        if description.key in FIBER_MODE and "GPON" not in linktype:
             continue
         entities.append(LiveboxSensor(coordinator, description))
 
