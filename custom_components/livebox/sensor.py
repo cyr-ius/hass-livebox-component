@@ -175,7 +175,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfDataRate.MEGABYTES_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_rx",
-        attrs={"Tx errors": lambda x: x.get("fiber_stats", {}).get("RxErrors")},
+        attrs={"Rx errors": lambda x: x.get("fiber_stats", {}).get("RxErrors")},
     ),
 )
 
