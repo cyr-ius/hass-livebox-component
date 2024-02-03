@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, MISSED_ICON
+from .const import DDNS_ICON, DOMAIN, MISSED_ICON, RA_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
@@ -69,7 +69,9 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
     LiveboxBinarySensorEntityDescription(
         key="remote_access",
         name="Remote Access",
+        icon=RA_ICON,
         value_fn=lambda x: x.get("remote_access"),
+        attrs={},
         translation_key="remote_access",
     ),
 )
@@ -90,6 +92,7 @@ async def async_setup_entry(
         description = LiveboxBinarySensorEntityDescription(
             key=f"ddns_{idx}",
             index=idx,
+            icon=DDNS_ICON,
             device_class=BinarySensorDeviceClass.PROBLEM,
             name=f"Dynamic DNS ({item.get('service')})",
             value_fn=lambda x, y: x["ddns"][y].get("status", "").lower() != "updated",
