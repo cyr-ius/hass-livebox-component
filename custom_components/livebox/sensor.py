@@ -12,7 +12,11 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfDataRate, UnitOfInformation
+from homeassistant.const import (
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    UnitOfDataRate,
+    UnitOfInformation,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -101,6 +105,77 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_tx",
         entity_registry_enabled_default=False,
+    ),
+    LiveboxSensorEntityDescription(
+        key="fiber_power_rx",
+        name="Fiber Power Rx",
+        value_fn=lambda x: x.get("fiber_status", {}).get("SignalRxPower"),
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="fiber_power_rx",
+        attrs={
+            "Downstream max rate": lambda x: x.get("fiber_status", {}).get(
+                "DownstreamMaxRate"
+            ),
+            "Downstream current rate": lambda x: x.get("fiber_status", {}).get(
+                "DownstreamCurrRate"
+            ),
+            "Max bitrate (gbps)": lambda x: x.get("fiber_status", {}).get(
+                "MaxBitRateSupported", 0
+            )
+            / 1000,
+            "Temperature": lambda x: x.get("fiber_status", {}).get("Temperature"),
+            "Voltage": lambda x: x.get("fiber_status", {}).get("Voltage"),
+            "Bias": lambda x: x.get("fiber_status", {}).get("Bias"),
+            "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
+        },
+    ),
+    LiveboxSensorEntityDescription(
+        key="fiber_power_tx",
+        name="Fiber Power Tx",
+        value_fn=lambda x: x.get("fiber_status", {}).get("SignalTxPower", 0),
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="fiber_power_tx",
+        attrs={
+            "Upstream max rate": lambda x: x.get("fiber_status", {}).get(
+                "UpstreamMaxRate"
+            ),
+            "Upstream current rate (mb)": lambda x: x.get("fiber_status", {}).get(
+                "UpstreamCurrRate"
+            ),
+            "Max bitrate (gbps)": lambda x: x.get("fiber_status", {}).get(
+                "MaxBitRateSupported", 0
+            )
+            / 1000,
+            "Tx power (dbm)": lambda x: x.get("fiber_status", {}).get("SignalTxPower"),
+            "Temperature": lambda x: x.get("fiber_status", {}).get("Temperature"),
+            "Voltage": lambda x: x.get("fiber_status", {}).get("Voltage"),
+            "Bias": lambda x: x.get("fiber_status", {}).get("Bias"),
+            "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
+        },
+    ),
+    LiveboxSensorEntityDescription(
+        key="fiber_tx",
+        name="Fiber Tx",
+        value_fn=lambda x: round(
+            x.get("fiber_stats", {}).get("TxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfDataRate.MEGABYTES_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="fiber_tx",
+        attrs={"Tx errors": lambda x: x.get("fiber_stats", {}).get("TxErrors")},
+    ),
+    LiveboxSensorEntityDescription(
+        key="fiber_rx",
+        name="Fiber Rx",
+        value_fn=lambda x: round(
+            x.get("fiber_stats", {}).get("RxBytes", 0) / 1048576, 2
+        ),
+        native_unit_of_measurement=UnitOfDataRate.MEGABYTES_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        translation_key="fiber_rx",
+        attrs={"Tx errors": lambda x: x.get("fiber_stats", {}).get("RxErrors")},
     ),
 )
 

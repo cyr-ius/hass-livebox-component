@@ -69,6 +69,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 },
                 "ddns": await self.async_get_ddns(),
                 "wifi_stats": await self.async_get_wifi_stats(),
+                "fiber_status": await self.async_get_fiber_status(),
+                "fiber_stats": await self.async_get_fiber_stats(),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -130,10 +132,28 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl_status = await self._make_request(
+        dsl0 = await self._make_request(
             self.api.nemo.async_get_MIBs, "data", parameters
         )
-        return dsl_status.get("status", {}).get("dsl", {}).get("dsl0", {})
+        return dsl0.get("status", {}).get("dsl", {}).get("dsl0", {})
+
+    async def async_get_fiber_status(self):
+        """Get fiber status."""
+        parameters = {"mibs": "gpon"}
+        veip0 = await self._make_request(
+            self.api.nemo.async_get_MIBs, "veip0", parameters
+        )
+        return veip0.get("status", {}).get("gpon", {}).get("veip0", {})
+
+    async def async_get_wifi_stats(self) -> bool:
+        """Get wifi stats."""
+        stats = await self._make_request(self.api.nmc.async_get_wifi_stats)
+        return stats.get("data", {})
+
+    async def async_get_fiber_stats(self) -> bool:
+        """Get fiber stats."""
+        stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, "veip0")
+        return stats.get("status", {})
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
@@ -149,11 +169,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Get dsl status."""
         wifi = await self._make_request(self.api.nmc.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
-
-    async def async_get_wifi_stats(self) -> bool:
-        """Get wifi stats."""
-        stats = await self._make_request(self.api.nmc.async_get_wifi_stats)
-        return stats.get("data", {})
 
     async def async_get_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
