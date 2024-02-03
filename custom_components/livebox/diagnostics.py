@@ -138,7 +138,7 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.userinterface.async_get_language,
         coordinator.api.userinterface.async_get_state,
         coordinator.api.upnpigd.async_get,
-        # coordinator.api.homelan.async_get_results,  # take 5s
+        coordinator.api.homelan.async_get_results,  # take 5s
         # coordinator.api.homelan.async_get_devices_results,  # take 13s
         coordinator.api.homelan.async_get_maxnumber_records,
         coordinator.api.homelan.async_get_reading_interval,
