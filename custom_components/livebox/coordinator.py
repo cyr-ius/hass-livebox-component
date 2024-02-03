@@ -1,14 +1,13 @@
 """Coordinator for Livebox."""
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -60,8 +59,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "infos": infos,
                 "nmc": await self.async_get_nmc(),
                 "wan_status": await self.async_get_wan_status(),
-                "wifi": await self.async_get_wifi(),
-                "guest_wifi": await self.async_get_guest_wifi(),
+                "wifi": await self.async_is_wifi(),
+                "guest_wifi": await self.async_is_guest_wifi(),
                 "count_wired_devices": device_counters["wired"],
                 "count_wireless_devices": device_counters["wireless"],
                 "devices_wan_access": {
@@ -71,6 +70,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "wifi_stats": await self.async_get_wifi_stats(),
                 "fiber_status": await self.async_get_fiber_status(),
                 "fiber_stats": await self.async_get_fiber_stats(),
+                "remote_access": await self.async_is_remote_access(),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -165,12 +165,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         nmc = await self._make_request(self.api.nmc.async_get)
         return nmc.get("status", {})
 
-    async def async_get_wifi(self) -> bool:
+    async def async_is_wifi(self) -> bool:
         """Get dsl status."""
         wifi = await self._make_request(self.api.nmc.async_get_wifi)
         return wifi.get("status", {}).get("Enable") is True
 
-    async def async_get_guest_wifi(self) -> bool:
+    async def async_is_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
         guest_wifi = await self._make_request(self.api.nmc.async_get_guest_wifi)
         return guest_wifi.get("status", {}).get("Enable") is True
@@ -187,6 +187,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             self.api.schedule.async_get_schedule, parameters
         )
         return data.get("data", {}).get("scheduleInfo", {})
+
+    async def async_is_remote_access(self, device_key):
+        """Get Remote access status schedule."""
+        ra = await self._make_request(self.api.remoteaccess.async_get)
+        return ra.get("status", {}).get("Enable", False) is True
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any
