@@ -114,19 +114,21 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_power_rx",
         attrs={
-            "Downstream max rate": lambda x: x.get("fiber_status", {}).get(
-                "DownstreamMaxRate"
-            ),
-            "Downstream current rate": lambda x: x.get("fiber_status", {}).get(
-                "DownstreamCurrRate"
-            ),
-            "Max bitrate (gbps)": lambda x: x.get("fiber_status", {}).get(
+            "Downstream max rate Gbps": lambda x: x.get("fiber_status", {}).get(
+                "DownstreamMaxRate", 0
+            )
+            / 1000,
+            "Downstream current rate Gbps": lambda x: x.get("fiber_status", {}).get(
+                "DownstreamCurrRate", 0
+            )
+            / 1000,
+            "Max bitrate (Gbps)": lambda x: x.get("fiber_status", {}).get(
                 "MaxBitRateSupported", 0
             )
             / 1000,
-            "Temperature": lambda x: x.get("fiber_status", {}).get("Temperature"),
-            "Voltage": lambda x: x.get("fiber_status", {}).get("Voltage"),
-            "Bias": lambda x: x.get("fiber_status", {}).get("Bias"),
+            "Temperature (°C)": lambda x: x.get("fiber_status", {}).get("Temperature"),
+            "Voltage (V)": lambda x: x.get("fiber_status", {}).get("Voltage"),
+            "Bias (mA)": lambda x: x.get("fiber_status", {}).get("Bias"),
             "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
         },
     ),
@@ -138,20 +140,22 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_power_tx",
         attrs={
-            "Upstream max rate": lambda x: x.get("fiber_status", {}).get(
-                "UpstreamMaxRate"
-            ),
-            "Upstream current rate (mb)": lambda x: x.get("fiber_status", {}).get(
-                "UpstreamCurrRate"
-            ),
-            "Max bitrate (gbps)": lambda x: x.get("fiber_status", {}).get(
+            "Upstream max rate (Gbps)": lambda x: x.get("fiber_status", {}).get(
+                "UpstreamMaxRate", 0
+            )
+            / 1000,
+            "Upstream current rate (Gbps)": lambda x: x.get("fiber_status", {}).get(
+                "UpstreamCurrRate", 0
+            )
+            / 1000,
+            "Max bitrate (Gbps)": lambda x: x.get("fiber_status", {}).get(
                 "MaxBitRateSupported", 0
             )
             / 1000,
             "Tx power (dbm)": lambda x: x.get("fiber_status", {}).get("SignalTxPower"),
-            "Temperature": lambda x: x.get("fiber_status", {}).get("Temperature"),
-            "Voltage": lambda x: x.get("fiber_status", {}).get("Voltage"),
-            "Bias": lambda x: x.get("fiber_status", {}).get("Bias"),
+            "Temperature (°C)": lambda x: x.get("fiber_status", {}).get("Temperature"),
+            "Voltage (V)": lambda x: x.get("fiber_status", {}).get("Voltage"),
+            "Bias (mA)": lambda x: x.get("fiber_status", {}).get("Bias"),
             "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
         },
     ),
