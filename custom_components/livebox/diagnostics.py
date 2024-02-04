@@ -102,6 +102,7 @@ TO_REDACT = {
     "DestinationIPAddress",
     "RadiusSecret",
     "SelfPIN",
+    "MACADDRESS",
 }
 
 _LOGGER = logging.getLogger(__name__)
