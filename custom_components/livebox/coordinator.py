@@ -188,8 +188,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         )
         return data.get("data", {}).get("scheduleInfo", {})
 
-    async def async_is_remote_access(self, device_key):
-        """Get Remote access status schedule."""
+    async def async_is_remote_access(self) -> bool:
+        """Get Remote access status."""
         ra = await self._make_request(self.api.remoteaccess.async_get)
         return ra.get("status", {}).get("Enable", False) is True
 
