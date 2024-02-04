@@ -38,7 +38,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
 SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     LiveboxSensorEntityDescription(
         key="down",
-        name="Orange Livebox Download speed",
+        name="xDSL Download",
         icon=DOWNLOAD_ICON,
         translation_key="down_rate",
         value_fn=lambda x: round(
@@ -63,7 +63,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     ),
     LiveboxSensorEntityDescription(
         key="up",
-        name="Orange Livebox Upload speed",
+        name="xDSL Upload",
         icon=UPLOAD_ICON,
         translation_key="up_rate",
         value_fn=lambda x: round(
@@ -189,9 +189,6 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     ),
 )
 
-FIBER_MODE = ["fiber_power_rx", "fiber_power_tx", "fiber_rx", "fiber_tx"]
-ADSL_MODE = ["up", "down"]
-
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -199,13 +196,10 @@ async def async_setup_entry(
     """Set up the sensors."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities = []
-    wanmode = coordinator.data.get("nmc", {}).get("WanMode", "").upper()
-    linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").upper()
+    linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").lower()
 
     for description in SENSOR_TYPES:
-        if description.key in ADSL_MODE and "ETHERNET" in wanmode:
-            continue
-        if description.key in FIBER_MODE and "GPON" not in linktype:
+        if description.key in ["up", "down"] and linktype in ["gpon", "sfp"]:
             continue
         entities.append(LiveboxSensor(coordinator, description))
 
