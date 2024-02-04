@@ -8,12 +8,12 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/cyr-ius/hass-livebox-component/issues",
   "loggers": ["aiosysbus"],
-  "requirements": ["aiosysbus==1.1.5"],
+  "requirements": ["aiosysbus==1.1.6"],
   "ssdp": [
     {
       "st": "urn:schemas-upnp-org:device:InternetGatewayDevice:2",
       "friendlyName": "Orange Livebox"
     }
   ],
-  "version": "2.3.2"
+  "version": "2.3.3"
 }
