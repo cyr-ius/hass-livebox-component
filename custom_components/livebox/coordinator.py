@@ -41,6 +41,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             use_tls=config_entry.data.get(CONF_USE_TLS, False),
         )
         self.unique_id: str | None = None
+        self.model: int | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -48,6 +49,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             # Mandatory information
             infos = await self.async_get_infos()
             self.unique_id = infos["SerialNumber"]
+            match infos["ProductClass"]:
+                case "Livebox 4":
+                    self.model = 4
+                case "Livebox Fibre":
+                    self.model = 5
+                case "Livebox 6":
+                    self.model = 6
+                case "Livebox 7":
+                    self.model = 7
 
             # Optionals
             lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
@@ -152,7 +162,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_stats(self) -> bool:
         """Get fiber stats."""
-        stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, "veip0")
+        intf = "eth0" if self.model == 4 else "veip0"
+        stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
         return stats.get("status", {})
 
     async def async_get_wan_status(self) -> dict[str, Any]:
