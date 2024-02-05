@@ -149,6 +149,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
+        if self.model == 4:
+            return {}
         parameters = {"mibs": "gpon"}
         veip0 = await self._make_request(
             self.api.nemo.async_get_MIBs, "veip0", parameters
