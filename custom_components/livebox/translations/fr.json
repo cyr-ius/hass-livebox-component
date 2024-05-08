@@ -8,7 +8,8 @@
           "username": "Utilisateur",
           "password": "Mot de passe",
           "port": "Port",
-          "use_tls": "Utiliser SSL/TLS"
+          "use_tls": "Utiliser SSL/TLS",
+          "verify_tls": "Verify SSL/TLS"
         }
       }
     },

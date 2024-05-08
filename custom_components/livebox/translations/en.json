@@ -8,7 +8,8 @@
           "username": "Username",
           "password": "Password",
           "port": "Port",
-          "use_tls": "Use SSL"
+          "use_tls": "Use TSL",
+          "verify_tls": "Verify TLS"
         }
       }
     },

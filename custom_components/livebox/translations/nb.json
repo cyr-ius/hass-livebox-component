@@ -8,6 +8,7 @@
           "username": "Brukernavn",
           "password": "Passord",
           "port": "Port",
+          "use_tls": "Use TSL",
           "verify_ssl": "SSL/TLS"
         }
       }

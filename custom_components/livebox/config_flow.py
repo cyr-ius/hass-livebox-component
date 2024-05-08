@@ -1,4 +1,5 @@
 """Config flow to configure Livebox."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -18,12 +19,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_HOST,
-    CONF_PASSWORD,
-    CONF_PORT,
-    CONF_USERNAME,
-)
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
@@ -33,6 +29,7 @@ from .const import (
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     CONF_USE_TLS,
+    CONF_VERIFY_TLS,
     DEFAULT_HOST,
     DEFAULT_LAN_TRACKING,
     DEFAULT_PORT,
@@ -48,6 +45,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_PASSWORD): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): cv.port,
         vol.Required(CONF_USE_TLS, default=False): bool,
+        vol.Required(CONF_VERIFY_TLS, default=True): bool,
     }
 )
 
@@ -83,6 +81,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     host=user_input[CONF_HOST],
                     port=user_input[CONF_PORT],
                     use_tls=user_input[CONF_USE_TLS],
+                    verify_tls=user_input[CONF_VERIFY_TLS],
                 )
                 await api.async_connect()
                 await api.async_get_permissions()

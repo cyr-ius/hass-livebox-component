@@ -8,7 +8,8 @@
           "username": "[%key:common::config_flow::data::username%]",
           "password": "[%key:common::config_flow::data::password%]",
           "port": "[%key:common::config_flow::data::port%]",
-          "use_tls": "Use TLS"
+          "use_tls": "Use TLS",
+          "verify_tls": "Verify TLS"
         }
       }
     },
