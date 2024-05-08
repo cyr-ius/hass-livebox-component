@@ -104,8 +104,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             except (RetrieveFailed, HttpRequestFailed) as err:
                 _LOGGER.warning("Fail to connect to the Livebox: %s", err)
                 errors["base"] = "cannot_connect"
-            except AiosysbusException as err:
-                _LOGGER.exception("Unknown error connecting to the Livebox: %s", err)
+            except AiosysbusException:
+                _LOGGER.exception("Unknown error connecting to the Livebox")
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
