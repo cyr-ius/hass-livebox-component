@@ -11,11 +11,11 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Generate changelog
         id: changelog
-        uses: metcalfc/changelog-generator@v4.1.0
+        uses: metcalfc/changelog-generator@v4.3.1
         with:
           mytoken: ${{ secrets.GITHUB_TOKEN }}
 
