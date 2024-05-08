@@ -3,7 +3,7 @@ on: pull_request
 
 permissions:
   pull-requests: write
-  content: write
+  contents: write
 
 jobs:
   dependency:
