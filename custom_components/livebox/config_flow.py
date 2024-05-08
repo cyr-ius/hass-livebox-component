@@ -4,7 +4,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 import logging
 from typing import Any
-from urllib.parse import urlparse
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
@@ -18,14 +17,11 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.components import ssdp
-from homeassistant.components.ssdp import ATTR_SSDP_UDN, ATTR_SSDP_USN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
-    CONF_NAME,
     CONF_PASSWORD,
     CONF_PORT,
-    CONF_UNIQUE_ID,
     CONF_USERNAME,
 )
 from homeassistant.core import callback
@@ -124,20 +120,10 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_ssdp(self, discovery_info: ssdp.SsdpServiceInfo) -> FlowResult:
         """Handle a discovered device."""
-        hostname = urlparse(discovery_info.ssdp_location).hostname
-        friendly_name = discovery_info.upnp[ssdp.ATTR_UPNP_FRIENDLY_NAME]
         unique_id = discovery_info.upnp[ssdp.ATTR_UPNP_SERIAL]
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
-
-        user_input = {
-            CONF_HOST: hostname,
-            CONF_NAME: friendly_name,
-            CONF_UNIQUE_ID: unique_id,
-            ATTR_SSDP_USN: discovery_info.ssdp_usn,
-            ATTR_SSDP_UDN: discovery_info.ssdp_udn,
-        }
-        return await self.async_step_user(user_input)
+        return await self.async_step_user()
 
 
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
