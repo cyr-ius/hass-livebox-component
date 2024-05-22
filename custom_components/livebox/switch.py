@@ -1,4 +1,5 @@
 """Sensor for Livebox router."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -7,13 +8,13 @@ import logging
 from typing import Any, Final
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from . import LiveboxConfigEntry
 from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
@@ -52,10 +53,12 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: LiveboxConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensors."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = [LiveboxSwitch(coordinator, description) for description in SWITCH_TYPES]
 
     for key, device in coordinator.data["devices"].items():

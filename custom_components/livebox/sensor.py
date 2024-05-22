@@ -1,9 +1,10 @@
 """Sensor for Livebox router."""
+
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -11,7 +12,6 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfDataRate,
@@ -20,7 +20,8 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DOWNLOAD_ICON, UPLOAD_ICON
+from . import LiveboxConfigEntry
+from .const import DOWNLOAD_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
@@ -191,10 +192,12 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: LiveboxConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensors."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = []
     linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").lower()
 

@@ -1,4 +1,5 @@
 """Support for the Livebox platform."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -7,11 +8,11 @@ from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from . import LiveboxConfigEntry
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
@@ -20,10 +21,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: LiveboxConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up device tracker from config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = [
         LiveboxDeviceScannerEntity(
             coordinator,

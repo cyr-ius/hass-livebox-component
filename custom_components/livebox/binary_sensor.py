@@ -1,10 +1,11 @@
 """Livebox binary sensor entities."""
+
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import logging
 from typing import Any, Final
 
 from homeassistant.components.binary_sensor import (
@@ -12,12 +13,12 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DDNS_ICON, DOMAIN, MISSED_ICON, RA_ICON
+from . import LiveboxConfigEntry
+from .const import DDNS_ICON, MISSED_ICON, RA_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
@@ -78,10 +79,12 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: LiveboxConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Defer binary sensor setup to the shared sensor module."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = [
         LiveboxBinarySensor(coordinator, description)
         for description in BINARYSENSOR_TYPES

@@ -1,17 +1,18 @@
 """Button for Livebox router."""
+
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+import logging
 from typing import Any, Final
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, RESTART_ICON, RING_ICON
+from . import LiveboxConfigEntry
+from .const import RESTART_ICON, RING_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
@@ -44,10 +45,12 @@ BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: LiveboxConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensors."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = [Button(coordinator, description) for description in BUTTON_TYPES]
     async_add_entities(entities)
 
