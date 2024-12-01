@@ -27,8 +27,8 @@ class LiveboxSwitchEntityDescription(SwitchEntityDescription):
     """Class describing Livebox button entities."""
 
     value_fn: Callable[..., Any] | None = None
-    tunr_on_parameters: dict[str, Any] | None = None
-    tunr_off_parameters: dict[str, Any] | None = None
+    turn_on_parameters: dict[str, Any] | None = None
+    turn_off_parameters: dict[str, Any] | None = None
 
 
 SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
@@ -37,8 +37,8 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
         name="Wifi switch",
         translation_key="wifi_switch",
         value_fn=lambda x: getattr(getattr(x, "nmc"), "async_set_wifi"),
-        tunr_on_parameters={"Enable": "true", "Status": "true"},
-        tunr_off_parameters={"Enable": "false", "Status": "false"},
+        turn_on_parameters={"Enable": "true", "Status": "true"},
+        turn_off_parameters={"Enable": "false", "Status": "false"},
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
@@ -46,8 +46,8 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: getattr(getattr(x, "nmc"), "async_set_guest_wifi"),
-        tunr_on_parameters={"Enable": "true", "Status": "true"},
-        tunr_off_parameters={"Enable": "false", "Status": "false"},
+        turn_on_parameters={"Enable": "true", "Status": "true"},
+        turn_off_parameters={"Enable": "false", "Status": "false"},
     ),
 )
 
@@ -86,14 +86,14 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         await self.entity_description.value_fn(self.coordinator.api)(
-            self.entity_description.tunr_on_parameters
+            self.entity_description.turn_on_parameters
         )
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         await self.entity_description.value_fn(self.coordinator.api)(
-            self.entity_description.tunr_off_parameters
+            self.entity_description.turn_off_parameters
         )
         await self.coordinator.async_request_refresh()
 
