@@ -15,7 +15,14 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
-from .const import CONF_LAN_TRACKING, CONF_USE_TLS, DOMAIN
+from .const import ( 
+    CONF_LAN_TRACKING,
+    CONF_WIFI_TRACKING,
+    DEFAULT_LAN_TRACKING,
+    DEFAULT_WIFI_TRACKING,
+    CONF_USE_TLS,
+    DOMAIN
+)
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
@@ -60,8 +67,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 7
 
             # Optionals
-            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, False)
-            devices, device_counters = await self.async_get_devices(lan_tracking)
+            wifi_tracking = self.config_entry.options.get(CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING)
+            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING)
+            devices, device_counters = await self.async_get_devices(lan_tracking, wifi_tracking)
             return {
                 "cmissed": await self.async_get_caller_missed(),
                 "devices": devices,
@@ -92,7 +100,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         return infos.get("status", {})
 
     async def async_get_devices(
-        self, lan_tracking=False
+        self, lan_tracking=False, wifi_tracking=True
     ) -> tuple[dict[str, Any], dict[str, int]]:
         """Get all devices."""
         devices_tracker = {}
@@ -106,11 +114,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         devices = await self._make_request(
             self.api.devices.async_get_devices, parameters
         )
-        devices_status_wireless = devices.get("status", {}).get("wifi", {})
-        device_counters["wireless"] = len(devices_status_wireless)
-        for device in devices_status_wireless:
-            if device.get("Key"):
-                devices_tracker.setdefault(device.get("Key"), {}).update(device)
+        if wifi_tracking:
+            devices_status_wireless = devices.get("status", {}).get("wifi", {})
+            device_counters["wireless"] = len(devices_status_wireless)
+            for device in devices_status_wireless:
+                if device.get("Key"):
+                    devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if lan_tracking:
             devices_status_wired = devices.get("status", {}).get("eth", {})
