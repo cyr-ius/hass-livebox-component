@@ -15,6 +15,7 @@ CALLID = "callId"
 CONF_USE_TLS = "use_tls"
 CONF_VERIFY_TLS = "verify_tls"
 CONF_LAN_TRACKING = "lan_tracking"
+CONF_WIFI_TRACKING = "wifi_tracking"
 DEFAULT_LAN_TRACKING = False
 
 CONF_TRACKING_TIMEOUT = "timeout_tracking"
