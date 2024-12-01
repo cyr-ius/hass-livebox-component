@@ -87,7 +87,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await api.async_get_permissions()
 
                 infos = await api.deviceinfo.async_get_deviceinfo()
-                if sn := infos.get("status", {}).get("SerialNumber") is None:
+                if (sn := infos.get("status", {}).get("SerialNumber")) is None:
                     raise RetrieveFailed("Serial number of device not found")
 
                 await self.async_set_unique_id(sn)
