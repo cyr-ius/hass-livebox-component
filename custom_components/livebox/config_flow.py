@@ -30,11 +30,13 @@ from .const import (
     CONF_TRACKING_TIMEOUT,
     CONF_USE_TLS,
     CONF_VERIFY_TLS,
+    CONF_WIFI_TRACKING
     DEFAULT_HOST,
     DEFAULT_LAN_TRACKING,
     DEFAULT_PORT,
     DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_USERNAME,
+    DEFAULT_WIFI_TRACKING,
     DOMAIN,
 )
 
@@ -131,6 +133,9 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: ConfigEntry):
         """Initialize the options flow."""
         self.config_entry = config_entry
+        self._wifi_tracking = self.config_entry.options.get(
+            CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
+        )
         self._lan_tracking = self.config_entry.options.get(
             CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
         )
@@ -144,6 +149,7 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
         """Handle a flow initialized by the user."""
         options_schema = vol.Schema(
             {
+                vol.Required(CONF_WIFI_TRACKING, default=self._wifi_tracking): bool,
                 vol.Required(CONF_LAN_TRACKING, default=self._lan_tracking): bool,
                 vol.Required(
                     CONF_TRACKING_TIMEOUT, default=self._tracking_timeout
