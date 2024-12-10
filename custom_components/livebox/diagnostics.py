@@ -1,4 +1,5 @@
 """Diagnostics support for Livebox."""
+
 from __future__ import annotations
 
 import logging
@@ -9,7 +10,6 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
 
 TO_REDACT = {
     "address",
@@ -112,7 +112,7 @@ async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     api_methods = [
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
