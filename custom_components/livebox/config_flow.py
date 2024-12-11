@@ -63,7 +63,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: ConfigEntry):
         """Get option flow."""
-        return LiveboxOptionsFlowHandler(config_entry)
+        return LiveboxOptionsFlowHandler()
 
     async def async_step_import(self, import_config) -> FlowResult:
         """Import a config entry from configuration.yaml."""
@@ -130,9 +130,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle option."""
 
-    def __init__(self, config_entry: ConfigEntry):
+    def __init__(self):
         """Initialize the options flow."""
-        self.config_entry = config_entry
         self._wifi_tracking = self.config_entry.options.get(
             CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
         )
