@@ -27,6 +27,7 @@
         "description": "you want tracking  yours wired devices in addition to wireless devices",
         "data": {
           "lan_tracking": "Wired tracking",
+          "wifi_tracking": "Wireless tracking",
           "timeout_tracking": "Timeout tracking"
         }
       }

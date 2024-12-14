@@ -27,6 +27,7 @@
         "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
         "data": {
           "lan_tracking": "Kablet sporing",
+          "wifi_tracking": "Trådløs sporing",
           "timeout_tracking": "Tid før overvejelse om manglende udstyr"
         }
       }

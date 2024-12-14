@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import logging
+from collections.abc import Mapping
 from typing import Any
 
+import voluptuous as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -14,8 +15,6 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
-import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry
@@ -130,32 +129,29 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle option."""
 
-    def __init__(self):
-        """Initialize the options flow."""
-        self._wifi_tracking = self.config_entry.options.get(
-            CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
-        )
-        self._lan_tracking = self.config_entry.options.get(
-            CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
-        )
-        self._tracking_timeout = self.config_entry.options.get(
-            CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
-        )
-
     async def async_step_init(
         self, user_input: Mapping[str, Any] | None = None
     ) -> FlowResult:
         """Handle a flow initialized by the user."""
-        options_schema = vol.Schema(
-            {
-                vol.Required(CONF_WIFI_TRACKING, default=self._wifi_tracking): bool,
-                vol.Required(CONF_LAN_TRACKING, default=self._lan_tracking): bool,
-                vol.Required(
-                    CONF_TRACKING_TIMEOUT, default=self._tracking_timeout
-                ): int,
-            },
-        )
         if user_input:
             return self.async_create_entry(title="", data=user_input)
 
-        return self.async_show_form(step_id="init", data_schema=options_schema)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_WIFI_TRACKING, default=DEFAULT_WIFI_TRACKING
+                        ): bool,
+                        vol.Required(
+                            CONF_LAN_TRACKING, default=DEFAULT_LAN_TRACKING
+                        ): bool,
+                        vol.Required(
+                            CONF_TRACKING_TIMEOUT, default=DEFAULT_TRACKING_TIMEOUT
+                        ): int,
+                    },
+                ),
+                self.config_entry.options,
+            ),
+        )

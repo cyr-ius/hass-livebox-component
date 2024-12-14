@@ -27,6 +27,7 @@
         "description": "Pour suivre les équipements filaires en plus des équipements Wifi",
         "data": {
           "lan_tracking": "Equipements Filaires",
+          "wifi_tracking": "Equipements Wifi",
           "timeout_tracking": "Délai avant de considérer un équipement absent"
         }
       }

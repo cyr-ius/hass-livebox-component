@@ -27,6 +27,7 @@
         "description": "[%key:components::livebox::options::step::init::description%]",
         "data": {
           "lan_tracking": "[%key:components::livebox::options::step::init::data::lan_tracking%]",
+          "wifi_tracking": "[%key:components::livebox::options::step::init::data::wifi_tracking%]",
           "timeout_tracking": "[%key:components::livebox::options::step::init::data::timeout_tracking%]"
         }
       }
