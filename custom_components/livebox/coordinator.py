@@ -1,4 +1,5 @@
 """Coordinator for Livebox."""
+
 from __future__ import annotations
 
 import logging
@@ -15,13 +16,13 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
-from .const import ( 
+from .const import (
     CONF_LAN_TRACKING,
+    CONF_USE_TLS,
     CONF_WIFI_TRACKING,
     DEFAULT_LAN_TRACKING,
     DEFAULT_WIFI_TRACKING,
-    CONF_USE_TLS,
-    DOMAIN
+    DOMAIN,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -67,9 +68,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 7
 
             # Optionals
-            wifi_tracking = self.config_entry.options.get(CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING)
-            lan_tracking = self.config_entry.options.get(CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING)
-            devices, device_counters = await self.async_get_devices(lan_tracking, wifi_tracking)
+            wifi_tracking = self.config_entry.options.get(
+                CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
+            )
+            lan_tracking = self.config_entry.options.get(
+                CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
+            )
+            devices, device_counters = await self.async_get_devices(
+                lan_tracking, wifi_tracking
+            )
             return {
                 "cmissed": await self.async_get_caller_missed(),
                 "devices": devices,
