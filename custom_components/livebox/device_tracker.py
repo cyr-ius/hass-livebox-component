@@ -175,6 +175,8 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                 return "mdi:gamepad-square"
             case "Homepoint":
                 return "mdi:home-automation"
+            case "Nas":
+                return "mdi:nas"
             case _:
                 return "mdi:devices"
 
