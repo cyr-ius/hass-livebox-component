@@ -16,13 +16,13 @@ from aiosysbus.exceptions import (
     RetrieveFailed,
 )
 from homeassistant import config_entries
-from homeassistant.components import ssdp
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
 
 from .const import (
     CONF_LAN_TRACKING,
@@ -118,9 +118,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_step_ssdp(self, discovery_info: ssdp.SsdpServiceInfo) -> FlowResult:
+    async def async_step_ssdp(self, discovery_info: SsdpServiceInfo) -> FlowResult:
         """Handle a discovered device."""
-        unique_id = discovery_info.upnp[ssdp.ATTR_UPNP_SERIAL]
+        unique_id = discovery_info.upnp[ATTR_UPNP_SERIAL]
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
         return await self.async_step_user()
