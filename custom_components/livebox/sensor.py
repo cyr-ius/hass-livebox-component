@@ -171,7 +171,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         value_fn=lambda x: round(
             x.get("fiber_stats", {}).get("TxBytes", 0) / 1048576, 2
         ),
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_tx",
         attrs={"Tx errors": lambda x: x.get("fiber_stats", {}).get("TxErrors")},
@@ -183,7 +183,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         value_fn=lambda x: round(
             x.get("fiber_stats", {}).get("RxBytes", 0) / 1048576, 2
         ),
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_rx",
         attrs={"Rx errors": lambda x: x.get("fiber_stats", {}).get("RxErrors")},

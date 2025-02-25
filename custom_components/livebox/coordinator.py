@@ -58,6 +58,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             infos = await self.async_get_infos()
             self.unique_id = infos["SerialNumber"]
             match infos["ProductClass"]:
+                case "Livebox 3":
+                    self.model = 3
                 case "Livebox 4":
                     self.model = 4
                 case "Livebox Fibre":
@@ -114,8 +116,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         device_counters = {"wireless": 0, "wired": 0}
         parameters = {
             "expression": {
-                "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
-                "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+                "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
+                "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
         devices = await self._make_request(
@@ -165,7 +167,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
-        if self.model == 4:
+        if self.model == 4 or self.model == 3:
             return {}
         parameters = {"mibs": "gpon"}
         veip0 = await self._make_request(
@@ -180,7 +182,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_stats(self) -> bool:
         """Get fiber stats."""
-        intf = "eth0" if self.model == 4 else "veip0"
+        if self.model == 4:
+          intf = "eth0"
+        elif self.model == 3:
+          intf = "bridge_vmulti"
+        else:
+          intf = "veip0"
         stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
         return stats.get("status", {})
 
