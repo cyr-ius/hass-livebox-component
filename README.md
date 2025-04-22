@@ -43,6 +43,7 @@ Only the routers with Livebox OS are supported:
 - Livebox v6
 - Livebox v7 (not tested)
 - KPN Box 12 (Firmware: V12.C.23.04.36)
+- Sagemcom f@st 5656
 
 ## Presence Detection
 
