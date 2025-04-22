@@ -68,7 +68,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 6
                 case "Livebox 7":
                     self.model = 7
-
+                case "SMBSLBFIBRA":
+                    self.model = 5656  # Sagemcom f@st 5656
             # Optionals
             wifi_tracking = self.config_entry.options.get(
                 CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
@@ -169,6 +170,18 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Get fiber status."""
         if self.model == 4 or self.model == 3:
             return {}
+        if self.model == 5656:
+            async def async_get_optical():
+                return await self.api._auth.post("SgcOmci.Optical", "get")
+            optical = (await self._make_request(async_get_optical)).get('status', {})
+            return dict({
+                'SignalTxPower': float(optical.get('PowerTx', 0)) * 1000,
+                'SignalRxPower': float(optical.get('PowerRx', 0)) * 1000,
+                'Temperature': float(optical.get('Temperature',0)),
+                'Voltage': float(optical.get('Vcc',0)),
+                'Bias': float(optical.get('BiasCurrent',0)),
+            })
+
         parameters = {"mibs": "gpon"}
         veip0 = await self._make_request(
             self.api.nemo.async_get_MIBs, "veip0", parameters
