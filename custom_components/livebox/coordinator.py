@@ -117,8 +117,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         device_counters = {"wireless": 0, "wired": 0}
         parameters = {
             "expression": {
-                "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
-                "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
+                "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
+                "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
             }
         }
         devices = await self._make_request(
