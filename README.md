@@ -45,6 +45,12 @@ Only the routers with Livebox OS are supported:
 - KPN Box 12 (Firmware: V12.C.23.04.36)
 - Sagemcom f@st 5656
 
+### Unsupported routers
+
+Despite being labelled "Livebox", the following router models **cannot** be supported:
+
+- Arcadyan PRV3399 ("Livebox Plus")
+
 ## Presence Detection
 
 This platform offers presence detection by keeping track of the
