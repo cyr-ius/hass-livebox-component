@@ -33,6 +33,19 @@ You must have set a password for your Livebox router web administration page.
 
 The first time Home Assistant will connect to your Livebox, you will need to specify the password of livebox.
 
+### Options configure
+
+You can use the Configure button to change the following options:
+
+- Wired tracking (default: **No**): I track wired equipment
+- Wireless tracking (default: **Yes**): I track wireless equipment
+- Timeout tracking (default: **300 seconds**) : Time before the device is considered disconnected (Some iOS devices tend to disconnect/reconnect to networks unexpectedly)
+- Track devices (default: **Active**):
+
+  - All: Displays all active or inactive devices
+
+  - Active: Displays only active devices (that have an IP address)
+
 ### Supported routers
 
 Only the routers with Livebox OS are supported:
