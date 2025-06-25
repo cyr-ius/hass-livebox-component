@@ -28,7 +28,8 @@
         "data": {
           "lan_tracking": "Equipements Filaires",
           "wifi_tracking": "Equipements Wifi",
-          "timeout_tracking": "Délai avant de considérer un équipement absent"
+          "timeout_tracking": "Délai avant de considérer un équipement absent",
+          "device_tracker_mode": "Afficher les équipements"
         }
       }
     }

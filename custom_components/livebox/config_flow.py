@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping
+import logging
 from typing import Any
 
-import voluptuous as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -15,6 +14,8 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
+import voluptuous as vol
+
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
@@ -25,11 +26,13 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
 
 from .const import (
+    CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
     CONF_TRACKING_TIMEOUT,
     CONF_USE_TLS,
     CONF_VERIFY_TLS,
     CONF_WIFI_TRACKING,
+    DEFAULT_DISPLAY_DEVICES,
     DEFAULT_HOST,
     DEFAULT_LAN_TRACKING,
     DEFAULT_PORT,
@@ -88,11 +91,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await api.async_get_permissions()
 
                 infos = await api.deviceinfo.async_get_deviceinfo()
-                if (sn := infos.get("status", {}).get("SerialNumber")) is None:
-                    raise RetrieveFailed("Serial number of device not found")
 
-                await self.async_set_unique_id(sn)
-                self._abort_if_unique_id_configured()
             except AuthenticationFailed as err:
                 _LOGGER.warning("Fail to authenticate to the Livebox: %s", err)
                 errors["base"] = "login_incorrect"
@@ -109,10 +108,16 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unknown error connecting to the Livebox")
                 errors["base"] = "unknown"
             else:
-                return self.async_create_entry(
-                    title=infos.get("ProductClass", DOMAIN.capitalize()),
-                    data=user_input,
-                )
+                if (sn := infos.get("status", {}).get("SerialNumber")) is not None:
+                    await self.async_set_unique_id(sn)
+                    self._abort_if_unique_id_configured()
+
+                    return self.async_create_entry(
+                        title=infos.get("ProductClass", DOMAIN.capitalize()),
+                        data=user_input,
+                    )
+
+                errors["base"] = "cannot_connect"
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
@@ -150,6 +155,9 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
                         vol.Required(
                             CONF_TRACKING_TIMEOUT, default=DEFAULT_TRACKING_TIMEOUT
                         ): int,
+                        vol.Required(
+                            CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
+                        ): vol.In(["All", "Active only"]),
                     },
                 ),
                 self.config_entry.options,

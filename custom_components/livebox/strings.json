@@ -23,12 +23,13 @@
   "options": {
     "step": {
       "init": {
-        "title": "[%key:components::livebox::options::step::init::title%]",
-        "description": "[%key:components::livebox::options::step::init::description%]",
+        "title": "Device Tracking - Track devices on lan",
+        "description": "you want tracking  yours wired devices in addition to wireless devices",
         "data": {
-          "lan_tracking": "[%key:components::livebox::options::step::init::data::lan_tracking%]",
-          "wifi_tracking": "[%key:components::livebox::options::step::init::data::wifi_tracking%]",
-          "timeout_tracking": "[%key:components::livebox::options::step::init::data::timeout_tracking%]"
+          "lan_tracking": "Wired tracking",
+          "wifi_tracking": "Wireless tracking",
+          "timeout_tracking": "Timeout tracking",
+          "device_tracker_mode": "Track devices"
         }
       }
     }

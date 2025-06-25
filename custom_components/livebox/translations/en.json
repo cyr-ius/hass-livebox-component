@@ -28,7 +28,8 @@
         "data": {
           "lan_tracking": "Wired tracking",
           "wifi_tracking": "Wireless tracking",
-          "timeout_tracking": "Timeout tracking"
+          "timeout_tracking": "Timeout tracking",
+          "device_tracker_mode": "Track devices"
         }
       }
     }

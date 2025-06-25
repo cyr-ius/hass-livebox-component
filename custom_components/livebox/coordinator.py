@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -17,9 +18,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
 from .const import (
+    CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
     CONF_USE_TLS,
     CONF_WIFI_TRACKING,
+    DEFAULT_DISPLAY_DEVICES,
     DEFAULT_LAN_TRACKING,
     DEFAULT_WIFI_TRACKING,
     DOMAIN,
@@ -115,12 +118,23 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Get all devices."""
         devices_tracker = {}
         device_counters = {"wireless": 0, "wired": 0}
-        parameters = {
-            "expression": {
-                "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
-                "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+        device_tracker_mode = self.config_entry.options.get(
+            CONF_DISPLAY_DEVICES, DEFAULT_DISPLAY_DEVICES
+        )
+        if device_tracker_mode == "All":
+            parameters = {
+                "expression": {
+                    "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
+                    "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+                }
             }
-        }
+        else:
+            parameters = {
+                "expression": {
+                    "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
+                    "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
+                }
+            }
         devices = await self._make_request(
             self.api.devices.async_get_devices, parameters
         )
@@ -168,19 +182,21 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
-        if self.model == 4 or self.model == 3:
+        if self.model in [4, 3]:
             return {}
         if self.model == 5656:
+
             async def async_get_optical():
                 return await self.api._auth.post("SgcOmci.Optical", "get")
-            optical = (await self._make_request(async_get_optical)).get('status', {})
-            return dict({
-                'SignalTxPower': float(optical.get('PowerTx', 0)) * 1000,
-                'SignalRxPower': float(optical.get('PowerRx', 0)) * 1000,
-                'Temperature': float(optical.get('Temperature',0)),
-                'Voltage': float(optical.get('Vcc',0)),
-                'Bias': float(optical.get('BiasCurrent',0)),
-            })
+
+            optical = (await self._make_request(async_get_optical)).get("status", {})
+            return {
+                "SignalTxPower": float(optical.get("PowerTx", 0)) * 1000,
+                "SignalRxPower": float(optical.get("PowerRx", 0)) * 1000,
+                "Temperature": float(optical.get("Temperature", 0)),
+                "Voltage": float(optical.get("Vcc", 0)),
+                "Bias": float(optical.get("BiasCurrent", 0)),
+            }
 
         parameters = {"mibs": "gpon"}
         veip0 = await self._make_request(
@@ -196,11 +212,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_fiber_stats(self) -> bool:
         """Get fiber stats."""
         if self.model == 4:
-          intf = "eth0"
+            intf = "eth0"
         elif self.model == 3:
-          intf = "bridge_vmulti"
+            intf = "bridge_vmulti"
         else:
-          intf = "veip0"
+            intf = "veip0"
         stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
         return stats.get("status", {})
 

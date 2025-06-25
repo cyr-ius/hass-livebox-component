@@ -28,7 +28,8 @@
         "data": {
           "lan_tracking": "Kablet sporing",
           "wifi_tracking": "Trådløs sporing",
-          "timeout_tracking": "Tid før overvejelse om manglende udstyr"
+          "timeout_tracking": "Tid før overvejelse om manglende udstyr",
+          "device_tracker_mode": "Spor enheter"
         }
       }
     }
