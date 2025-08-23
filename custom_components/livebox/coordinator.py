@@ -71,6 +71,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 6
                 case "Livebox 7":
                     self.model = 7
+                case "Livebox W7":
+                    self.model = 7
                 case "SMBSLBFIBRA":
                     self.model = 5656  # Sagemcom f@st 5656
             # Optionals
