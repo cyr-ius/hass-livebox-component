@@ -56,16 +56,40 @@ SWITCH_TYPES_5: Final[tuple[SwitchEntityDescription, ...]] = (
         key="wifi",
         name="Wifi switch",
         translation_key="wifi_switch",
-        value_fn=lambda x: getattr(getattr(x, "nmc"), "async_set_wlan_config"),
-        turn_on_parameters= {"mibs":{"penable":{"wl0":{"Enable":True,"PersistentEnable":True,"Status":True},"eth4":{"Enable":True,"PersistentEnable":True,"Status":True}, "wlanvap":{"wl0":{},"eth4":{}}}}},
-        turn_off_parameters={"mibs":{"penable":{"wl0":{"Enable":False,"PersistentEnable":False,"Status":False},"eth4":{"Enable":False,"PersistentEnable":False,"Status":False}, "wlanvap":{"wl0":{},"eth4":{}}}}},
+        value_fn=lambda x: getattr(getattr(x, "nemo"), "async_set_wlan_config"),
+        turn_on_parameters={
+            "mibs": {
+                "penable": {
+                    "wl0": {"Enable": True, "PersistentEnable": True, "Status": True},
+                    "eth4": {"Enable": True, "PersistentEnable": True, "Status": True},
+                    "wlanvap": {"wl0": {}, "eth4": {}},
+                }
+            }
+        },
+        turn_off_parameters={
+            "mibs": {
+                "penable": {
+                    "wl0": {
+                        "Enable": False,
+                        "PersistentEnable": False,
+                        "Status": False,
+                    },
+                    "eth4": {
+                        "Enable": False,
+                        "PersistentEnable": False,
+                        "Status": False,
+                    },
+                    "wlanvap": {"wl0": {}, "eth4": {}},
+                }
+            }
+        },
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
         name="Guest Wifi switch",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
-        value_fn=lambda x: getattr(getattr(x, "nmc"), "async_set_guest_wifi"),
+        value_fn=lambda x: getattr(getattr(x, "nemo"), "async_set_guest_wifi"),
         turn_on_parameters={"Enable": "true", "Status": "true"},
         turn_off_parameters={"Enable": "false", "Status": "false"},
     ),
@@ -80,7 +104,9 @@ async def async_setup_entry(
     """Set up the sensors."""
     coordinator = entry.runtime_data
     switchs_description = SWITCH_TYPES_5 if coordinator.model == 5 else SWITCH_TYPES
-    entities = [LiveboxSwitch(coordinator, description) for description in switchs_description]
+    entities = [
+        LiveboxSwitch(coordinator, description) for description in switchs_description
+    ]
 
     for key, device in coordinator.data["devices"].items():
         entities.append(DeviceWANAccessSwitch(coordinator, key, device))
