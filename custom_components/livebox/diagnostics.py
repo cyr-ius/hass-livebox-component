@@ -125,7 +125,7 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
         coordinator.api.devices.async_get_devices,
-        (coordinator.api.devices.async_get_device, [params]),
+        (coordinator.api.devices.async_get_devices, [params]),
         coordinator.api.voiceservice.async_get_calllist,
         (coordinator.api.nemo.async_lucky_addr_address, ["lan"]),
         (coordinator.api.nemo.async_lucky_addr_address, ["data"]),
