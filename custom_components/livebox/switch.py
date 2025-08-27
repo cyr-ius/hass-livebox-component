@@ -99,7 +99,7 @@ SWITCH_TYPES_5: Final[tuple[SwitchEntityDescription, ...]] = (
         name="Guest Wifi switch",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
-        value_fn=lambda x: x.nemo.async_set_guest_wifi,
+        value_fn=lambda x: x.nmc.async_set_guest_wifi,
         turn_on_parameters={"Enable": True, "Status": True},
         turn_off_parameters={"Enable": False, "Status": False},
     ),
