@@ -10,7 +10,6 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-
 TO_REDACT = {
     "address",
     "api_key",
@@ -113,10 +112,20 @@ async def async_get_config_entry_diagnostics(
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     coordinator = entry.runtime_data
+
+    # Only dump devices with a MAC address
+    params = {
+        "expression": {
+            "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
+            "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+        }
+    }
+
     api_methods = [
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
         coordinator.api.devices.async_get_devices,
+        (coordinator.api.devices.async_get_device, [params]),
         coordinator.api.voiceservice.async_get_calllist,
         (coordinator.api.nemo.async_lucky_addr_address, ["lan"]),
         (coordinator.api.nemo.async_lucky_addr_address, ["data"]),
