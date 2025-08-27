@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.device_tracker import SourceType
@@ -140,6 +140,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
                     "band": self._device.get("OperatingFrequencyBand"),
                     "signal_strength": self._device.get("SignalStrength"),
                     "signal_quality": signal_quality,
+                    "frenquency_band": self._device.get("OperatingFrequencyBand"),
                     "connection": "wifi"
                     if iname not in ["wlguest2", "wlguest5"]
                     else "guestwifi",
