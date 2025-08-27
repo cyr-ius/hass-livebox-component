@@ -187,11 +187,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         if self.model in [4, 3]:
             return {}
         if self.model == 5656:
-
-            async def async_get_optical():
-                return await self.api._auth.post("SgcOmci.Optical", "get")
-
-            optical = (await self._make_request(async_get_optical)).get("status", {})
+            optical = (
+                await self._make_request(self.api.sgcomci.async_get_optical)
+            ).get("status", {})
             return {
                 "SignalTxPower": float(optical.get("PowerTx", 0)) * 1000,
                 "SignalRxPower": float(optical.get("PowerRx", 0)) * 1000,
