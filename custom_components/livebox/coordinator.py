@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -140,6 +139,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         devices = await self._make_request(
             self.api.devices.async_get_devices, parameters
         )
+        _LOGGER.debug("Fetch Devices: %s", devices)
         if wifi_tracking:
             devices_status_wireless = devices.get("status", {}).get("wifi", {})
             device_counters["wireless"] = len(devices_status_wireless)
