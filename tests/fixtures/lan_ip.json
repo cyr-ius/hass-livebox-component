@@ -1,0 +1,11 @@
+{
+  "status": null,
+  "data": {
+    "Address": "**REDACTED**",
+    "Netmask": "**REDACTED**",
+    "DHCPEnable": true,
+    "DHCPMinAddress": "**REDACTED**",
+    "DHCPMaxAddress": "**REDACTED**",
+    "LeaseTime": 86400
+  }
+}

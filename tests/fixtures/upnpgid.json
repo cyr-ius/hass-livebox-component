@@ -1,0 +1,12 @@
+{
+  "status": {
+    "Enable": true,
+    "WANAccessProvider": "Orange Livebox",
+    "ModelNumber": "4+",
+    "ModelName": "Residential Livebox (GPON, WAN Ethernet)",
+    "FriendlyName": "Orange Livebox",
+    "AllowedHostHeader": "lan, lan.home, livebox, livebox.home, installation, installation.home, liveboxipv4, liveboxipv4.home, liveboxipv6, liveboxipv6.home, HGW.local, LIVEBOX.local",
+    "AlwaysStartIgdDaemon": false,
+    "TR064ServiceURL": ""
+  }
+}

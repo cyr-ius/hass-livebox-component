@@ -1,0 +1,11 @@
+{
+  "status": {
+    "Status": "Disabled",
+    "LastName": "",
+    "FirstName": "",
+    "MobilePhoneNumber": "",
+    "ValidationDomain": "se-connecter-au-reseau.orange.com",
+    "ConnectionMode": "",
+    "Enable": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "status": {
+    "RxPackets": 523240895,
+    "TxPackets": 84285134,
+    "RxBytes": 3191980484,
+    "TxBytes": 1975319780,
+    "RxErrors": 0,
+    "TxErrors": 0,
+    "RxDropped": 19,
+    "TxDropped": 5,
+    "Multicast": 221787905,
+    "Collisions": 0,
+    "RxLengthErrors": 0,
+    "RxOverErrors": 0,
+    "RxCrcErrors": 0,
+    "RxFrameErrors": 0,
+    "RxFifoErrors": 0,
+    "RxMissedErrors": 0,
+    "TxAbortedErrors": 0,
+    "TxCarrierErrors": 0,
+    "TxFifoErrors": 0,
+    "TxHeartbeatErrors": 0,
+    "TxWindowErrors": 0
+  }
+}

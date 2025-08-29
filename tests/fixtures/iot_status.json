@@ -1,0 +1,14 @@
+{
+  "status": 0,
+  "data": {
+    "operationalStatus": "disabled",
+    "adminStatus": "disabled",
+    "subscriptionStatus": "notSubscribed",
+    "mqttStatus": "disabled",
+    "powerStatus": true,
+    "uniqueIdentifier": "",
+    "accessURL": "LK23206DP908914.livebox.dns-orange.fr",
+    "softwareVersion": "0.0.45",
+    "apiVersion": "1.6"
+  }
+}

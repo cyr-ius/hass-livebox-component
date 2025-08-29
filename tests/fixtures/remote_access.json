@@ -1,0 +1,19 @@
+{
+  "status": {
+    "SourcePrefix": "",
+    "SourcePrefixnullmpty": false,
+    "PortMode": "RANDOM",
+    "AllowedPorts": "",
+    "Port": 0,
+    "SupportedProtocols": "HTTPS",
+    "Protocol": "HTTPS",
+    "Timeout": 0,
+    "TimeLeft": 0,
+    "Interface": "data",
+    "EnableTime": "0001-01-01T00:00:00Z",
+    "DisabledAtStartup": false,
+    "ForcePortFailure": 0,
+    "EmulateHTTPService": false,
+    "Enable": false
+  }
+}

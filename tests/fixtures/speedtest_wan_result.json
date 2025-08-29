@@ -1,0 +1,17 @@
+{
+  "status": {
+    "status": "null",
+    "Downstream": {
+      "rate": 0,
+      "latency": 0,
+      "start": "0001-01-01T00:00:00Z",
+      "end": "0001-01-01T00:00:00Z"
+    },
+    "Upstream": {
+      "rate": 0,
+      "latency": 0,
+      "start": "0001-01-01T00:00:00Z",
+      "end": "0001-01-01T00:00:00Z"
+    }
+  }
+}

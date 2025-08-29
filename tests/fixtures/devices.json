@@ -1,0 +1,4196 @@
+{
+  "status": {
+    "wifi": [
+      {
+        "Key": "01:23:45:67:89:AB",
+        "DiscoverySource": "import",
+        "Name": "Big Boopsy",
+        "DeviceType": "Mobile iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats ssw_sta wifi mdns events",
+        "FirstSeen": "2024-10-21T11:02:15Z",
+        "LastConnection": "2024-12-14T16:16:57Z",
+        "LastChanged": "2024-12-14T16:21:52Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "IPAddress": "1.2.3.4",
+        "IPAddressSource": "DHCP",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -56,
+        "SignalNoiseRatio": 34,
+        "LastDataDownlinkRate": 1200950,
+        "LastDataUplinkRate": 24000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40,40MHz-INTOL",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "SU&MU-BFE,MU-BFR,TWT_RESP",
+        "SupportedMCS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+        "AuthenticationState": true,
+        "OperatingStandard": "ax",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -56,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 1200950,
+        "DownlinkMCS": 11,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 8,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 1200950,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "Index": "5",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "5",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Big-Boopsy",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Big Boopsy",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Big-Boopsy",
+            "Source": "mdns",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Mobile iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "Locations": [],
+        "mDNSService": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 18,
+          "AvgSteeringTime": 416,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "Transparent%20network%20proxy%20for%20Apple%20system%20services (unknown version) CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-26T15:13:24Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CaptiveNetworkSupport-480 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-24T19:42:49Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [Watch OS,11.1,22R585,Watch6,2]",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-10T01:06:17Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-06T13:43:04Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CaptiveNetworkSupport-480.40.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T00:18:53Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Transparent%20network%20proxy%20for%20Apple%20system%20services (unknown version) CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:16:54Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        }
+      },
+      {
+        "Key": "01:23:45:67:89:AC",
+        "DiscoverySource": "bridge",
+        "Name": "Google Bureau",
+        "DeviceType": "Tablet Android",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 ssw_sta dhcp mdns events",
+        "FirstSeen": "2024-11-09T14:34:29Z",
+        "LastConnection": "2024-12-13T18:26:05Z",
+        "LastChanged": "2024-12-14T16:16:20Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -31,
+        "SignalNoiseRatio": 60,
+        "LastDataDownlinkRate": 72222,
+        "LastDataUplinkRate": 1000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "20MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7",
+        "AuthenticationState": true,
+        "OperatingStandard": "n",
+        "OperatingFrequencyBand": "2.4GHz",
+        "AvgSignalStrengthByChain": -31,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 72222,
+        "DownlinkMCS": 7,
+        "DownlinkBandwidth": 1,
+        "DownlinkShortGuard": true,
+        "UplinkMCS": 0,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 72222,
+        "MaxTxSpatialStreamsSupported": 1,
+        "MaxRxSpatialStreamsSupported": 1,
+        "IPAddress": "1.2.3.5",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,6]",
+        "Index": "113",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "113",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Google Bureau",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet Android",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CrKey/1.56.500000",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:16:19Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          },
+          {
+            "Address": "**REDACTED**",
+            "Status": "error",
+            "Scope": "",
+            "AddressSource": "",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 2,
+          "SuccessSteerCount": 18,
+          "AvgSteeringTime": 10375,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C",
+          "VendorSpecificElementOUIList": "00:90:4C,00:10:18,00:50:F2"
+        },
+        "mDNSService": []
+      },
+      {
+        "Key": "01:23:45:67:89:AD",
+        "DiscoverySource": "bridge",
+        "Name": "iPad de Mama",
+        "DeviceType": "Tablet iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta mdns apple events",
+        "FirstSeen": "2024-11-10T10:35:44Z",
+        "LastConnection": "2024-12-14T16:35:56Z",
+        "LastChanged": "2024-12-14T16:48:07Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -59,
+        "SignalNoiseRatio": 26,
+        "LastDataDownlinkRate": 1200950,
+        "LastDataUplinkRate": 24000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40,40MHz-INTOL",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "SU&MU-BFE,MU-BFR,TWT_RESP",
+        "SupportedMCS": "",
+        "AuthenticationState": true,
+        "OperatingStandard": "ax",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -59,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 1200950,
+        "DownlinkMCS": 11,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 8,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 216660,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "IPAddress": "1.2.3.6",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "Index": "124",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "124",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iPad de Mama",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Annas-iPad-Pink",
+            "Source": "mdns",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iPad",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet",
+            "Source": "dhcp",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-461.140.2 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-24T07:22:23Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T13:55:41Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-23T14:42:22Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Maps/2811.36.5.1.2 CFNetwork/1498.700.2 Darwin/23.6.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-20T14:12:53Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPad; CPU OS 17_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-20T15:44:18Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CaptiveNetworkSupport-480.40.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T10:17:10Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [iPhone OS,18.1.1,22B91,iPad13,18]",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T10:17:49Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "NetworkingExtension/8619.2.8.10.9 Network/4277.42.2 iOS/18.1.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T10:17:22Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T10:17:22Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 73,
+          "AvgSteeringTime": 463,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        },
+        "mDNSService": [
+          {
+            "Name": "Anna’s iPad (Pink)",
+            "ServiceName": "_companion-link._tcp",
+            "Domain": "local",
+            "Port": "49272",
+            "Text": "",
+            "Id": "**REDACTED**"
+          }
+        ]
+      },
+      {
+        "Key": "01:23:45:67:89:AE",
+        "DiscoverySource": "bridge",
+        "Name": "iPad de Papa",
+        "DeviceType": "Tablet iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta mdns events",
+        "FirstSeen": "2024-11-10T11:04:06Z",
+        "LastConnection": "2024-12-14T10:32:00Z",
+        "LastChanged": "2024-12-14T15:29:21Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -66,
+        "SignalNoiseRatio": 22,
+        "LastDataDownlinkRate": 780000,
+        "LastDataUplinkRate": 24000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40,40MHz-INTOL",
+        "VhtCapabilities": "SGI80,SU-BFR,SU-BFE",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+        "AuthenticationState": true,
+        "OperatingStandard": "ac",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -66,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 866667,
+        "DownlinkMCS": 9,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 8,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 866667,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "IPAddress": "1.2.3.6",
+        "IPAddressSource": "DHCP",
+        "Index": "125",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "125",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iPad de Papa",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Boopsa",
+            "Source": "mdns",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T15:29:21Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [iPhone OS,16.7.10,20H350,iPad6,7]",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T11:15:01Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CaptiveNetworkSupport-443.120.3 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-30T17:30:39Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPad; CPU OS 16_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-12T19:11:00Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPad; CPU OS 16_7_10 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-05T22:07:37Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPad; CPU OS 16_7_10 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.103 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T23:16:34Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 658,
+          "AvgSteeringTime": 314,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        },
+        "mDNSService": []
+      },
+      {
+        "Key": "01:23:45:67:89:AF",
+        "DiscoverySource": "ssw",
+        "Name": "Super iMac de Papa - WiFi",
+        "DeviceType": "Desktop iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi ipv4 ipv6 flowstats dhcp ssw_sta mdns events",
+        "FirstSeen": "2024-11-11T13:23:43Z",
+        "LastConnection": "2024-12-11T17:24:10Z",
+        "LastChanged": "2024-12-11T17:25:06Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -59,
+        "SignalNoiseRatio": 31,
+        "LastDataDownlinkRate": 2401910,
+        "LastDataUplinkRate": 24000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "160MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40,40MHz-INTOL",
+        "VhtCapabilities": "SGI80,SGI160,SU-BFR,SU-BFE",
+        "HeCapabilities": "SU-BFR,SU&MU-BFE,MU-BFR,TWT_RESP",
+        "SupportedMCS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+        "AuthenticationState": true,
+        "OperatingStandard": "ax",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -59,
+        "MaxBandwidthSupported": "160MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 2401910,
+        "DownlinkMCS": 11,
+        "DownlinkBandwidth": 4,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 8,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 2401910,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "IPAddress": "1.2.3.8",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252,95,44,46]",
+        "Index": "136",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "136",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Mac",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Super iMac de Papa - WiFi",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Super-iMac-de-Papa",
+            "Source": "mdns",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Desktop iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-480.40.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T17:20:32Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T17:21:08Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "OneDrive/24093.0507.0003 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T16:34:45Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T14:01:02Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "GoogleUpdater 132.0.6833.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-06T00:29:00Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [macOS,15.1.1,24B91,Mac15,5]",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-22T14:31:28Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T15:58:39Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Maps/2864.21.7.31.18 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-25T14:30:18Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": true,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 29,
+          "AvgSteeringTime": 433,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3,U-NII-5",
+          "VendorSpecificElementOUIList": "00:17:F2,00:90:4C,00:10:18,00:50:F2"
+        },
+        "mDNSService": [
+          {
+            "Name": "1636A5BD8481@Super iMac de Papa",
+            "ServiceName": "_raop._tcp",
+            "Domain": "local",
+            "Port": "7000",
+            "Text": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Super iMac de Papa",
+            "ServiceName": "_airplay._tcp",
+            "Domain": "local",
+            "Port": "7000",
+            "Text": "",
+            "Id": "**REDACTED**"
+          }
+        ]
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "ssw",
+        "Name": "iMac de Super Papa",
+        "DeviceType": "Desktop iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 ssw_sta dhcp events",
+        "FirstSeen": "2024-11-12T10:51:45Z",
+        "LastConnection": "2024-12-07T13:37:23Z",
+        "LastChanged": "2024-12-14T16:44:51Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -44,
+        "SignalNoiseRatio": 46,
+        "LastDataDownlinkRate": 1300000,
+        "LastDataUplinkRate": 1300000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40",
+        "VhtCapabilities": "SGI80,SU-BFR,SU-BFE",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23",
+        "AuthenticationState": true,
+        "OperatingStandard": "ac",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -44,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 1300000,
+        "DownlinkMCS": 9,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": true,
+        "UplinkMCS": 9,
+        "UplinkBandwidth": 3,
+        "UplinkShortGuard": true,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 1300000,
+        "MaxTxSpatialStreamsSupported": 3,
+        "MaxRxSpatialStreamsSupported": 3,
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252,95,44,46]",
+        "Index": "137",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "137",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iMacdeSuperPapa",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iMac de Super Papa",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Desktop iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-428.140.2 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T12:32:44Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/2.2",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:44:51Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "OneDrive/24132.0701.0001 CFNetwork/1335.5 Darwin/21.6.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T12:14:20Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [macOS,12.7.5,21H1222,iMac17,1]",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-12T11:48:10Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T14:14:00Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "GoogleUpdater 132.0.6833.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T21:03:37Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 1,
+          "SuccessSteerCount": 15,
+          "AvgSteeringTime": 8638,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "bridge",
+        "Name": "Tuya 2",
+        "DeviceType": "HomePlug",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi ipv4 ipv6 flowstats dhcp ssw_sta events",
+        "FirstSeen": "2024-11-12T12:41:31Z",
+        "LastConnection": "2024-12-11T14:11:22Z",
+        "LastChanged": "2024-12-11T14:11:23Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -25,
+        "SignalNoiseRatio": 66,
+        "LastDataDownlinkRate": 65000,
+        "LastDataUplinkRate": 6000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "20MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "SGI20",
+        "VhtCapabilities": "",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7",
+        "AuthenticationState": true,
+        "OperatingStandard": "n",
+        "OperatingFrequencyBand": "2.4GHz",
+        "AvgSignalStrengthByChain": -25,
+        "MaxBandwidthSupported": "20MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 72222,
+        "DownlinkMCS": 7,
+        "DownlinkBandwidth": 1,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 3,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 72222,
+        "MaxTxSpatialStreamsSupported": 0,
+        "MaxRxSpatialStreamsSupported": 0,
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,28,6]",
+        "Index": "138",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "138",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "TY_WR",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Tuya 2",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "HomePlug",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k",
+          "Supports24GHz": true,
+          "Supports5GHz": false,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 2,
+          "SuccessSteerCount": 5,
+          "AvgSteeringTime": 8781,
+          "SupportedUNIIBands": "",
+          "VendorSpecificElementOUIList": "00:50:F2"
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "bridge",
+        "Name": "iPhone15 de Mama",
+        "DeviceType": "Mobile iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp apple ssw_sta events",
+        "FirstSeen": "2024-11-24T12:45:29Z",
+        "LastConnection": "2024-12-14T15:49:51Z",
+        "LastChanged": "2024-12-14T16:48:00Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -46,
+        "SignalNoiseRatio": 40,
+        "LastDataDownlinkRate": 1200950,
+        "LastDataUplinkRate": 24000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40,40MHz-INTOL",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "SU&MU-BFE,MU-BFR,TWT_RESP",
+        "SupportedMCS": "",
+        "AuthenticationState": true,
+        "OperatingStandard": "ax",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -46,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 866667,
+        "MaxDownlinkRateReached": 1200950,
+        "DownlinkMCS": 11,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 8,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 866667,
+        "MaxUplinkRateReached": 1200950,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "Index": "297",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "297",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "AnnaStoiPhone15",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "iPhone15 de Mama",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Mobile",
+            "Source": "dhcp",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Mobile iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-461.140.2 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-24T12:45:31Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:48:00Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CaptiveNetworkSupport-480.40.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T19:53:40Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [iPhone OS,18.1.1,22B91,iPhone15,4]",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T02:12:47Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "MobileAsset/1 MAClient/trustd MABrain/BuiltIn MAAssetType/com_apple_MobileAsset_SecExperimentAssets BuildVersion/22B91",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-24T13:21:49Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "TwistedTangle/286 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T14:23:38Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Tetris/5764 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T20:48:38Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T13:35:39Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Spider/248 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T13:37:25Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.google.GoogleMobile/343.0 iPhone/18.1.1 hw/iPhone15_4",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-25T00:15:01Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "NetworkingExtension/8619.2.8.10.9 Network/4277.42.2 iOS/18.1.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T11:40:01Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1.1 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T21:30:14Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T11:40:01Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/22B91 [FBAN/FBIOS;FBAV/491.1.0.62.114;FBBV/667691447;FBDV/iPhone15,4;FBMD/iPhone;FBSN/iOS;FBSV/18.1.1;FBSS/3;FBID/phone;FBLC/en_GB;FBOP/5;FBRV/6694237",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-03T17:05:13Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/22B91 [FBAN/FBIOS;FBDV/iPhone15,4;FBMD/iPhone;FBSN/iOS;FBSV/18.1.1;FBSS/3;FBID/phone;FBLC/en_GB;FBOP/5]",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-03T17:04:19Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Le%20Figaro.fr/10989 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T21:12:51Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/22B91 [FBAN/FBIOS;FBAV/492.0.0.101.111;FBBV/670308045;FBDV/iPhone15,4;FBMD/iPhone;FBSN/iOS;FBSV/18.1.1;FBSS/3;FBID/phone;FBLC/en_GB;FBOP/5;FBRV/672748",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-10T22:02:59Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.103 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-08T08:55:51Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 1,
+          "SuccessSteerCount": 13,
+          "AvgSteeringTime": 583,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "bridge",
+        "Name": "Grand iPad de Mama",
+        "DeviceType": "Tablet iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp events",
+        "FirstSeen": "2024-11-28T09:02:06Z",
+        "LastConnection": "2024-12-14T12:17:22Z",
+        "LastChanged": "2024-12-14T15:57:27Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -58,
+        "SignalNoiseRatio": 32,
+        "LastDataDownlinkRate": 780000,
+        "LastDataUplinkRate": 866667,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+        "AuthenticationState": true,
+        "OperatingStandard": "ac",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -58,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 866667,
+        "DownlinkMCS": 9,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 9,
+        "UplinkBandwidth": 3,
+        "UplinkShortGuard": true,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 866667,
+        "MaxTxSpatialStreamsSupported": 2,
+        "MaxRxSpatialStreamsSupported": 2,
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "Index": "347",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "347",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Grand iPad de Mama",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-461.120.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T12:32:53Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T15:57:26Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.invitation-registration [iPhone OS,17.5.1,21F90,iPad7,1]",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-28T09:02:29Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "MobileAsset/1 MAClient/suggestd MABrain/BuiltIn MAAssetType/com_apple_MobileAsset_CoreSuggestionsModels BuildVersion/21F90",
+            "Type": "HTTP",
+            "LastSeen": "2024-11-28T09:17:44Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T10:54:45Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "MobileAsset/1 MAClient/trustd MABrain/BuiltIn MAAssetType/com_apple_MobileAsset_SecExperimentAssets BuildVersion/21F90",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-06T13:46:52Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Mozilla/5.0 (iPad; CPU OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-07T11:07:43Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 4,
+          "AvgSteeringTime": 465,
+          "SupportedUNIIBands": "U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**"
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "ip_neigh",
+        "Name": "Samsung-Refrigerator",
+        "DeviceType": "Airbox",
+        "Active": true,
+        "Tags": "lan edev mac physical ipv4 ipv6 events wifi flowstats dhcp ssw_sta",
+        "FirstSeen": "2024-12-06T14:08:29Z",
+        "LastConnection": "2024-12-14T12:10:21Z",
+        "LastChanged": "2024-12-14T12:10:22Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "SignalStrength": -51,
+        "SignalNoiseRatio": 46,
+        "LastDataDownlinkRate": 65000,
+        "LastDataUplinkRate": 6000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "20MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40",
+        "VhtCapabilities": "",
+        "HeCapabilities": "",
+        "SupportedMCS": "0,1,2,3,4,5,6,7",
+        "AuthenticationState": true,
+        "OperatingStandard": "n",
+        "OperatingFrequencyBand": "2.4GHz",
+        "AvgSignalStrengthByChain": -51,
+        "MaxBandwidthSupported": "40MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 72222,
+        "DownlinkMCS": 7,
+        "DownlinkBandwidth": 1,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 3,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 72222,
+        "MaxTxSpatialStreamsSupported": 0,
+        "MaxRxSpatialStreamsSupported": 0,
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,28,6]",
+        "Index": "398",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "398",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Samsung-Refrigerator",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Samsung-Refrigerator",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Airbox",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k",
+          "Supports24GHz": true,
+          "Supports5GHz": false,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 0,
+          "AvgSteeringTime": 0,
+          "SupportedUNIIBands": "",
+          "VendorSpecificElementOUIList": "00:50:F2"
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "ssw",
+        "Name": "Google Cuisine",
+        "DeviceType": "Tablet Android",
+        "Active": false,
+        "Tags": "lan edev mac physical wifi events flowstats ipv4 ipv6 ssw_sta dhcp",
+        "FirstSeen": "2024-12-09T19:03:40Z",
+        "LastConnection": "2024-12-14T08:25:42Z",
+        "LastChanged": "2024-12-14T10:25:07Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -74,
+        "SignalNoiseRatio": 12,
+        "LastDataDownlinkRate": 6500,
+        "LastDataUplinkRate": 175500,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "40MHz,SGI20,SGI40",
+        "VhtCapabilities": "SGI80,SU-BFE",
+        "HeCapabilities": "",
+        "SupportedMCS": "",
+        "AuthenticationState": true,
+        "OperatingStandard": "ac",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -74,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 433333,
+        "MaxDownlinkRateReached": 433333,
+        "DownlinkMCS": 0,
+        "DownlinkBandwidth": 1,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 4,
+        "UplinkBandwidth": 3,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 433333,
+        "MaxUplinkRateReached": 325000,
+        "MaxTxSpatialStreamsSupported": 1,
+        "MaxRxSpatialStreamsSupported": 1,
+        "IPAddress": "",
+        "IPAddressSource": "",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,6]",
+        "Index": "399",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "399",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Google Cuisine",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Tablet Android",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CrKey/1.56.500000",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T09:26:56Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "not reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211w",
+          "Supports24GHz": false,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 1,
+          "AvgSteeringTime": 18719,
+          "SupportedUNIIBands": "U-NII-1,U-NII-2A,U-NII-2C",
+          "VendorSpecificElementOUIList": "00:90:4C,00:10:18,00:50:F2"
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "bridge",
+        "Name": "Smart Light Bulb",
+        "DeviceType": "Airbox",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi flowstats events ipv4 ipv6 dhcp ssw_sta",
+        "FirstSeen": "2024-12-10T15:01:21Z",
+        "LastConnection": "2024-12-13T16:52:00Z",
+        "LastChanged": "2024-12-13T16:52:00Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -68,
+        "SignalNoiseRatio": 31,
+        "LastDataDownlinkRate": 48000,
+        "LastDataUplinkRate": 1000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "20MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "SGI20",
+        "VhtCapabilities": "",
+        "HeCapabilities": "",
+        "SupportedMCS": "",
+        "AuthenticationState": true,
+        "OperatingStandard": "g",
+        "OperatingFrequencyBand": "2.4GHz",
+        "AvgSignalStrengthByChain": -68,
+        "MaxBandwidthSupported": "20MHz",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 54000,
+        "DownlinkMCS": 10,
+        "DownlinkBandwidth": 1,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 0,
+        "UplinkBandwidth": 1,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 54000,
+        "MaxTxSpatialStreamsSupported": 0,
+        "MaxRxSpatialStreamsSupported": 0,
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,28,6]",
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "Index": "401",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "401",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "wlan0",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Smart Light Bulb",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Airbox",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "",
+          "Supports24GHz": true,
+          "Supports5GHz": false,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 0,
+          "AvgSteeringTime": 0,
+          "SupportedUNIIBands": "",
+          "VendorSpecificElementOUIList": "00:50:F2"
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "ssw",
+        "Name": "Watch",
+        "DeviceType": "Computer",
+        "Active": false,
+        "Tags": "lan edev mac physical wifi events ipv4 ipv6 dhcp ssw_sta",
+        "FirstSeen": "2024-12-10T15:50:52Z",
+        "LastConnection": "2024-12-14T12:17:05Z",
+        "LastChanged": "2024-12-14T12:20:20Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": 0,
+        "SignalNoiseRatio": 0,
+        "LastDataDownlinkRate": 0,
+        "LastDataUplinkRate": 0,
+        "EncryptionMode": "",
+        "LinkBandwidth": "",
+        "SecurityModeEnabled": "",
+        "HtCapabilities": "SGI20,40MHz-INTOL",
+        "VhtCapabilities": "",
+        "HeCapabilities": "",
+        "SupportedMCS": "",
+        "AuthenticationState": false,
+        "OperatingStandard": "",
+        "OperatingFrequencyBand": "2.4GHz",
+        "AvgSignalStrengthByChain": 0,
+        "MaxBandwidthSupported": "",
+        "MaxDownlinkRateSupported": 0,
+        "MaxDownlinkRateReached": 0,
+        "DownlinkMCS": 0,
+        "DownlinkBandwidth": 0,
+        "DownlinkShortGuard": false,
+        "UplinkMCS": 0,
+        "UplinkBandwidth": 0,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 0,
+        "MaxUplinkRateReached": 0,
+        "MaxTxSpatialStreamsSupported": 0,
+        "MaxRxSpatialStreamsSupported": 0,
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252]",
+        "IPAddress": "",
+        "IPAddressSource": "",
+        "Index": "402",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "402",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "Watch",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "CaptiveNetworkSupport-480.40.4 wispr",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-11T16:14:59Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "not reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**",
+        "SSWSta": {
+          "SupportedStandards": "80211k,80211v,80211w",
+          "Supports24GHz": true,
+          "Supports5GHz": true,
+          "Supports6GHz": false,
+          "ReconnectClass": "",
+          "FailedSteerCount": 0,
+          "SuccessSteerCount": 0,
+          "AvgSteeringTime": 0,
+          "SupportedUNIIBands": "Unknown,U-NII-1,U-NII-2A,U-NII-2C,U-NII-3",
+          "VendorSpecificElementOUIList": ""
+        }
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "ip_neigh",
+        "Name": "SuperiMacdePapa - Eth",
+        "DeviceType": "Desktop iOS",
+        "Active": true,
+        "Tags": "lan edev mac physical eth ipv4 ipv6 flowstats events dhcp",
+        "FirstSeen": "2024-12-11T17:23:01Z",
+        "LastConnection": "2024-12-14T17:13:56Z",
+        "LastChanged": "2024-12-14T17:13:56Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "VendorClassID": "",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,121,3,6,15,108,114,119,252,95,44,46]",
+        "Index": "404",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "404",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "SuperiMacdePapa",
+            "Source": "dhcp",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "SuperiMacdePapa - Eth",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Desktop iOS",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T17:00:49Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "com.apple.trustd/3.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:43:44Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Transparent%20network%20proxy%20for%20Apple%20system%20services (unknown version) CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T04:55:26Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "OneDrive/24093.0507.0003 CFNetwork/1568.200.51 Darwin/24.1.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T09:12:34Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "GoogleUpdater 132.0.6833.0",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-13T01:05:36Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**"
+      },
+      {
+        "Key": "**REDACTED**",
+        "DiscoverySource": "bridge",
+        "Name": "PS4",
+        "DeviceType": "Game Console",
+        "Active": true,
+        "Tags": "lan edev mac physical eth ipv4 ipv6 dhcp flowstats events",
+        "FirstSeen": "2024-12-12T14:12:12Z",
+        "LastConnection": "2024-12-12T14:17:53Z",
+        "LastChanged": "2024-12-14T12:49:54Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "eth1",
+        "InterfaceName": "ETH3",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "VendorClassID": "PS4",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,15,6]",
+        "IPAddress": "**REDACTED**",
+        "IPAddressSource": "DHCP",
+        "Index": "406",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "406",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Name": "PS4",
+            "Source": "webui",
+            "Suffix": "",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Game Console",
+            "Source": "webui",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": " libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T14:12:14Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "SceBgDailyChecker/1.00 libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T05:22:47Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Download/1.00 libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T05:22:49Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "TzdataUpdateCheck libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T05:22:52Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "ScePartyDaemon libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T14:12:28Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "WorkaroundCtl/1.00 libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T14:13:01Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "NetEv/1.00 libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T14:13:12Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "SceRifMgr libhttp/12.00 (PlayStation 4)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-12T14:13:13Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**"
+      },
+      {
+        "Key": "00:1a:2b:3c:4d:5e",
+        "DiscoverySource": "bridge",
+        "Name": "PC-408",
+        "DeviceType": "Mobile",
+        "Active": true,
+        "Tags": "lan edev mac physical wifi ipv4 ipv6 dhcp events android upnp",
+        "FirstSeen": "2024-12-14T16:52:41Z",
+        "LastConnection": "2024-12-14T16:52:41Z",
+        "LastChanged": "2024-12-14T16:52:45Z",
+        "Master": "",
+        "DeviceCategory": "",
+        "Location": "",
+        "PhysAddress": "**REDACTED**",
+        "Layer2Interface": "wl1",
+        "InterfaceName": "vap5g0priv0",
+        "MACVendor": "",
+        "Owner": "",
+        "UniqueID": "**REDACTED**",
+        "SignalStrength": -27,
+        "SignalNoiseRatio": 58,
+        "LastDataDownlinkRate": 866667,
+        "LastDataUplinkRate": 780000,
+        "EncryptionMode": "AES",
+        "LinkBandwidth": "80MHz",
+        "SecurityModeEnabled": "WPA2-Personal",
+        "HtCapabilities": "",
+        "VhtCapabilities": "",
+        "HeCapabilities": "",
+        "SupportedMCS": "",
+        "AuthenticationState": true,
+        "OperatingStandard": "ac",
+        "OperatingFrequencyBand": "5GHz",
+        "AvgSignalStrengthByChain": -27,
+        "MaxBandwidthSupported": "80MHz",
+        "MaxDownlinkRateSupported": 866667,
+        "MaxDownlinkRateReached": 866667,
+        "DownlinkMCS": 9,
+        "DownlinkBandwidth": 3,
+        "DownlinkShortGuard": true,
+        "UplinkMCS": 9,
+        "UplinkBandwidth": 3,
+        "UplinkShortGuard": false,
+        "MaxUplinkRateSupported": 866667,
+        "MaxUplinkRateReached": 780000,
+        "MaxTxSpatialStreamsSupported": 0,
+        "MaxRxSpatialStreamsSupported": 0,
+        "VendorClassID": "android-dhcp-11",
+        "UserClassID": "",
+        "ClientID": "**REDACTED**",
+        "SerialNumber": "",
+        "ProductClass": "",
+        "OUI": "",
+        "DHCPOption55": "[1,3,6,15,26,28,51,58,59,43,114]",
+        "IPAddress": "10.1.2.3",
+        "IPAddressSource": "DHCP",
+        "Index": "408",
+        "Actions": [
+          {
+            "Function": "setName",
+            "Name": "Edit Name",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "setType",
+            "Name": "Edit Type",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "source",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "startEventing",
+            "Name": "startEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "types",
+                "Type": "string",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "stopEventing",
+            "Name": "stopEventing",
+            "Arguments": [
+              {
+                "Name": "name",
+                "Type": "string",
+                "Mandatory": true
+              }
+            ]
+          },
+          {
+            "Function": "getEventLog",
+            "Name": "getEventLog",
+            "Arguments": [
+              {
+                "Name": "type",
+                "Type": "string",
+                "Mandatory": true
+              },
+              {
+                "Name": "since",
+                "Type": "datetime",
+                "Mandatory": false
+              },
+              {
+                "Name": "until",
+                "Type": "datetime",
+                "Mandatory": false
+              }
+            ]
+          },
+          {
+            "Function": "listLiveEventTypes",
+            "Name": "listLiveEventTypes"
+          },
+          {
+            "Function": "listLogEventTypes",
+            "Name": "listLogEventTypes"
+          },
+          {
+            "Function": "listEventSubscribers",
+            "Name": "listEventSubscribers"
+          }
+        ],
+        "Names": [
+          {
+            "Name": "PC",
+            "Source": "default",
+            "Suffix": "408",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "DeviceTypes": [
+          {
+            "Type": "Mobile",
+            "Source": "dhcp",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "Computer",
+            "Source": "default",
+            "Id": "**REDACTED**"
+          },
+          {
+            "Type": "MediaRenderer",
+            "Source": "upnp-uuid:bb3a1655-01f6-417e-ae0d-f8b248553970",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "BDD": {
+          "CloudVersion": "",
+          "BDDRequestsSent": 0,
+          "BDDRequestsAnswered": 0,
+          "BDDRequestsFailed": 0,
+          "DeviceName": "",
+          "DeviceType": "",
+          "ModelName": "",
+          "OperatingSystem": "",
+          "SoftwareVersion": "",
+          "Manufacturer": "",
+          "MACVendor": "",
+          "DeviceCategory": ""
+        },
+        "Locations": [],
+        "Groups": [],
+        "Priority": {
+          "Configuration": "All",
+          "Type": "BestEffort"
+        },
+        "UserAgents": [
+          {
+            "UserAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.32 Safari/537.36",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:52:42Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "Dalvik/2.1.0 (Linux; U; Android 11; 2021/22 Philips UHD Android TV Build/RTT2.211108.001)",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:52:43Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          },
+          {
+            "UserAgent": "CrKey/3.72.446070",
+            "Type": "HTTP",
+            "LastSeen": "2024-12-14T16:53:45Z",
+            "Source": "captiveportal",
+            "Id": "**REDACTED**"
+          }
+        ],
+        "WANAccess": {
+          "BlockedReasons": ""
+        },
+        "IPv4Address": [
+          {
+            "Address": "**REDACTED**",
+            "Status": "reachable",
+            "Scope": "global",
+            "AddressSource": "DHCP",
+            "Reserved": false,
+            "Id": "**REDACTED**"
+          }
+        ],
+        "IPv6Address": "**REDACTED**"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "status": [
+    {
+      "name": "admin",
+      "enable": true,
+      "type": "system",
+      "linux_user": false,
+      "friendlyname": "",
+      "passwordstate": 0,
+      "groups": ["http", "admin"]
+    },
+    {
+      "name": "iotuser",
+      "enable": true,
+      "type": "system",
+      "linux_user": false,
+      "friendlyname": "",
+      "passwordstate": 1,
+      "groups": ["http", "iot"]
+    }
+  ]
+}

@@ -1,0 +1,800 @@
+{
+  "status": {
+    "base": {
+      "data": {
+        "Name": "data",
+        "Enable": true,
+        "Status": true,
+        "Flags": "up nat-config enabled",
+        "ULIntf": {},
+        "LLIntf": {
+          "primdata": {
+            "Name": "primdata"
+          }
+        }
+      },
+      "primdata": {
+        "ULIntf": {
+          "data": {}
+        },
+        "LLIntf": {
+          "dhcp_data": {},
+          "dhcpv6_data": {}
+        }
+      },
+      "dhcp_data": {
+        "Name": "dhcp_data",
+        "Enable": true,
+        "Status": true,
+        "Flags": "dhcp logical enabled up",
+        "ULIntf": {
+          "primdata": {
+            "Name": "primdata"
+          }
+        },
+        "LLIntf": {
+          "bridge_gvmulti": {
+            "Name": "bridge_gvmulti"
+          }
+        }
+      },
+      "bridge_gvmulti": {
+        "Name": "bridge_gvmulti",
+        "Enable": true,
+        "Status": true,
+        "Flags": "bridge netdev ipv4 ipv6 nmc-ipv6 ra wan nat-enabled enabled netdev-bound netdev-up up ipv6-up ipv4-up ipv6-remote-routes",
+        "ULIntf": {
+          "dhcp_data": {
+            "Name": "dhcp_data"
+          },
+          "dhcpv6_data": {
+            "Name": "dhcpv6_data"
+          }
+        },
+        "LLIntf": {
+          "gvlan_multi": {
+            "Name": "gvlan_multi"
+          }
+        }
+      },
+      "gvlan_multi": {
+        "Name": "gvlan_multi",
+        "Enable": true,
+        "Status": true,
+        "Flags": "vlan netdev zap-iptv vod-iptv mcast-iptv bcmvlan statmon enabled netdev-bound netdev-up up inbridge ipv6-remote-routes",
+        "ULIntf": {
+          "bridge_gvmulti": {
+            "Name": "bridge_gvmulti"
+          }
+        },
+        "LLIntf": {
+          "veip0": {
+            "Name": "veip0"
+          }
+        }
+      },
+      "veip0": {
+        "Name": "veip0",
+        "Enable": true,
+        "Status": true,
+        "Flags": "netdev gpon physical netdev-monitor wan statmon enabled netdev-bound netdev-up up ipv6-remote-routes",
+        "ULIntf": {
+          "gvlan_data": {
+            "Name": "gvlan_data"
+          },
+          "gvlan_multi": {
+            "Name": "gvlan_multi"
+          },
+          "gvlan_voip": {
+            "Name": "gvlan_voip"
+          },
+          "gvlan_iptv1": {
+            "Name": "gvlan_iptv1"
+          },
+          "gvlan_iptv2": {
+            "Name": "gvlan_iptv2"
+          }
+        },
+        "LLIntf": {}
+      },
+      "dhcpv6_data": {
+        "Name": "dhcpv6_data",
+        "Enable": true,
+        "Status": true,
+        "Flags": "dhcpv6 enabled up",
+        "ULIntf": {
+          "primdata": {
+            "Name": "primdata"
+          }
+        },
+        "LLIntf": {
+          "bridge_gvmulti": {
+            "Name": "bridge_gvmulti"
+          }
+        }
+      }
+    },
+    "6rd": {},
+    "alias": {
+      "data": {
+        "Alias": "cpe-data"
+      },
+      "primdata": {},
+      "dhcp_data": {
+        "Alias": "cpe-dhcp_data"
+      },
+      "bridge_gvmulti": {
+        "Alias": "cpe-bridge_gvmulti"
+      },
+      "gvlan_multi": {
+        "Alias": "cpe-gvlan_multi"
+      },
+      "veip0": {
+        "Alias": "cpe-veip0"
+      },
+      "dhcpv6_data": {
+        "Alias": "cpe-dhcpv6_data"
+      }
+    },
+    "atm": {},
+    "bcmvlan": {
+      "gvlan_multi": {
+        "DscpToPbitsTable": "0000000010101010202020203030303040404040500000506000000070000000",
+        "QoS": {
+          "default_rx": {
+            "Enable": true,
+            "Tags": 2,
+            "SetVlanId": 4095,
+            "SetPbits": -1,
+            "SetDscp": -1,
+            "SetEthertype": 0,
+            "DscpToPbits": -1,
+            "PushTag": false,
+            "PopTag": true,
+            "Direction": false,
+            "FilterVlanId": 4095,
+            "FilterSkbPriority": -1,
+            "FilterSkbMarkFlowid": -1,
+            "FilterEthertype": 0,
+            "FilterVlanDevMacAddr": 1
+          },
+          "arp_tx": {
+            "Enable": true,
+            "Tags": 1,
+            "SetVlanId": 4095,
+            "SetPbits": 6,
+            "SetDscp": -1,
+            "SetEthertype": 0,
+            "DscpToPbits": -1,
+            "PushTag": true,
+            "PopTag": false,
+            "Direction": true,
+            "FilterVlanId": 4095,
+            "FilterSkbPriority": -1,
+            "FilterSkbMarkFlowid": -1,
+            "FilterEthertype": 2054,
+            "FilterVlanDevMacAddr": -1
+          },
+          "default_tx": {
+            "Enable": true,
+            "Tags": 1,
+            "SetVlanId": 4095,
+            "SetPbits": -1,
+            "SetDscp": -1,
+            "SetEthertype": 33024,
+            "DscpToPbits": 0,
+            "PushTag": true,
+            "PopTag": false,
+            "Direction": true,
+            "FilterVlanId": 4095,
+            "FilterSkbPriority": -1,
+            "FilterSkbMarkFlowid": -1,
+            "FilterEthertype": 0,
+            "FilterVlanDevMacAddr": -1
+          }
+        }
+      }
+    },
+    "bridge": {
+      "bridge_gvmulti": {
+        "Ageing": 0,
+        "STPEnable": false,
+        "Priority": 0,
+        "MaxAge": 0,
+        "ForwardDelay": 2,
+        "HelloTime": 0
+      }
+    },
+    "copy": {
+      "data": {},
+      "primdata": {},
+      "dhcp_data": {},
+      "bridge_gvmulti": {},
+      "gvlan_multi": {},
+      "veip0": {},
+      "dhcpv6_data": {}
+    },
+    "dhcp-api": {
+      "data": {},
+      "primdata": {},
+      "dhcp_data": {},
+      "bridge_gvmulti": {},
+      "gvlan_multi": {},
+      "veip0": {},
+      "dhcpv6_data": {}
+    },
+    "dhcp": {
+      "dhcp_data": {
+        "DHCPStatus": "Bound",
+        "LastConnectionError": "null",
+        "Renew": false,
+        "IPAddress": "**REDACTED**",
+        "SubnetMask": "**REDACTED**",
+        "IPRouters": "**REDACTED**",
+        "DNSServers": "80.10.246.132,81.253.149.2",
+        "DHCPServer": "**REDACTED**",
+        "LeaseTime": 259200,
+        "LeaseTimeRemaining": 236361,
+        "Uptime": 1210168,
+        "DSCPMark": 48,
+        "PriorityMark": 6,
+        "Formal": false,
+        "BroadcastFlag": 65535,
+        "CheckAuthentication": true,
+        "AuthenticationInformation": "**REDACTED**",
+        "ResetOnPhysDownTimeout": 20,
+        "RetransmissionStrategy": "4000 8000 16000 32000 64000 128000 -1 0",
+        "RetransmissionRenewTimeout": -1,
+        "SendMaxMsgSize": false,
+        "SentOption": {
+          "60": {
+            "Enable": true,
+            "Alias": "cpe-60",
+            "Tag": 60,
+            "Value": "736167656d"
+          },
+          "61": {
+            "Enable": true,
+            "Alias": "cpe-61",
+            "Tag": 61,
+            "Value": "01581DD8056300"
+          },
+          "77": {
+            "Enable": true,
+            "Alias": "cpe-77",
+            "Tag": 77,
+            "Value": "2b46535644534c5f6c697665626f782e496e7465726e65742e736f66746174686f6d652e4c697665626f7837"
+          },
+          "90": {
+            "Enable": true,
+            "Alias": "cpe-90",
+            "Tag": 90,
+            "Value": "00000000000000000000001a0900000558010341010d6674692f767239747033753c122b292b7854526e4079767632792b792803134fb150654162c5cc722ad7253c6342bd6d"
+          }
+        },
+        "ReqOption": {
+          "1": {
+            "Enable": true,
+            "Alias": "cpe-1",
+            "Tag": 1,
+            "Value": "fffffe00"
+          },
+          "3": {
+            "Enable": true,
+            "Alias": "cpe-3",
+            "Tag": 3,
+            "Value": "5c8ac001"
+          },
+          "6": {
+            "Enable": true,
+            "Alias": "cpe-6",
+            "Tag": 6,
+            "Value": "500af68451fd9502"
+          },
+          "15": {
+            "Enable": true,
+            "Alias": "cpe-15",
+            "Tag": 15,
+            "Value": ""
+          },
+          "28": {
+            "Enable": true,
+            "Alias": "cpe-28",
+            "Tag": 28,
+            "Value": "5c8ac1ff"
+          },
+          "51": {
+            "Enable": true,
+            "Alias": "cpe-51",
+            "Tag": 51,
+            "Value": "0003f480"
+          },
+          "58": {
+            "Enable": true,
+            "Alias": "cpe-58",
+            "Tag": 58,
+            "Value": "00014e20"
+          },
+          "59": {
+            "Enable": true,
+            "Alias": "cpe-59",
+            "Tag": 59,
+            "Value": "00032a00"
+          },
+          "90": {
+            "Enable": true,
+            "Alias": "cpe-90",
+            "Tag": 90,
+            "Value": "0000000000000000000000646863706c697665626f786672323530"
+          },
+          "119": {
+            "Enable": true,
+            "Alias": "cpe-119",
+            "Tag": 119,
+            "Value": "0342415906616363657373116f72616e67652d6d756c74696d65646961036e657400"
+          },
+          "120": {
+            "Enable": true,
+            "Alias": "cpe-120",
+            "Tag": 120,
+            "Value": ""
+          },
+          "125": {
+            "Enable": true,
+            "Alias": "cpe-125",
+            "Tag": 125,
+            "Value": "000005580c010a00010000000000000000"
+          }
+        }
+      }
+    },
+    "dhcpv6": {
+      "dhcpv6_data": {
+        "DHCPStatus": "Bound",
+        "Uptime": 1210163,
+        "DSCPMark": 0,
+        "DUID": "**REDACTED**",
+        "RequestAddresses": false,
+        "RequestPrefixes": true,
+        "RapidCommit": false,
+        "IAID": 0,
+        "SuggestedT1": -1,
+        "SuggestedT2": -1,
+        "SupportedOptions": "",
+        "RequestedOptions": "11,17,23,24",
+        "Renew": false,
+        "ResetOnPhysDownTimeout": 20,
+        "CheckAuthentication": true,
+        "AuthenticationInfo": "dhcpliveboxfr250",
+        "RetryOnFailedAuth": true,
+        "SentOption": {
+          "11": {
+            "Enable": true,
+            "Alias": "cpe-11",
+            "Tag": 11,
+            "Value": "00000000000000000000001a0900000558010341010d6674692f767239747033753c122b292b7854526e4079767632792b792803134fb150654162c5cc722ad7253c6342bd6d"
+          },
+          "15": {
+            "Enable": true,
+            "Alias": "cpe-15",
+            "Tag": 15,
+            "Value": "002b46535644534c5f6c697665626f782e496e7465726e65742e736f66746174686f6d652e4c697665626f7837"
+          },
+          "16": {
+            "Enable": true,
+            "Alias": "cpe-16",
+            "Tag": 16,
+            "Value": "0000040e0005736167656d"
+          },
+          "17": {
+            "Enable": false,
+            "Alias": "cpe-17",
+            "Tag": 17,
+            "Value": "000005580006000e495056365f524551554553544544"
+          }
+        },
+        "ReceivedOption": {
+          "1": {
+            "Tag": 1,
+            "Alias": "cpe-1",
+            "Value": "00030001581dd8056300"
+          },
+          "2": {
+            "Tag": 2,
+            "Alias": "cpe-2",
+            "Value": "0003000100d0f6bf1d80"
+          },
+          "11": {
+            "Tag": 11,
+            "Alias": "cpe-11",
+            "Value": "0000000000000000000000646863706c697665626f786672323530"
+          },
+          "17": {
+            "Tag": 17,
+            "Alias": "cpe-17",
+            "Value": "000005580001000a00010000000000000000"
+          },
+          "23": {
+            "Tag": 23,
+            "Alias": "cpe-23",
+            "Value": "2a01cfc42180400000000000000000012a01cfc42000000e0000000000000001"
+          },
+          "24": {
+            "Tag": 24,
+            "Alias": "cpe-24",
+            "Value": "0342415906616363657373116f72616e67652d6d756c74696d65646961036e657400"
+          },
+          "25": {
+            "Tag": 25,
+            "Alias": "cpe-25",
+            "Value": "d805630000014e2000032a00001a00190003f4800003f480382a01cb18810fc4000000000000000000"
+          }
+        }
+      }
+    },
+    "dop-slave": {},
+    "dsl": {},
+    "dslbonding": {},
+    "dslite": {},
+    "dslline": {},
+    "eth": {},
+    "gpon": {
+      "veip0": {
+        "RegistrationID": "",
+        "RegistrationIDIsInHexFormat": false,
+        "VeipPptpUni": true,
+        "MaxBitRateSupported": 10000,
+        "SignalRxPower": -16861,
+        "SignalTxPower": 3618,
+        "Temperature": 47,
+        "Voltage": 32920,
+        "Bias": 19008,
+        "PonMode": "GPON",
+        "SerialNumber": "**REDACTED**",
+        "HardwareVersion": "SMBSXLB7400",
+        "EquipmentId": "SagemcomFast5694OFR",
+        "VendorId": "SMBS",
+        "VendorProductCode": 0,
+        "ONTSoftwareVersion0": "SAHEOFR070101",
+        "ONTSoftwareVersion1": "SAHEOFR070202",
+        "ONTSoftwareVersionActive": 1,
+        "LowerOpticalThreshold": -35000,
+        "UpperOpticalThreshold": 0,
+        "LowerTransmitPowerThreshold": -1000,
+        "UpperTransmitPowerThreshold": 7000,
+        "Mode": "Normal",
+        "CustomVendorID": "",
+        "CustomEquipmentID": "",
+        "VLANs": "851,832,835,838,840",
+        "RogueOnu": false,
+        "RogueOnuCount": 0,
+        "RogueOnuLastOccurence": "0001-01-01T00:00:00Z",
+        "OnuState": "O5_Operation",
+        "OnuId": 22,
+        "PonId": "",
+        "DownstreamMaxRate": 2488320,
+        "UpstreamMaxRate": 1244160,
+        "DownstreamCurrRate": 2488320,
+        "UpstreamCurrRate": 1244160
+      }
+    },
+    "gre": {},
+    "ipsec": {},
+    "nat": {
+      "bridge_gvmulti": {
+        "NATEnabled": true
+      },
+      "gvlan_multi": {
+        "NATEnabled": false
+      },
+      "veip0": {
+        "NATEnabled": false
+      }
+    },
+    "netdev-api": {
+      "data": {},
+      "primdata": {},
+      "dhcp_data": {},
+      "bridge_gvmulti": {},
+      "gvlan_multi": {},
+      "veip0": {},
+      "dhcpv6_data": {}
+    },
+    "netdev": {
+      "bridge_gvmulti": {
+        "NetDevIndex": 41,
+        "NetDevType": "ether",
+        "NetDevFlags": "broadcast allmulti multicast up",
+        "NetDevName": "bridge_gvmulti",
+        "LLAddress": "**REDACTED**",
+        "TxQueueLen": 1000,
+        "MTU": 1500,
+        "NetDevState": "up",
+        "IPv4Forwarding": true,
+        "IPv4ForceIGMPVersion": 2,
+        "IPv4AcceptSourceRoute": true,
+        "IPv4AcceptLocal": false,
+        "IPv4AcceptRedirects": false,
+        "IPv4ArpFilter": false,
+        "IPv6AcceptRA": true,
+        "IPv6ActAsRouter": false,
+        "IPv6AutoConf": true,
+        "IPv6MaxRtrSolicitations": 3,
+        "IPv6RtrSolicitationInterval": 4000,
+        "IPv6AcceptSourceRoute": false,
+        "IPv6AcceptRedirects": true,
+        "IPv6OptimisticDAD": false,
+        "IPv6Disable": false,
+        "IPv6HostPart": "",
+        "RtTable": 0,
+        "RtPriority": 0,
+        "IPv6AddrDelegate": "bridge",
+        "IPv4Addr": {
+          "dyn8": {
+            "Enable": true,
+            "Status": "dynamic",
+            "Address": "**REDACTED**",
+            "Peer": "",
+            "PrefixLen": 23,
+            "Flags": "permanent",
+            "Scope": "global",
+            "NeMoFlags": "@gua"
+          }
+        },
+        "IPv6Addr": {
+          "dyn7": {
+            "Enable": true,
+            "Status": "dynamic",
+            "Address": "**REDACTED**",
+            "Peer": "",
+            "PrefixLen": 64,
+            "Flags": "permanent",
+            "Scope": "link",
+            "NeMoFlags": "@lla",
+            "PreferredLifetime": 0,
+            "ValidLifetime": 0
+          }
+        },
+        "IPv4Route": {
+          "dyn25": {
+            "Enable": true,
+            "Status": "dynamic",
+            "DstLen": 23,
+            "Table": "main",
+            "Scope": "link",
+            "Protocol": "kernel",
+            "Type": "unicast",
+            "Dst": "**REDACTED**",
+            "Priority": 0,
+            "Gateway": ""
+          },
+          "route_0": {
+            "Enable": true,
+            "Status": "bound",
+            "DstLen": 0,
+            "Table": "main",
+            "Scope": "global",
+            "Protocol": "boot",
+            "Type": "unicast",
+            "Dst": "**REDACTED**",
+            "Priority": 0,
+            "Gateway": "**REDACTED**"
+          }
+        },
+        "IPv6Route": {
+          "dyn21": {
+            "Enable": true,
+            "Status": "dynamic",
+            "DstLen": 8,
+            "Table": "main",
+            "Scope": "global",
+            "Protocol": "kernel",
+            "Type": "multicast",
+            "Dst": "**REDACTED**",
+            "Priority": 256,
+            "Gateway": ""
+          },
+          "dyn22": {
+            "Enable": true,
+            "Status": "dynamic",
+            "DstLen": 64,
+            "Table": "main",
+            "Scope": "global",
+            "Protocol": "kernel",
+            "Type": "unicast",
+            "Dst": "**REDACTED**",
+            "Priority": 256,
+            "Gateway": ""
+          },
+          "dyn23": {
+            "Enable": true,
+            "Status": "dynamic",
+            "DstLen": 128,
+            "Table": "main",
+            "Scope": "global",
+            "Protocol": "kernel",
+            "Type": "local",
+            "Dst": "**REDACTED**",
+            "Priority": 0,
+            "Gateway": ""
+          },
+          "dyn26": {
+            "Enable": true,
+            "Status": "dynamic",
+            "DstLen": 0,
+            "Table": "main",
+            "Scope": "global",
+            "Protocol": "9",
+            "Type": "unicast",
+            "Dst": "**REDACTED**",
+            "Priority": 1024,
+            "Gateway": "**REDACTED**"
+          }
+        }
+      },
+      "gvlan_multi": {
+        "NetDevIndex": 42,
+        "NetDevType": "ether",
+        "NetDevFlags": "up broadcast allmulti multicast",
+        "NetDevName": "gvlan_multi",
+        "LLAddress": "**REDACTED**",
+        "TxQueueLen": 1000,
+        "MTU": 1500,
+        "NetDevState": "up",
+        "IPv4Forwarding": true,
+        "IPv4ForceIGMPVersion": 0,
+        "IPv4AcceptSourceRoute": true,
+        "IPv4AcceptLocal": false,
+        "IPv4AcceptRedirects": false,
+        "IPv4ArpFilter": false,
+        "IPv6AcceptRA": true,
+        "IPv6ActAsRouter": true,
+        "IPv6AutoConf": true,
+        "IPv6MaxRtrSolicitations": 3,
+        "IPv6RtrSolicitationInterval": 4000,
+        "IPv6AcceptSourceRoute": false,
+        "IPv6AcceptRedirects": true,
+        "IPv6OptimisticDAD": false,
+        "IPv6Disable": true,
+        "IPv6HostPart": "",
+        "RtTable": 0,
+        "RtPriority": 0,
+        "IPv6AddrDelegate": "",
+        "IPv4Addr": {},
+        "IPv6Addr": {},
+        "IPv4Route": {},
+        "IPv6Route": {}
+      },
+      "veip0": {
+        "NetDevIndex": 39,
+        "NetDevType": "ether",
+        "NetDevFlags": "up broadcast allmulti multicast",
+        "NetDevName": "veip0",
+        "LLAddress": "**REDACTED**",
+        "TxQueueLen": 1000,
+        "MTU": 1500,
+        "NetDevState": "up",
+        "IPv4Forwarding": true,
+        "IPv4ForceIGMPVersion": 0,
+        "IPv4AcceptSourceRoute": true,
+        "IPv4AcceptLocal": false,
+        "IPv4AcceptRedirects": false,
+        "IPv4ArpFilter": false,
+        "IPv6AcceptRA": true,
+        "IPv6ActAsRouter": true,
+        "IPv6AutoConf": true,
+        "IPv6MaxRtrSolicitations": 3,
+        "IPv6RtrSolicitationInterval": 4000,
+        "IPv6AcceptSourceRoute": false,
+        "IPv6AcceptRedirects": true,
+        "IPv6OptimisticDAD": false,
+        "IPv6Disable": true,
+        "IPv6HostPart": "",
+        "RtTable": 0,
+        "RtPriority": 0,
+        "IPv6AddrDelegate": "",
+        "IPv4Addr": {},
+        "IPv6Addr": {},
+        "IPv4Route": {},
+        "IPv6Route": {}
+      }
+    },
+    "penable": {},
+    "ppp": {},
+    "ptm": {},
+    "ra-api": {
+      "data": {},
+      "primdata": {},
+      "dhcp_data": {},
+      "bridge_gvmulti": {},
+      "gvlan_multi": {},
+      "veip0": {},
+      "dhcpv6_data": {}
+    },
+    "ra": {
+      "bridge_gvmulti": {
+        "IPv6RouterDownTimeout": 20,
+        "IPv6Router": {
+          "fe80::ba0:bab": {
+            "Address": "**REDACTED**",
+            "LastAdvertisement": 1209794,
+            "CurHopLimit": 255,
+            "Managed": false,
+            "Other": false,
+            "HomeAgent": false,
+            "Preference": 0,
+            "RouterLifetime": 4500,
+            "ReachableTime": 1800000,
+            "RetransTimer": 0,
+            "Option": {
+              "1": {
+                "Tag": 5,
+                "Value": "05010000000005dc"
+              },
+              "2": {
+                "Tag": 1,
+                "Value": "010100d0f6bf1ef2"
+              }
+            }
+          }
+        }
+      }
+    },
+    "statmon": {
+      "gvlan_multi": {
+        "StatMon": {
+          "netdev-historical": {
+            "Enable": true,
+            "Interval": 30000,
+            "Type": "netdev"
+          }
+        }
+      },
+      "veip0": {
+        "StatMon": {
+          "netdev-historical": {
+            "Enable": true,
+            "Interval": 30000,
+            "Type": "netdev"
+          },
+          "netdev-saturation": {
+            "Enable": true,
+            "Interval": 1000,
+            "Type": "netdev"
+          }
+        }
+      }
+    },
+    "switch": {},
+    "tethering": {},
+    "vlan": {
+      "gvlan_multi": {
+        "LastChangeTime": 198,
+        "LastChange": 1210174,
+        "VLANID": "**REDACTED**",
+        "VLANPriority": -1
+      }
+    },
+    "vpnclient": {},
+    "vpnserver": {},
+    "wan": {
+      "bridge_gvmulti": {
+        "PhysicalInterface": ""
+      },
+      "veip0": {
+        "PhysicalInterface": "GPON"
+      }
+    },
+    "wlanbcmep": {},
+    "wlanbcmrad": {},
+    "wlanbcmvap": {},
+    "wlanconfig": {},
+    "wlanendpoint": {},
+    "wlanmtkrad": {},
+    "wlanquanrad": {},
+    "wlanquanvap": {},
+    "wlanradio": {},
+    "wlanvap": {},
+    "wwan": {}
+  }
+}
