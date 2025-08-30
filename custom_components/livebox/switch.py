@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
@@ -27,81 +27,46 @@ class LiveboxSwitchEntityDescription(SwitchEntityDescription):
     """Class describing Livebox button entities."""
 
     value_fn: Callable[..., Any] | None = None
-    turn_on_parameters: dict[str, Any] | None = None
-    turn_off_parameters: dict[str, Any] | None = None
-    iface: str | None = None
+    turn_on: Callable[..., Any] | None = None
+    turn_off: Callable[..., Any] | None = None
 
 
 SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
-        name="Wifi switch",
+        name="Wifi",
         translation_key="wifi_switch",
-        value_fn=lambda x: x.nmc.async_set_wifi,
-        turn_on_parameters={"Enable": True, "Status": True},
-        turn_off_parameters={"Enable": False, "Status": False},
+        value_fn=lambda x: x.get("wifi"),
+        turn_on=lambda x: x.nmc.async_set_wifi({"Enable": True, "Status": True}),
+        turn_off=lambda x: x.nmc.async_set_wifi({"Enable": False, "Status": False}),
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
         name="Guest Wifi switch",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
-        value_fn=lambda x: x.nmc.async_set_guest_wifi,
-        turn_on_parameters={"Enable": True, "Status": True},
-        turn_off_parameters={"Enable": False, "Status": False},
+        value_fn=lambda x: x.get("guest_wifi"),
+        turn_on=lambda x: x.nmc.async_set_guest_wifi(enable=True),
+        turn_off=lambda x: x.nmc.async_set_guest_wifi(enable=False),
     ),
 )
 
 SWITCH_TYPES_5: Final[tuple[SwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
-        name="Wifi switch",
+        name="Wifi",
         translation_key="wifi_switch",
-        value_fn=lambda x: x.nemo.async_set_wlan_config,
-        iface="lan",
-        turn_on_parameters={
-            "mibs": {
-                "penable": {
-                    "wl0": {
-                        "Enable": True,
-                        "PersistentEnable": True,
-                        "Status": True,
-                    },
-                    "eth4": {
-                        "Enable": True,
-                        "PersistentEnable": True,
-                        "Status": True,
-                    },
-                    "wlanvap": {"wl0": {}, "eth4": {}},
-                }
-            }
-        },
-        turn_off_parameters={
-            "mibs": {
-                "penable": {
-                    "wl0": {
-                        "Enable": False,
-                        "PersistentEnable": False,
-                        "Status": False,
-                    },
-                    "eth4": {
-                        "Enable": False,
-                        "PersistentEnable": False,
-                        "Status": False,
-                    },
-                    "wlanvap": {"wl0": {}, "eth4": {}},
-                }
-            }
-        },
+        value_fn=lambda x: x.get("wifi"),
+        turn_on=lambda x: x.nemo.async_wifi(True),
+        turn_off=lambda x: x.nemo.async_wifi(False),
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
         name="Guest Wifi switch",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
-        value_fn=lambda x: x.nmc.async_set_guest_wifi,
-        turn_on_parameters={"Enable": True, "Status": True},
-        turn_off_parameters={"Enable": False, "Status": False},
+        turn_on=lambda x: x.nmc.async_guest_wifi(True),
+        turn_off=lambda x: x.nmc.async_guest_wifi(False),
     ),
 )
 
@@ -138,30 +103,16 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        return self.coordinator.data.get(self.entity_description.key) is True
+        return self.entity_description.value_fn(self.coordinator.data) is True
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        if iface := self.entity_description.iface:
-            await self.entity_description.value_fn(self.coordinator.api)(
-                iface, self.entity_description.turn_on_parameters
-            )
-        else:
-            await self.entity_description.value_fn(self.coordinator.api)(
-                self.entity_description.turn_on_parameters
-            )
+        await self.entity_description.turn_on(self.coordinator.api)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
-        if iface := self.entity_description.iface:
-            await self.entity_description.value_fn(self.coordinator.api)(
-                iface, self.entity_description.turn_off_parameters
-            )
-        else:
-            await self.entity_description.value_fn(self.coordinator.api)(
-                self.entity_description.turn_off_parameters
-            )
+        await self.entity_description.turn_off(self.coordinator.api)
         await self.coordinator.async_request_refresh()
 
 
