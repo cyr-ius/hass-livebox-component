@@ -11,7 +11,10 @@ from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityDescription
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+    AddEntitiesCallback,
+)
 
 from . import LiveboxConfigEntry
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
@@ -31,32 +34,46 @@ async def async_setup_entry(
     tracked = set()
 
     @callback
-    def _async_add_new_device(uid: str, device: dict[str, Any]) -> None:
-        """Create a new device tracker entity when detected."""
-        if uid in tracked:
-            return
-        tracked.add(uid)
-        entity = LiveboxDeviceScannerEntity(
-            coordinator,
-            EntityDescription(key=f"{uid}_tracker", name=device.get("Name")),
-            device,
-        )
-        async_add_entities([entity])  # ici HA appellera async_added_to_hass()
+    def async_update_router() -> None:
+        """Update the values of the router."""
+        async_add_new_tracked_entities(coordinator, async_add_entities, tracked)
 
-    # On écoute les signaux envoyés par le coordinator
     entry.async_on_unload(
         async_dispatcher_connect(
-            hass,
-            coordinator.signal_device_new,
-            _async_add_new_device,
+            hass, coordinator.signal_device_new, async_update_router
         )
     )
 
-    # Au démarrage, on ajoute déjà les devices connus
-    for uid, device in coordinator.data.get("devices", {}).items():
-        _async_add_new_device(uid, device)
+    async_update_router()
 
 
+@callback
+def async_add_new_tracked_entities(
+    coordinator: LiveboxDataUpdateCoordinator,
+    async_add_entities: AddConfigEntryEntitiesCallback,
+    tracked: set[str],
+) -> None:
+    """Add new tracker entities from the router."""
+    new_tracked = []
+
+    _LOGGER.info("Adding device trackers entities")
+    for mac, device in coordinator.data.get("devices", {}).items():
+        if mac in tracked:
+            continue
+        _LOGGER.info("New device tracker: %s", device.get("Name", "Unknown"))
+        new_tracked.append(
+            LiveboxDeviceScannerEntity(
+                coordinator,
+                EntityDescription(key=f"{mac}_tracker", name=device.get("Name")),
+                device,
+            )
+        )
+        tracked.add(mac)
+
+    async_add_entities(new_tracked)
+
+
+@callback
 class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     """Represent a tracked device."""
 
@@ -68,17 +85,20 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     ) -> None:
         """Initialize the device tracker."""
         super().__init__(coordinator, description)
+        self.coordinator = coordinator
+        self.entity_description = description
+
         self._device = device
         self._old_status = datetime.today()
+        self._attr_is_connected = device.get("Active", False)
+        self._attr_source_type = SourceType.ROUTER
+        self._attr_mac_address = device.get("Key")
+        self._attr_ip_address = device.get("IPAddress")
         self._attr_device_info = {
             "name": self.name,
             "identifiers": {(DOMAIN, device.get("Key"))},
             "via_device": (DOMAIN, coordinator.unique_id),
         }
-        self._attr_is_connected = device.get("Active", False)
-        self._attr_source_type = SourceType.ROUTER
-        self._attr_mac_address = device.get("Key")
-        self._attr_ip_address = device.get("IPAddress")
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -194,10 +214,5 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
             _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
             self._attr_is_connected = True
 
+        _LOGGER.debug("%s is connected: %s", self.name, self._attr_is_connected)
         self.async_write_ha_state()
-
-    async def async_added_to_hass(self) -> None:
-        """When entity is added to hass."""
-        self._handle_coordinator_update()
-        await super().async_added_to_hass()
-        await self.async_update()
