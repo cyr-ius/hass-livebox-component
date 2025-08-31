@@ -54,7 +54,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
     elif model == "7":
         api = load_json_object_fixture("Livebox 7.json")["api_raw"]
     elif model == "7.1":
-        api = load_json_object_fixture("Livebox 7.json")["api_raw"]
+        api = load_json_object_fixture("Livebox W7.json")["api_raw"]
     else:
         raise ValueError(f"Unknown model: {model}")
 
