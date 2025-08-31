@@ -9,8 +9,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 
-from .const import WAN_STATUS
-
 
 @pytest.mark.asyncio
 async def test_binary_sensor_link_status(
@@ -21,7 +19,7 @@ async def test_binary_sensor_link_status(
     """Test the link status binary sensor."""
     # --- Test Setup ---
     # Make a deep copy of the fixture data to allow modification in this test
-    info_data = copy.deepcopy(WAN_STATUS)
+    info_data = copy.deepcopy(await AIOSysbus.nmc.async_get_wan_status())
 
     # --- Test for ON state ---
     # Set the status to 1 (Connected)
@@ -33,7 +31,7 @@ async def test_binary_sensor_link_status(
     await hass.async_block_till_done()
 
     # Check the state
-    state = hass.states.get("binary_sensor.livebox_7_wan_status")
+    state = hass.states.get(f"binary_sensor.{AIOSysbus.__unique_name}_wan_status")
     assert state is not None
     assert state.state == STATE_ON
 
@@ -44,11 +42,11 @@ async def test_binary_sensor_link_status(
 
     # Trigger a refresh of the coordinator
     coordinator = config_entry.runtime_data
-    await coordinator.async_request_refresh()
+    await coordinator.async_refresh()
     await hass.async_block_till_done()
 
     # Check the state again
-    state = hass.states.get("binary_sensor.livebox_7_wan_status")
+    state = hass.states.get(f"binary_sensor.{AIOSysbus.__unique_name}_wan_status")
     assert state is not None
     assert state.state == STATE_OFF
 
@@ -65,10 +63,10 @@ async def test_binary_sensor(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    state = hass.states.get("binary_sensor.livebox_7_call_missed")
+    state = hass.states.get(f"binary_sensor.{AIOSysbus.__unique_name}_call_missed")
     assert state is not None
     assert state.state == STATE_ON
 
-    state = hass.states.get("binary_sensor.livebox_7_remote_access")
+    state = hass.states.get(f"binary_sensor.{AIOSysbus.__unique_name}_remote_access")
     assert state is not None
     assert state.state == STATE_OFF

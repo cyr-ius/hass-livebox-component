@@ -53,7 +53,7 @@ async def test_form_success(
 
         # Assert the flow finished and created an entry
         assert result2["type"] == FlowResultType.CREATE_ENTRY
-        assert result2["title"] == "Livebox"  # From INFO fixture
+        assert result2["title"] == "Livebox (012345678901234)"  # From INFO fixture
         assert result2["data"] == MOCK_USER_INPUT
         assert result2["result"].unique_id == "012345678901234"  # From INFO fixture
 

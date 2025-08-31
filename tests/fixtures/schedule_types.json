@@ -1,6 +1,0 @@
-{
-  "status": true,
-  "data": {
-    "types": ["ToD", "RWLAN", "WLAN", "RUE", "POWER"]
-  }
-}

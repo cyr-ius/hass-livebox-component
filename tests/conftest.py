@@ -6,51 +6,26 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 import pytest
 from homeassistant.config_entries import SOURCE_USER, ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.util import slugify
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     load_json_object_fixture,
 )
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import (
+    CONF_DISPLAY_DEVICES,
+    CONF_LAN_TRACKING,
+    CONF_TRACKING_TIMEOUT,
+    CONF_WIFI_TRACKING,
+    DEFAULT_DISPLAY_DEVICES,
+    DEFAULT_LAN_TRACKING,
+    DEFAULT_TRACKING_TIMEOUT,
+    DEFAULT_WIFI_TRACKING,
+    DOMAIN,
+)
 
 from .const import (
-    CALLLIST,
-    DEVICES,
-    DHCP_POOL,
-    DSL0_LINE_STATS,
-    GROUPS,
-    GUEST_WIFI,
-    IOT_STATUS,
-    LAN_IP,
-    LANGUAGE,
-    LOCALTIME_ZONE,
-    MIBS_DATA,
-    MIBS_LAN,
-    MIBS_VEIP0,
     MOCK_USER_INPUT,
-    NET_DEV_STATS_ETH0,
-    NET_DEV_STATS_VEIP0,
-    NMC_AUTODETECT,
-    NMC_GET,
-    NMC_IPTV,
-    NMC_IPTV_CONFIG,
-    NMC_IPTV_MULTI_SCREENS,
-    NMC_NETWORK,
-    NTP,
-    ORANGE_REMOTE_ACCESS,
-    PNP,
-    REMOTE_ACCESS,
-    SCHEDULETYPES,
-    SFP,
-    SPEEDTEST_INFOS,
-    TIME,
-    TIME_STATUS,
-    UPNPNGID,
-    USERS,
-    UTCTIME,
-    WAN_STATUS,
-    WIFI,
-    WIFI_STATS,
 )
 
 
@@ -65,42 +40,67 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
     """Mock a successful connection."""
     model = getattr(request, "param", "7")  # valeur par défaut
 
-    if model == "4":
-        INFO = load_json_object_fixture("LB_4_deviceinfo.json")
-    elif model == "5":
-        INFO = load_json_object_fixture("LB_5_deviceinfo.json")
-    elif model == "6":
-        INFO = load_json_object_fixture("LB_6_deviceinfo.json")
+    # "Livebox 3": "Livebox 3", 3
+    # "Livebox 4": "Livebox 4", 4
+    # "Livebox Fibre": "Livebox 5", 5
+    # "Livebox 6": "Livebox 6", 6
+    # "Livebox 7": "Livebox 7", 7
+    # "Livebox W7": "Livebox W7", 7.1
+    # "Livebox Nautilus": "Livebox S", 7.2
+    # "Livebox S": "Livebox S", 7.2
+
+    if model == "5":
+        api = load_json_object_fixture("Livebox Fibre.json")["api_raw"]
     elif model == "7":
-        INFO = load_json_object_fixture("LB_7_deviceinfo.json")
-    elif model == "w7":
-        INFO = load_json_object_fixture("LB_W7_deviceinfo.json")
+        api = load_json_object_fixture("Livebox 7.json")["api_raw"]
+    elif model == "7.1":
+        api = load_json_object_fixture("Livebox 7.json")["api_raw"]
     else:
         raise ValueError(f"Unknown model: {model}")
 
     with patch("custom_components.livebox.coordinator.AIOSysbus") as mock:
         instance = mock.return_value
-        type(instance).__model = PropertyMock(return_value=model)
         instance.async_connect = AsyncMock(return_value=True)
-        instance.async_get_permissions = AsyncMock(return_value="http,admin")
-        instance.deviceinfo.async_get_deviceinfo = AsyncMock(return_value=INFO)
-        instance.devices.async_get_devices = AsyncMock(return_value=DEVICES)
-        instance.voiceservice.async_get_calllist = AsyncMock(return_value=CALLLIST)
+        instance.async_get_permissions = AsyncMock(
+            return_value=api["AIOSysbus.async_get_permissions"]
+        )
+        instance.deviceinfo.async_get_deviceinfo = AsyncMock(
+            return_value=api["DeviceInfo.async_get_deviceinfo"]
+        )
+        # instance.devices.async_get_devices = AsyncMock(
+        #     return_value=api["Devices.async_get_devices"]
+        # )
+        devices = api["Devices.async_get_devices"]["status"]
+        filtered_devices = []
+        for device in devices:
+            if (
+                ("edev" or "hnid") in device["Tags"]
+                and "wifi" in device["Tags"]
+                and device["PhysAddress"] is not None
+            ):
+                filtered_devices.append(device)
+        instance.devices.async_get_devices = AsyncMock(
+            return_value={"status": {"wifi": filtered_devices}}
+        )
+
+        instance.voiceservice.async_get_calllist = AsyncMock(
+            return_value=api["VoiceService.async_get_calllist"]
+        )
         instance.nemo.async_lucky_addr_address_lan = AsyncMock(
-            return_value={"status": "1.2.3.4"}
+            return_value=api["NeMo.async_lucky_addr_address::lan"]
         )
         instance.nemo.async_lucky_addr_address_data = AsyncMock(
-            return_value={"status": "192.168.1.1"}
+            return_value=api["NeMo.async_lucky_addr_address::data"]
         )
 
         def _mock_get_mibs(*args, **kwargs):
             """Mock for async_get_MIBs to return different values based on first arg."""
             if args[0] == "data":
-                return MIBS_DATA
+                return api["NeMo.async_get_MIBs::data"]
             if args[0] == "lan":
-                return MIBS_LAN
+                return api["NeMo.async_get_MIBs::lan"]
             if args[0] == "veip0":
-                return MIBS_VEIP0
+                return api["NeMo.async_get_MIBs::veip0"]
             return {}
 
         instance.nemo.async_get_MIBs = AsyncMock(side_effect=_mock_get_mibs)
@@ -108,18 +108,20 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         def _mock_get_net_dev_stats(*args, **kwargs):
             """Mock for async_get_net_dev_stats to return different values based on first arg."""
             if args[0] == "eth0":
-                return NET_DEV_STATS_ETH0
+                return api["NeMo.async_get_net_dev_stats::eth0"]
             if args[0] == "veip0":
-                return NET_DEV_STATS_VEIP0
+                return api["NeMo.async_get_net_dev_stats::veip0"]
             return {}
 
         instance.nemo.async_get_net_dev_stats = AsyncMock(
             side_effect=_mock_get_net_dev_stats
         )
         instance.nemo.async_get_dsl0_line_stats = AsyncMock(
-            return_value=DSL0_LINE_STATS
+            return_value=api["NeMo.async_get_dsl0_line_stats"]
         )
-        instance.sfp.async_get = AsyncMock(return_value=SFP)
+        instance.nemo.async_wifi = AsyncMock()
+
+        instance.sfp.async_get = AsyncMock(return_value=api["SFP.async_get"])
 
         def _mock_get_schedule(*args, **kwargs):
             """Mock for async_get_schedule to return different values based on first arg."""
@@ -128,86 +130,136 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.schedule.async_get_schedule = AsyncMock(side_effect=_mock_get_schedule)
 
         instance.schedule.async_get_scheduletypes = AsyncMock(
-            return_value=SCHEDULETYPES
+            return_value=api["Schedule.async_get_scheduletypes"]
         )
-        instance.dhcp.async_get_dhcp_pool = AsyncMock(return_value=DHCP_POOL)
-        # instance.dhcp.async_get_dhcp_stats = AsyncMock(return_value=INFO)
+        instance.dhcp.async_get_dhcp_pool = AsyncMock(
+            return_value=api["Dhcp.async_get_dhcp_pool"]
+        )
+        instance.dhcp.async_get_dhcp_stats = AsyncMock(
+            return_value=api.get("Dhcp.async_get_dhcp_stats", {})
+        )
         instance.dhcp.async_get_dhcp6_status = AsyncMock(
-            return_value={"status": "Enabled"}
+            return_value=api["Dhcp.async_get_dhcp6_status"]
         )
-        instance.dyndns.async_get_hosts = AsyncMock(return_value={"status": []})
+        instance.dyndns.async_get_hosts = AsyncMock(
+            return_value=api["DynDNS.async_get_hosts"]
+        )
         instance.dyndns.async_get_services = AsyncMock(
-            return_value={
-                "status": ["dyndns", "No-IP", "ChangeIP", "OVH-dynhost", "GnuDIP"]
-            }
+            return_value=api["DynDNS.async_get_services"]
         )
         instance.dyndns.async_get_global_enable = AsyncMock(
-            return_value={"status": True}
+            return_value=api["DynDNS.async_get_global_enable"]
         )
         # instance.event.async_get_events = AsyncMock(return_value=INFO)  # take 10s
-        instance.userinterface.async_get_language = AsyncMock(return_value=LANGUAGE)
-        instance.userinterface.async_get_state = AsyncMock(
-            return_value={"status": "connected"}
+        instance.userinterface.async_get_language = AsyncMock(
+            return_value=api["UserInterface.async_get_language"]
         )
-        instance.upnpigd.async_get = AsyncMock(return_value=UPNPNGID)
-        # instance.homelan.async_get_results = AsyncMock(return_value=INFO)  # take 5s
+        instance.userinterface.async_get_state = AsyncMock(
+            return_value=api["UserInterface.async_get_state"]
+        )
+        instance.upnpigd.async_get = AsyncMock(return_value=api["UPnPIGD.async_get"])
+        instance.homelan.async_get_results = AsyncMock(
+            return_value=api.get("HomeLan.async_get_results", {})
+        )
         # instance.homelan.async_get_devices_results = AsyncMock(return_value=INFO)  # take 13s
         instance.homelan.async_get_maxnumber_records = AsyncMock(
-            return_value={"status": 8680}
+            return_value=api["HomeLan.async_get_maxnumber_records"]
         )
         instance.homelan.async_get_reading_interval = AsyncMock(
-            return_value={"status": 30}
+            return_value=api["HomeLan.async_get_reading_interval"]
         )
         instance.homelan.async_get_devices_reading_interval = AsyncMock(
-            return_value={"status": 30}
+            return_value=api["HomeLan.async_get_devices_reading_interval"]
         )
         instance.homelan.async_get_devices_status = AsyncMock(
-            return_value={"status": True}
+            return_value=api["HomeLan.async_get_devices_status"]
         )
         instance.screen.async_get_show_wifi_password = AsyncMock(
-            return_value={"status": True}
+            return_value=api["Screen.async_get_show_wifi_password"]
         )
-        instance.pnp.async_get = AsyncMock(return_value=PNP)
-        instance.iotservice.async_get_status = AsyncMock(return_value=IOT_STATUS)
-        instance.time.async_get_time = AsyncMock(return_value=TIME)
-        instance.time.async_get_utctime = AsyncMock(return_value=UTCTIME)
-        instance.time.async_get_status = AsyncMock(return_value=TIME_STATUS)
-        instance.time.async_get_ntp = AsyncMock(return_value=NTP)
+        instance.pnp.async_get = AsyncMock(return_value=api["PnP.async_get"])
+        instance.iotservice.async_get_status = AsyncMock(
+            return_value=api["IoTService.async_get_status"]
+        )
+        instance.time.async_get_time = AsyncMock(
+            return_value=api["Time.async_get_time"]
+        )
+        instance.time.async_get_utctime = AsyncMock(
+            return_value=api["Time.async_get_utctime"]
+        )
+        instance.time.async_get_status = AsyncMock(
+            return_value=api["Time.async_get_status"]
+        )
+        instance.time.async_get_ntp = AsyncMock(return_value=api["Time.async_get_ntp"])
         instance.time.async_get_localtime_zonename = AsyncMock(
-            return_value=LOCALTIME_ZONE
+            return_value=api["Time.async_get_localtime_zonename"]
         )
-        instance.nmc.async_get = AsyncMock(return_value=NMC_GET)
-        instance.nmc.async_get_wifi = AsyncMock(return_value=WIFI)
-        instance.nmc.async_get_guest_wifi = AsyncMock(return_value=GUEST_WIFI)
-        instance.nmc.async_get_wifi_stats = AsyncMock(return_value=WIFI_STATS)
-        instance.nmc.async_get_lan_ip = AsyncMock(return_value=LAN_IP)
+        instance.nmc.async_get = AsyncMock(return_value=api["Nmc.async_get"])
+        instance.nmc.async_get_wifi = AsyncMock(return_value=api["Nmc.async_get_wifi"])
+        instance.nmc.async_get_guest_wifi = AsyncMock(
+            return_value=api["Nmc.async_get_guest_wifi"]
+        )
+        instance.nmc.async_get_wifi_stats = AsyncMock(
+            return_value=api["Nmc.async_get_wifi_stats"]
+        )
+        instance.nmc.async_get_lan_ip = AsyncMock(
+            return_value=api["Nmc.async_get_lan_ip"]
+        )
         instance.nmc.async_get_wanmodelist = AsyncMock(
-            return_value={"status": "Ethernet_PPP;Ethernet_DHCP;GPON_DHCP;GPON_PPP"}
+            return_value=api["Nmc.async_get_wanmodelist"]
         )
-        instance.nmc.async_get_wan_status = AsyncMock(return_value=WAN_STATUS)
-        instance.nmc.async_update_versioninfo = AsyncMock(return_value={"status": True})
-        instance.nmc.async_get_network = AsyncMock(return_value=NMC_NETWORK)
-        instance.nmc.async_get_iptv_status = AsyncMock(return_value=NMC_IPTV)
-        instance.nmc.async_get_iptv_config = AsyncMock(return_value=NMC_IPTV_CONFIG)
+        instance.nmc.async_get_wan_status = AsyncMock(
+            return_value=api["Nmc.async_get_wan_status"]
+        )
+        instance.nmc.async_update_versioninfo = AsyncMock(
+            return_value=api["Nmc.async_update_versioninfo"]
+        )
+        instance.nmc.async_get_network = AsyncMock(
+            return_value=api["Nmc.async_get_network"]
+        )
+        instance.nmc.async_get_iptv_status = AsyncMock(
+            return_value=api["Nmc.async_get_iptv_status"]
+        )
+        instance.nmc.async_get_iptv_config = AsyncMock(
+            return_value=api["Nmc.async_get_iptv_config"]
+        )
         instance.nmc.async_get_iptv_multi_screens = AsyncMock(
-            return_value=NMC_IPTV_MULTI_SCREENS
+            return_value=api["Nmc.async_get_iptv_multi_screens"]
         )
-        instance.nmc.async_autodetect = AsyncMock(return_value=NMC_AUTODETECT)
-        instance.nmc.async_get_wan_status = AsyncMock(return_value=WAN_STATUS)
-        instance.nmc.async_get_remote_access = AsyncMock(return_value=INFO)
+        instance.nmc.async_autodetect = AsyncMock(
+            return_value=api["Nmc.async_autodetect"]
+        )
+        instance.nmc.async_get_remote_access = AsyncMock(
+            return_value=api["Nmc.async_get_remote_access"]
+        )
         instance.nmc.async_reboot = AsyncMock()
         instance.nmc.async_ring = AsyncMock()
-        instance.usermanagement.async_get_users = AsyncMock(return_value=USERS)
-        instance.usermanagement.async_get_groups = AsyncMock(return_value=GROUPS)
-        instance.remoteaccess.async_get = AsyncMock(return_value=REMOTE_ACCESS)
+        instance.nmc.async_guest_wifi = AsyncMock()
+
+        instance.usermanagement.async_get_users = AsyncMock(
+            return_value=api["UserManagement.async_get_users"]
+        )
+        instance.usermanagement.async_get_groups = AsyncMock(
+            return_value=api["UserManagement.async_get_groups"]
+        )
+        instance.remoteaccess.async_get = AsyncMock(
+            return_value=api["RemoteAccess.async_get"]
+        )
         instance.orangeremoteaccess.async_get = AsyncMock(
-            return_value=ORANGE_REMOTE_ACCESS
+            return_value=api["OrangeRemoteAccess.async_get"]
         )
         instance.speedtest.async_get_wan_results = AsyncMock(
-            return_value=SPEEDTEST_INFOS
+            return_value=api["SpeedTest.async_get_wan_results"]
         )
         instance.sgcomci.async_get_optical = AsyncMock(return_value={})  # Livebox 5656
         instance.close = AsyncMock()
+
+        info = api["DeviceInfo.async_get_deviceinfo"]["status"]
+        type(instance).__model = PropertyMock(return_value=model)
+        type(instance).__unique_name = PropertyMock(
+            return_value=slugify(f"{info['ProductClass']} ({info['SerialNumber']})")
+        )
+
         yield instance
 
 
@@ -218,9 +270,14 @@ def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
         domain=DOMAIN,
         source=SOURCE_USER,
         data=MOCK_USER_INPUT,
-        unique_id="1",
-        options={},
-        entry_id="123456",
+        unique_id="012345678901234",
+        options={
+            CONF_WIFI_TRACKING: DEFAULT_WIFI_TRACKING,
+            CONF_LAN_TRACKING: DEFAULT_LAN_TRACKING,
+            CONF_TRACKING_TIMEOUT: DEFAULT_TRACKING_TIMEOUT,
+            CONF_DISPLAY_DEVICES: DEFAULT_DISPLAY_DEVICES,
+        },
+        title="Livebox X (012345678901234)",
     )
     config_entry.add_to_hass(hass)
     return config_entry

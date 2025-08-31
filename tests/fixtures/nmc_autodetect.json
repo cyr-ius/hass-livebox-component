@@ -1,8 +1,0 @@
-{
-  "status": {
-    "FirstBoot": false,
-    "LastConnectionError": "0000",
-    "IPv6SwitchEnable": false,
-    "IPv6Mode": "DualStack"
-  }
-}

@@ -7,8 +7,6 @@ from homeassistant.const import STATE_OFF, STATE_ON, Platform
 from homeassistant.core import HomeAssistant
 from sqlalchemy import false
 
-from .const import WIFI
-
 
 @pytest.mark.asyncio
 async def test_switch_wifi(
@@ -17,7 +15,7 @@ async def test_switch_wifi(
     """Test that the Wi-Fi switch toggles correctly."""
     # --- Test Setup ---
     # Make a deep copy of the fixture data to allow modification in this test
-    wifi_data = copy.deepcopy(WIFI)
+    wifi_data = copy.deepcopy(await AIOSysbus.nmc.async_get_wifi())
 
     # Set initial state to OFF for the guest wifi
     wifi_data["status"]["Enable"] = false
@@ -34,7 +32,7 @@ async def test_switch_wifi(
     await hass.async_block_till_done()
 
     # --- Initial State Check ---
-    state = hass.states.get("switch.livebox_7_wifi_switch")
+    state = hass.states.get(f"switch.{AIOSysbus.__unique_name}_wifi")
     assert state is not None
     assert state.state == STATE_OFF
 
@@ -43,17 +41,16 @@ async def test_switch_wifi(
     await hass.services.async_call(
         Platform.SWITCH,
         "turn_on",
-        {"entity_id": "switch.livebox_7_wifi_switch"},
+        {"entity_id": f"switch.{AIOSysbus.__unique_name}_wifi"},
         blocking=True,
     )
-    state = hass.states.get("switch.livebox_7_wifi_switch")
 
-    # --- Assertions ---
-    # The state should now be ON because the side_effect updated the data
-    # and the turn_on method in the switch entity triggered a coordinator refresh.
+    coordinator = config_entry.runtime_data
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+
+    state = hass.states.get(f"switch.{AIOSysbus.__unique_name}_wifi")
     assert state.state == STATE_ON
-
-    # Verify the mock was called correctly
     AIOSysbus.nmc.async_set_wifi.assert_called_once_with(
         {"Enable": True, "Status": True}
     )
