@@ -86,6 +86,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.voiceservice.async_get_calllist = AsyncMock(
             return_value=api["VoiceService.async_get_calllist"]
         )
+        instance.voiceservice.async_ring = AsyncMock()
         instance.nemo.async_lucky_addr_address_lan = AsyncMock(
             return_value=api["NeMo.async_lucky_addr_address::lan"]
         )
@@ -233,7 +234,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
             return_value=api["Nmc.async_get_remote_access"]
         )
         instance.nmc.async_reboot = AsyncMock()
-        instance.nmc.async_ring = AsyncMock()
+        instance.nmc.async_set_wifi = AsyncMock()
         instance.nmc.async_guest_wifi = AsyncMock()
 
         instance.usermanagement.async_get_users = AsyncMock(

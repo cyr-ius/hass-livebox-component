@@ -25,6 +25,7 @@ def mock_setup_entry():
         yield
 
 
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_form_success(
     hass: HomeAssistant,
     AIOSysbus: AsyncMock,
@@ -58,6 +59,7 @@ async def test_form_success(
         assert result2["result"].unique_id == "012345678901234"  # From INFO fixture
 
 
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_form_cannot_connect(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
     """Test the flow handles connection errors."""
     await setup.async_setup_component(hass, "persistent_notification", {})
@@ -81,6 +83,7 @@ async def test_form_cannot_connect(hass: HomeAssistant, AIOSysbus: AsyncMock) ->
         assert result["errors"] == {"base": "cannot_connect"}
 
 
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_form_invalid_auth(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
     """Test the flow handles invalid authentication."""
     await setup.async_setup_component(hass, "persistent_notification", {})
@@ -104,6 +107,7 @@ async def test_form_invalid_auth(hass: HomeAssistant, AIOSysbus: AsyncMock) -> N
         assert result["errors"] == {"base": "login_incorrect"}
 
 
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_form_unknown(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
     """Test the flow handles invalid authentication."""
     await setup.async_setup_component(hass, "persistent_notification", {})
@@ -127,6 +131,7 @@ async def test_form_unknown(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
         assert result["errors"] == {"base": "unknown"}
 
 
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_form_already_configured(
     hass: HomeAssistant, AIOSysbus: AsyncMock
 ) -> None:

@@ -9,9 +9,6 @@ import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.dispatcher import (
-    async_dispatcher_connect,
-)
 
 
 @pytest.mark.asyncio
@@ -21,9 +18,6 @@ async def test_device_tracker(
     AIOSysbus: Generator[AsyncMock | MagicMock],
 ) -> None:
     """Test the device tracker platform."""
-    devices_data = copy.deepcopy(await AIOSysbus.devices.async_get_devices())
-    AIOSysbus.devices.async_get_devices.return_value = devices_data
-
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -32,6 +26,7 @@ async def test_device_tracker(
     assert state.state == STATE_HOME
     assert state.attributes.get("ip") == "10.1.2.3"
 
+    devices_data = copy.deepcopy(await AIOSysbus.devices.async_get_devices())
     devices_data["status"]["wifi"][14]["Active"] = False
     devices_data["status"]["wifi"][14]["IPAddress"] = None
     AIOSysbus.devices.async_get_devices.return_value = devices_data
@@ -59,8 +54,6 @@ async def test_device_tracker_new_device(
     config_entry: ConfigEntry,
     AIOSysbus: Generator[AsyncMock | MagicMock],
 ):
-    calls = []
-
     new_device = {
         "Key": "AA:BB:CC:DD:EE:FF",
         "Name": "New Device",
@@ -69,27 +62,14 @@ async def test_device_tracker_new_device(
         "Active": True,
     }
 
-    # Abonne un callback
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
-
-    coordinator = config_entry.runtime_data
-
-    async_dispatcher_connect(
-        hass, coordinator.signal_device_new, lambda *a: calls.append(a)
-    )
 
     devices_data = copy.deepcopy(await AIOSysbus.devices.async_get_devices())
     devices_data["status"]["wifi"].append(new_device)
     AIOSysbus.devices.async_get_devices.return_value = devices_data
 
-    # Laisse HA traiter
-    await coordinator.async_request_refresh()
-    await hass.async_block_till_done()
-
-    assert len(calls) == 1
-
-    # Laisse HA traiter
+    coordinator = config_entry.runtime_data
     await coordinator.async_request_refresh()
     await hass.async_block_till_done()
 

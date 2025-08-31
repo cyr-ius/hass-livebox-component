@@ -8,7 +8,6 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_setup_entry(
     hass: HomeAssistant,
@@ -23,7 +22,6 @@ async def test_setup_entry(
     assert config_entry.state == ConfigEntryState.LOADED
 
 
-@pytest.mark.asyncio
 async def test_coordinator_refresh(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

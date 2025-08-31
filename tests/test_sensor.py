@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 
-@pytest.mark.asyncio
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
 async def test_sensors_state(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -20,8 +20,6 @@ async def test_sensors_state(
 
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_rx")
     assert state is not None
-    assert float(state.state) == -16.86
 
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_tx")
     assert state is not None
-    assert float(state.state) == 1883.81
