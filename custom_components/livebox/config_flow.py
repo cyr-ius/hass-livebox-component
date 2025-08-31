@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import logging
+from collections.abc import Mapping
 from typing import Any
 
+import voluptuous as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -14,8 +15,6 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
-import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
@@ -113,7 +112,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     self._abort_if_unique_id_configured()
 
                     return self.async_create_entry(
-                        title=infos.get("ProductClass", DOMAIN.capitalize()),
+                        title=f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})",
                         data=user_input,
                     )
 
