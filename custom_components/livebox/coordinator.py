@@ -13,7 +13,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
@@ -155,17 +154,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
-        if self.data and self.data.get("devices"):
-            for key, device in devices_tracker.items():
-                if key not in self.data.get("devices", {}):
-                    self.data["devices"] = devices_tracker
-                    async_dispatcher_send(
-                        self.hass,
-                        self.signal_device_new,
-                        key,
-                        device,
-                    )
-
         return devices_tracker, device_counters
 
     async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
@@ -282,5 +270,5 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     @property
     def signal_device_new(self) -> str:
-        """Event specific per Freebox entry to signal new device."""
+        """Event specific per Livebox entry to signal new device."""
         return f"{DOMAIN}-{self.unique_id}-device-new"
