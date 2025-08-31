@@ -13,6 +13,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
@@ -84,6 +85,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             devices, device_counters = await self.async_get_devices(
                 lan_tracking, wifi_tracking
             )
+
+            await self.async_detect_new_dvices(devices)
+
             return {
                 "cmissed": await self.async_get_caller_missed(),
                 "devices": devices,
@@ -257,6 +261,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Get Remote access status."""
         ra = await self._make_request(self.api.remoteaccess.async_get)
         return ra.get("status", {}).get("Enable", False) is True
+
+    async def async_detect_new_dvices(self, devices) -> None:
+        """New devices detected."""
+        if self.data and self.data.get("devices"):
+            for key in devices:
+                if key not in self.data.get("devices", {}):
+                    self.data["devices"] = devices
+                    async_dispatcher_send(self.hass, self.signal_device_new)
+                    break
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any

@@ -56,11 +56,11 @@ def async_add_new_tracked_entities(
     """Add new tracker entities from the router."""
     new_tracked = []
 
-    _LOGGER.info("Adding device trackers entities")
+    _LOGGER.debug("Adding device trackers entities")
     for mac, device in coordinator.data.get("devices", {}).items():
         if mac in tracked:
             continue
-        _LOGGER.info("New device tracker: %s", device.get("Name", "Unknown"))
+        _LOGGER.debug("New device tracker: %s", device.get("Name", "Unknown"))
         new_tracked.append(
             LiveboxDeviceScannerEntity(
                 coordinator,
@@ -94,11 +94,6 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         self._attr_source_type = SourceType.ROUTER
         self._attr_mac_address = device.get("Key")
         self._attr_ip_address = device.get("IPAddress")
-        self._attr_device_info = {
-            "name": self.name,
-            "identifiers": {(DOMAIN, device.get("Key"))},
-            "via_device": (DOMAIN, coordinator.unique_id),
-        }
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -197,6 +192,15 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     def is_connected(self) -> bool:
         """Return true if the device is connected to the network via router."""
         return self._attr_is_connected
+
+    @property
+    def device_info(self):
+        """Return device info to link entity to the Livebox device."""
+        return {
+            "name": self.coordinator.config_entry.title,
+            "identifiers": {(DOMAIN, self._device.get("Key"))},
+            "via_device": (DOMAIN, self.coordinator.unique_id),
+        }
 
     @callback
     def _handle_coordinator_update(self) -> None:
