@@ -197,7 +197,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     def device_info(self):
         """Return device info to link entity to the Livebox device."""
         return {
-            "name": self.coordinator.config_entry.title,
+            "name": self._unique_name,
             "identifiers": {(DOMAIN, self._device.get("Key"))},
             "via_device": (DOMAIN, self.coordinator.unique_id),
         }
