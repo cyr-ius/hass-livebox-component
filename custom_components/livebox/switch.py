@@ -41,7 +41,7 @@ SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        name="Guest Wifi switch",
+        name="Guest Wifi",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: x.get("guest_wifi"),
@@ -61,9 +61,10 @@ SWITCH_TYPES_5: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        name="Guest Wifi switch",
+        name="Guest Wifi",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
+        value_fn=lambda x: x.get("guest_wifi"),
         turn_on=lambda x: x.nmc.async_guest_wifi(True),
         turn_off=lambda x: x.nmc.async_guest_wifi(False),
     ),
