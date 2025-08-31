@@ -52,7 +52,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             use_tls=config_entry.data.get(CONF_USE_TLS, False),
         )
         self.unique_id: str | None = None
-        self.model: int | None = None
+        self.model: int | float | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -72,7 +72,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 case "Livebox 7":
                     self.model = 7
                 case "Livebox W7":
-                    self.model = 7
+                    self.model = 7.1
                 case "SMBSLBFIBRA":
                     self.model = 5656  # Sagemcom f@st 5656
             # Optionals
