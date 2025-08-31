@@ -4,7 +4,7 @@ DOMAIN = "livebox"
 COORDINATOR = "coordinator"
 UNSUB_LISTENER = "unsubscribe_listener"
 LIVEBOX_API = "api"
-PLATFORMS = ["sensor", "binary_sensor", "device_tracker", "switch", "button"]
+PLATFORMS = ["sensor", "binary_sensor", "switch", "button", "device_tracker"]
 
 TEMPLATE_SENSOR = "Orange Livebox"
 

@@ -10,7 +10,6 @@ from typing import Any, Final
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
@@ -142,7 +141,6 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
         self._attr_device_info = {
             "name": self._unique_name,
             "identifiers": {(DOMAIN, self._device_key)},
-            "connections": {(dr.CONNECTION_NETWORK_MAC, self._device_key)},
             "via_device": (DOMAIN, coordinator.unique_id),
         }
 
