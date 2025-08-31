@@ -121,7 +121,6 @@ class DeviceWANAccessSwitch(
 ):
     """Representation of a livebox device WAN access switch."""
 
-    _attr_name = "WAN access"
     _attr_icon = DEVICE_WANACCESS_ICON
     _attr_has_entity_name = True
 
@@ -135,10 +134,10 @@ class DeviceWANAccessSwitch(
         super().__init__(coordinator)
         self._device_key = device_key
         self._device = device
-        self._attr_name = "WAN access"
         self._attr_unique_id = f"{self._device_key}_wan_access"
+        self._attr_name = f"{self._device.get('Name')} WAN access"
         self._attr_device_info = {
-            "name": self._device.get("Name"),
+            "name": self.coordinator.config_entry.title,
             "identifiers": {(DOMAIN, self._device_key)},
             "connections": {(dr.CONNECTION_NETWORK_MAC, self._device_key)},
             "via_device": (DOMAIN, coordinator.unique_id),
