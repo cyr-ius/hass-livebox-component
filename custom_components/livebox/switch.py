@@ -12,7 +12,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import LiveboxConfigEntry
 from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
@@ -31,7 +30,7 @@ class LiveboxSwitchEntityDescription(SwitchEntityDescription):
     turn_off: Callable[..., Any] | None = None
 
 
-SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
+SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
         name="Wifi",
@@ -51,7 +50,7 @@ SWITCH_TYPES: Final[tuple[SwitchEntityDescription, ...]] = (
     ),
 )
 
-SWITCH_TYPES_5: Final[tuple[SwitchEntityDescription, ...]] = (
+SWITCH_TYPES_5: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
         name="Wifi",
@@ -70,6 +69,12 @@ SWITCH_TYPES_5: Final[tuple[SwitchEntityDescription, ...]] = (
     ),
 )
 
+SWITCH_WAN_ACCESS: SwitchEntityDescription = SwitchEntityDescription(
+    key="wan_access",
+    name="WAN access",
+    translation_key="wan_access",
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -83,8 +88,8 @@ async def async_setup_entry(
         LiveboxSwitch(coordinator, description) for description in switchs_description
     ]
 
-    for key, device in coordinator.data["devices"].items():
-        entities.append(DeviceWANAccessSwitch(coordinator, key, device))
+    for device in coordinator.data["devices"].values():
+        entities.append(DeviceWANAccessSwitch(coordinator, SWITCH_WAN_ACCESS, device))
 
     async_add_entities(entities)
 
@@ -95,7 +100,7 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        descrîption: SwitchEntityDescription,
+        descrîption: LiveboxSwitchEntityDescription,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, descrîption)
@@ -116,28 +121,25 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class DeviceWANAccessSwitch(
-    CoordinatorEntity[LiveboxDataUpdateCoordinator], SwitchEntity
-):
+class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
     """Representation of a livebox device WAN access switch."""
 
     _attr_icon = DEVICE_WANACCESS_ICON
-    _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        device_key: str,
+        description: SwitchEntityDescription,
         device: dict[str, Any],
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._device_key = device_key
+        super().__init__(coordinator, description)
+        self._device_key = device.get("Key")
         self._device = device
-        self._attr_unique_id = f"{self._device_key}_wan_access"
-        self._attr_name = f"{self._device.get('Name')} WAN access"
+        self._attr_unique_id = f"{self._device_key}_{description.key}"
+        self._attr_name = f"{self._device.get('Name')} {description.name}"
         self._attr_device_info = {
-            "name": self.coordinator.config_entry.title,
+            "name": self._unique_name,
             "identifiers": {(DOMAIN, self._device_key)},
             "connections": {(dr.CONNECTION_NETWORK_MAC, self._device_key)},
             "via_device": (DOMAIN, coordinator.unique_id),
