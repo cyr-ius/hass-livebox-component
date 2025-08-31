@@ -49,11 +49,12 @@ You can use the Configure button to change the following options:
 
 Only the routers with Livebox OS are supported:
 
-- Livebox v3
-- Livebox v4
-- Livebox v5
-- Livebox v6
-- Livebox v7 (not tested)
+- Livebox 3
+- Livebox 4
+- Livebox 5
+- Livebox 6
+- Livebox 7
+- Livebox W7
 - KPN Box 12 (Firmware: V12.C.23.04.36)
 - Sagemcom f@st 5656
 
