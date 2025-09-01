@@ -2,6 +2,7 @@
 
 from unittest.mock import AsyncMock
 
+import homeassistant.helpers.entity_registry as er
 import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -18,8 +19,18 @@ async def test_sensors_state(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_tx")
+    assert state is not None
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_rx")
     assert state is not None
 
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_tx")
+    assert state is not None
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_rx")
+    assert state is not None
+
+    # entity_registry_enabled_default=False
+    state = er.async_get(hass).async_get(f"sensor.{AIOSysbus.__unique_name}_wifi_tx")
+    assert state is not None
+    state = er.async_get(hass).async_get(f"sensor.{AIOSysbus.__unique_name}_wifi_rx")
     assert state is not None
