@@ -85,13 +85,11 @@ async def async_setup_entry(
 
     async_add_entities(entities)
 
-    # for device in coordinator.data["devices"].values():
-    #     entities.append(DeviceWANAccessSwitch(coordinator, SWITCH_WAN_ACCESS, device))
-
     wan_access = set()
 
     @callback
     def async_update_wan_access():
+        entities = []
         for key, device in coordinator.data["devices"].items():
             if key in wan_access:
                 continue
