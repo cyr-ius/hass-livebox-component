@@ -76,3 +76,6 @@ async def test_device_tracker_new_device(
     state = hass.states.get("device_tracker.new_device")
     assert state is not None
     assert state.state == STATE_HOME
+
+    state = hass.states.get("switch.new_device_wan_access")
+    assert state is not None
