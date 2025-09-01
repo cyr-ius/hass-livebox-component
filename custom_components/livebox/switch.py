@@ -139,7 +139,7 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
         self._attr_unique_id = f"{self._device_key}_{description.key}"
         self._attr_name = f"{self._device.get('Name')} {description.name}"
         self._attr_device_info = {
-            "name": self._unique_name,
+            "name": self._device.get("Name"),
             "identifiers": {(DOMAIN, self._device_key)},
             "via_device": (DOMAIN, coordinator.unique_id),
         }

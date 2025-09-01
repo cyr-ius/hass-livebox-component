@@ -77,6 +77,8 @@ def async_add_new_tracked_entities(
 class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     """Represent a tracked device."""
 
+    _attr_name = None
+
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
