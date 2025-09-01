@@ -104,3 +104,29 @@ async def test_switch_guest_wifi(
 
     state = hass.states.get(f"switch.{AIOSysbus.__unique_name}_guest_wifi")
     assert state.state == STATE_ON
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_switch_wan_access(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+    service_calls: list[ServiceCall],
+):
+    """Test that the Wi-Fi switch toggles correctly."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # --- Initial State Check ---
+    state = hass.states.get("switch.pc_408_wan_access")
+    assert state is not None
+    assert state.state == STATE_ON
+
+    # --- Test Turn On ---
+    # Simulate a service call to turn the switch on
+    data = {
+        ATTR_ENTITY_ID: "switch.pc_408_wan_access",
+    }
+    await hass.services.async_call(Platform.SWITCH, "turn_on", data, blocking=True)
+
+    assert len(service_calls) == 1
