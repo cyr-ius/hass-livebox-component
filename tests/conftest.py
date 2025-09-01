@@ -258,7 +258,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         info = api["DeviceInfo.async_get_deviceinfo"]["status"]
         type(instance).__model = PropertyMock(return_value=model)
         type(instance).__unique_name = PropertyMock(
-            return_value=slugify(f"{info['ProductClass']} ({info['SerialNumber']})")
+            return_value=slugify(info["ProductClass"])
         )
 
         yield instance

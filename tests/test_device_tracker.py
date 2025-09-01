@@ -11,7 +11,7 @@ from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant
 
 
-@pytest.mark.asyncio
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_device_tracker(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -21,7 +21,7 @@ async def test_device_tracker(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    state = hass.states.get(f"device_tracker.{AIOSysbus.__unique_name}_pc_408")
+    state = hass.states.get("device_tracker.pc_408")
     assert state is not None
     assert state.state == STATE_HOME
     assert state.attributes.get("ip") == "10.1.2.3"
@@ -42,13 +42,13 @@ async def test_device_tracker(
         await coordinator.async_request_refresh()
         await hass.async_block_till_done()
 
-        state = hass.states.get(f"device_tracker.{AIOSysbus.__unique_name}_pc_408")
+        state = hass.states.get("device_tracker.pc_408")
         assert state is not None
         assert state.state == STATE_NOT_HOME
         assert state.attributes.get("ip") is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_device_tracker_new_device(
     hass,
     config_entry: ConfigEntry,
@@ -73,6 +73,6 @@ async def test_device_tracker_new_device(
     await coordinator.async_request_refresh()
     await hass.async_block_till_done()
 
-    state = hass.states.get(f"device_tracker.{AIOSysbus.__unique_name}_new_device")
+    state = hass.states.get("device_tracker.new_device")
     assert state is not None
     assert state.state == STATE_HOME
