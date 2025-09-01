@@ -269,6 +269,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 if key not in self.data.get("devices", {}):
                     self.data["devices"] = devices
                     async_dispatcher_send(self.hass, self.signal_device_new)
+                    async_dispatcher_send(self.hass, self.signal_wan_access_new)
                     break
 
     async def _make_request(
@@ -285,3 +286,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     def signal_device_new(self) -> str:
         """Event specific per Livebox entry to signal new device."""
         return f"{DOMAIN}-{self.unique_id}-device-new"
+
+    @property
+    def signal_wan_access_new(self) -> str:
+        """Event specific per Livebox entry to signal new device."""
+        return f"{DOMAIN}-{self.unique_id}-wan-accessnew"
