@@ -118,22 +118,44 @@ async def async_get_config_entry_diagnostics(
             "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
         }
     }
+    end_time = int(time())
+    start_time = end_time - (60 * 3600)
 
     api_methods = [
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
-        coordinator.api.devices.async_get_devices,
-        (coordinator.api.devices.async_get_devices, [params]),
         coordinator.api.voiceservice.async_get_calllist,
         (coordinator.api.nemo.async_lucky_addr_address, ["lan"]),
         (coordinator.api.nemo.async_lucky_addr_address, ["data"]),
         (coordinator.api.nemo.async_get_MIBs, ["data"]),
         (coordinator.api.nemo.async_get_MIBs, ["lan"]),
         (coordinator.api.nemo.async_get_MIBs, ["veip0"]),
-        (coordinator.api.nemo.async_get_net_dev_stats, ["eth0"]),
+        (
+            coordinator.api.nemo.async_get_MIBs,
+            ["lan", {"mibs": "base eth"}],
+        ),
+        (
+            coordinator.api.nemo.async_get_MIBs,
+            ["guest", {"mibs": "base wlanradio wlanvap"}],
+        ),
+        (
+            coordinator.api.nemo.async_get_MIBs,
+            ["lan", {"mibs": "base wlanradio wlanvap"}],
+        ),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["ETH0"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["ETH1"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["ETH2"]),
         (coordinator.api.nemo.async_get_net_dev_stats, ["veip0"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["lan"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["vap2g0priv"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["rad2g0"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["vap5g0priv"]),
+        (coordinator.api.nemo.async_get_net_dev_stats, ["rad5g0"]),
         coordinator.api.nemo.async_get_dsl0_line_stats,
         coordinator.api.sfp.async_get,
+        coordinator.api.firewall.async_get_protocol_forwarding,
+        coordinator.api.firewall.async_get_port_forwarding,
+        coordinator.api.upnpigd.async_get,
         coordinator.api.schedule.async_get_scheduletypes,
         coordinator.api.dhcp.async_get_dhcp_pool,
         # coordinator.api.dhcp.async_get_dhcp_stats,
@@ -145,12 +167,23 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.userinterface.async_get_language,
         coordinator.api.userinterface.async_get_state,
         coordinator.api.upnpigd.async_get,
-        # coordinator.api.homelan.async_get_results,  # take 5s
-        # coordinator.api.homelan.async_get_devices_results,  # take 13s
+        coordinator.api.homelan.async_get_results,  # take 5s
+        (
+            coordinator.api.homelan.async_get_results,
+            [
+                {
+                    "InterfaceName": "lan",
+                    "BeginTrafficTimestamp": start_time,
+                    "EndTrafficTimestamp": end_time,
+                }
+            ],
+        ),
+        coordinator.api.homelan.async_get_devices_results,  # take 13s
         coordinator.api.homelan.async_get_maxnumber_records,
         coordinator.api.homelan.async_get_reading_interval,
         coordinator.api.homelan.async_get_devices_reading_interval,
         coordinator.api.homelan.async_get_devices_status,
+        coordinator.api.homelan.async_get_interface,
         coordinator.api.screen.async_get_show_wifi_password,
         coordinator.api.pnp.async_get,
         coordinator.api.iotservice.async_get_status,
@@ -179,6 +212,8 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.remoteaccess.async_get,
         coordinator.api.orangeremoteaccess.async_get,
         coordinator.api.speedtest.async_get_wan_results,
+        coordinator.api.devices.async_get_devices,
+        (coordinator.api.devices.async_get_devices, [params]),
     ]
 
     _LOGGER.debug("Start building diagnostics data...")
