@@ -114,6 +114,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "upnp": await self.async_get_port_forwarding(),
                 "dhcp_leases": await self.async_get_dhcp_leases(),
                 "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
+                "stats": await self.async_get_results(),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -405,6 +406,49 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 }
             )
         return leases
+
+    async def async_get_results(self) -> dict[str, Any]:
+        """Get interfaces."""
+        results = {}
+
+        data = (await self._make_request(self.api.homelan.async_get_interface)).get(
+            "status", {}
+        )
+
+        interfaces = {
+            item["FriendlyName"]: item
+            for item in data.values()
+            if "Name" in item and "FriendlyName" in item and "vlan" not in item["Name"]
+        }
+
+        data = (
+            await self._make_request(
+                self.api.homelan.async_get_results,
+                {"Interface": list(interfaces.keys()), "NumberOfReadings": 1},
+            )
+        ).get("status", {})
+
+        for key, item in interfaces.items():
+            traffic = data.get(key, {}).get("Traffic", [])
+            if len(traffic) == 0:
+                continue
+            stats = traffic[0]
+
+            # Rx_Counter and Tx_Counter => bits/30seconds
+            #  /8 => octets , / 30 => 1seconds (8*30 => 240)
+            # /1048576 => MBytes
+
+            results.update(
+                {
+                    item["Name"]: {
+                        "friendly_name": key,
+                        "alias": item.get("alias"),
+                        "rate_rx": round(stats.get("Rx_Counter", 0) / 240 / 1048576, 2),
+                        "rate_tx": round(stats.get("Tx_Counter", 0) / 240 / 1048576, 2),
+                    }
+                }
+            )
+        return results
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any

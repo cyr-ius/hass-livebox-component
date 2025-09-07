@@ -37,7 +37,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
     attrs: dict[str, Callable[..., Any]] | None = None
 
 
-SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
+SENSOR_TYPES: Final[list[SensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="down",
         name="xDSL Download",
@@ -210,7 +210,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         translation_key="guest_dhcp_leases",
         attrs={"Leases": lambda x: x.get("guest_dhcp_leases")},
     ),
-)
+]
 
 
 async def async_setup_entry(
@@ -223,7 +223,30 @@ async def async_setup_entry(
     entities = []
     linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").lower()
 
-    for description in SENSOR_TYPES:
+    sensor_stats = []
+    for name, item in coordinator.data.get("stats", {}).items():
+        sensor_stats.append(
+            LiveboxSensorEntityDescription(
+                key=f"{name}_rate_rx",
+                name=f"{item['friendly_name']} Rate Rx",
+                value_fn=lambda x: find_item(x, f"stats.{name}.rate_rx"),
+                translation_key=f"{name}_rate_rx",
+                native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+                state_class=SensorStateClass.MEASUREMENT,
+            )
+        )
+        sensor_stats.append(
+            LiveboxSensorEntityDescription(
+                key=f"{name}_rate_tx",
+                name=f"{item['friendly_name']} Rate Tx",
+                value_fn=lambda x: find_item(x, f"stats.{name}.rate_tx"),
+                translation_key=f"{name}_rate_tx",
+                native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+                state_class=SensorStateClass.MEASUREMENT,
+            )
+        )
+
+    for description in SENSOR_TYPES + sensor_stats:
         if description.key in ["up", "down"] and linktype in ["gpon", "sfp"]:
             continue
         entities.append(LiveboxSensor(coordinator, description))
