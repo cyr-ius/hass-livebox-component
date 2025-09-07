@@ -1,6 +1,5 @@
 """The tests for the bbox component."""
 
-import copy
 from datetime import datetime
 from typing import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -26,11 +25,9 @@ async def test_device_tracker(
     assert state.state == STATE_HOME
     assert state.attributes.get("ip") == "10.1.2.3"
 
-    devices_data = copy.deepcopy(await AIOSysbus.devices.async_get_devices())
-    devices_data["status"]["wifi"][14]["Active"] = False
-    devices_data["status"]["wifi"][14]["IPAddress"] = None
-    AIOSysbus.devices.async_get_devices.return_value = devices_data
-
+    # Disable device PC-408
+    AIOSysbus.__devices["status"][69]["Active"] = False
+    AIOSysbus.__devices["status"][69]["IPAddress"] = None
     with (
         patch("custom_components.livebox.device_tracker.datetime") as mock_datetime,
     ):
@@ -60,14 +57,16 @@ async def test_device_tracker_new_device(
         "PhysAddress": "AA:BB:CC:DD:EE:FF",
         "IPAddress": "10.10.10.10",
         "Active": True,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
     }
 
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
-    devices_data = copy.deepcopy(await AIOSysbus.devices.async_get_devices())
-    devices_data["status"]["wifi"].append(new_device)
-    AIOSysbus.devices.async_get_devices.return_value = devices_data
+    # Add new device
+    AIOSysbus.__devices["status"].append(new_device)
+
+    # Trigger a refresh of the coordinator
 
     coordinator = config_entry.runtime_data
     await coordinator.async_request_refresh()

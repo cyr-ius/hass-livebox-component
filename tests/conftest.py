@@ -67,21 +67,53 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.deviceinfo.async_get_deviceinfo = AsyncMock(
             return_value=api["DeviceInfo.async_get_deviceinfo"]
         )
-        # instance.devices.async_get_devices = AsyncMock(
-        #     return_value=api["Devices.async_get_devices"]
-        # )
-        devices = api["Devices.async_get_devices"]["status"]
-        filtered_devices = []
-        for device in devices:
-            if (
-                ("edev" or "hnid") in device["Tags"]
-                and "wifi" in device["Tags"]
-                and device["PhysAddress"] is not None
-            ):
-                filtered_devices.append(device)
-        instance.devices.async_get_devices = AsyncMock(
-            return_value={"status": {"wifi": filtered_devices}}
-        )
+
+        def _mock_get_devices(*args, **kwargs):
+            """Mock for async_get_devices to return different values based on first arg."""
+
+            def _filtered_devices():
+                filtered_devices = {"status": {"eth": [], "wifi": []}}
+                for device in api["Devices.async_get_devices"]["status"]:
+                    if (
+                        ("edev" in device["Tags"] or "hnid" in device["Tags"])
+                        and "wifi" in device["Tags"]
+                        and device["PhysAddress"] is not None
+                    ):
+                        filtered_devices["status"]["wifi"].append(device)
+                return filtered_devices
+
+            def _filtered_interfaces():
+                filtered_interfaces = {"status": {"eth": [], "wifi": []}}
+                for device in api["Devices.async_get_devices"]["status"]:
+                    if "self" in device["Tags"] and "vap" in device["Tags"]:
+                        filtered_interfaces["status"]["wifi"].append(device)
+                    if "self" in device["Tags"] and "eth" in device["Tags"]:
+                        filtered_interfaces["status"]["eth"].append(device)
+                return filtered_interfaces
+
+            if len(args) == 0:
+                return api["Devices.async_get_devices"]
+            if args[0] == {"expression": {"wifi": "vap && lan", "eth": "eth && lan"}}:
+                return _filtered_interfaces()
+            if args[0] == {
+                "expression": {
+                    "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
+                    "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+                }
+            }:
+                return _filtered_devices()
+
+            if args[0] == {
+                "expression": {
+                    "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
+                    "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
+                }
+            }:
+                return _filtered_devices()
+
+            return {}
+
+        instance.devices.async_get_devices = AsyncMock(side_effect=_mock_get_devices)
 
         instance.voiceservice.async_get_calllist = AsyncMock(
             return_value=api["VoiceService.async_get_calllist"]
@@ -99,6 +131,10 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
             if args[0] == "data":
                 return api["NeMo.async_get_MIBs::data"]
             if args[0] == "lan":
+                if args[1] == {"mibs": "wlanvap"}:
+                    return {
+                        "status": api["NeMo.async_get_MIBs::lan"]["status"]["wlanvap"]
+                    }
                 return api["NeMo.async_get_MIBs::lan"]
             if args[0] == "veip0":
                 return api["NeMo.async_get_MIBs::veip0"]
@@ -256,6 +292,9 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.close = AsyncMock()
 
         info = api["DeviceInfo.async_get_deviceinfo"]["status"]
+        type(instance).__devices = PropertyMock(
+            return_value=api["Devices.async_get_devices"]
+        )
         type(instance).__model = PropertyMock(return_value=model)
         type(instance).__unique_name = PropertyMock(
             return_value=slugify(info["ProductClass"])
