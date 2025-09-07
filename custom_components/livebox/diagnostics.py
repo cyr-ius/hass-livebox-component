@@ -90,6 +90,7 @@ TO_REDACT = {
     "SerialNumber",
     "SourceMACAddress",
     "SSID",
+    "ssid",
     "SubnetMask",
     "system_serial",
     "terminal",
@@ -157,7 +158,8 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.schedule.async_get_scheduletypes,
         coordinator.api.dhcp.async_get_dhcp_pool,
         coordinator.api.dhcp.async_get_dhcp_leases,
-        (coordinator.api.dhcp.async_get_dhcp_leases, ["guest"]),
+        (coordinator.api.dhcp.async_get_dhcp_leases, [None, "guest"]),
+        (coordinator.api.dhcp.async_get_dhcp_leases, [{}, "guest"]),
         coordinator.api.dhcp.async_get_dhcp_staticleases,
         # coordinator.api.dhcp.async_get_dhcp_stats,
         coordinator.api.dhcp.async_get_dhcp6_status,
@@ -168,11 +170,17 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.userinterface.async_get_language,
         coordinator.api.userinterface.async_get_state,
         coordinator.api.upnpigd.async_get,
+        coordinator.api.homelan.async_get_interface,
         # coordinator.api.homelan.async_get_results,  # take 5s
         (
             coordinator.api.homelan.async_get_results,
+            [{"BeginTrafficTimestamp": start_time, "EndTrafficTimestamp": end_time}],
+        ),
+        (
+            coordinator.api.homelan.async_get_results,
             [
                 {
+                    "InterfaceName": ["eth2"],
                     "BeginTrafficTimestamp": start_time,
                     "EndTrafficTimestamp": end_time,
                 }
@@ -180,33 +188,22 @@ async def async_get_config_entry_diagnostics(
         ),
         (
             coordinator.api.homelan.async_get_results,
-            [
-                {
-                    "InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"],
-                    "BeginTrafficTimestamp": start_time,
-                    "EndTrafficTimestamp": end_time,
-                }
-            ],
+            [{"Seconds": 60, "InterfaceName": ["eth2"], "NumberOfReadings": 0}],
         ),
         (
             coordinator.api.homelan.async_get_results,
-            [{"InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"], "Seconds": 60}],
+            [{"Seconds": 60, "InterfaceName": ["eth2", "WAN_GPON"]}],
         ),
+        (coordinator.api.homelan.async_get_results, [{"Seconds": 60}]),
         (
             coordinator.api.homelan.async_get_results,
-            [
-                {
-                    "InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"],
-                    "NumberOfReadings": 10,
-                }
-            ],
+            [{"NumberOfReadings": 10, "InterfaceName": ["eth2", "WAN_GPON"]}],
         ),
         # coordinator.api.homelan.async_get_devices_results,  # take 13s
         coordinator.api.homelan.async_get_maxnumber_records,
         coordinator.api.homelan.async_get_reading_interval,
         coordinator.api.homelan.async_get_devices_reading_interval,
         coordinator.api.homelan.async_get_devices_status,
-        coordinator.api.homelan.async_get_interface,
         coordinator.api.screen.async_get_show_wifi_password,
         coordinator.api.pnp.async_get,
         coordinator.api.iotservice.async_get_status,
