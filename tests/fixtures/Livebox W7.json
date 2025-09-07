@@ -33282,6 +33282,80 @@
         "wwan": {}
       }
     },
+    "NeMo.async_get_MIBs::lan::{'mibs': 'statmon'}": {
+      "status": {
+        "statmon": {
+          "ETH1": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "ETH2": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "ETH3": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              },
+              "netdev-saturation": {
+                "Enable": false,
+                "Interval": 1000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "ETH4": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "vap2g0priv": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "vap5g0priv": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          },
+          "ETH0": {
+            "StatMon": {
+              "netdev-historical": {
+                "Enable": true,
+                "Interval": 30000,
+                "Type": "netdev"
+              }
+            }
+          }
+        }
+      }
+    },
     "NeMo.async_get_MIBs::veip0": {
       "status": {
         "base": {
@@ -34485,6 +34559,275 @@
         "AllowedHostHeader": "lan, lan.home, livebox, livebox.home, installation, installation.home, liveboxipv4, liveboxipv4.home, liveboxipv6, liveboxipv6.home, LIVEBOX.local, LIVEBOX.local",
         "AlwaysStartIgdDaemon": false,
         "TR064ServiceURL": ""
+      }
+    },
+    "HomeLan.async_get_interface": {
+      "status": {
+        "vap2g0priv": {
+          "FriendlyName": "2.4GHz-Private_SSID",
+          "Name": "vap2g0priv",
+          "Alias": "WiFi",
+          "NumberOfStoredMeasures": 58
+        },
+        "vap5g0priv": {
+          "FriendlyName": "5GHz-Private_SSID",
+          "Name": "vap5g0priv",
+          "Alias": "WiFi",
+          "NumberOfStoredMeasures": 55
+        },
+        "ETH0": {
+          "FriendlyName": "LAN-10G",
+          "Name": "ETH0",
+          "Alias": "Eth",
+          "NumberOfStoredMeasures": 0
+        },
+        "ETH1": {
+          "FriendlyName": "eth1",
+          "Name": "ETH1",
+          "Alias": "Eth",
+          "NumberOfStoredMeasures": 0
+        },
+        "ETH2": {
+          "FriendlyName": "eth2",
+          "Name": "ETH2",
+          "Alias": "Eth",
+          "NumberOfStoredMeasures": 58
+        },
+        "ETH3": {
+          "FriendlyName": "eth3",
+          "Name": "ETH3",
+          "Alias": "Eth",
+          "NumberOfStoredMeasures": 59
+        },
+        "eth1_wan": {
+          "FriendlyName": "WAN_Ethernet",
+          "Name": "ETH1",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "ETH4": {
+          "FriendlyName": "eth4",
+          "Name": "ETH4",
+          "Alias": "Eth",
+          "NumberOfStoredMeasures": 0
+        },
+        "vlan_data": {
+          "FriendlyName": "WAN_Ethernet-Internet",
+          "Name": "vlan_data",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "vlan_multi": {
+          "FriendlyName": "WAN_Ethernet-MultiServices",
+          "Name": "vlan_multi",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "vlan_voip": {
+          "FriendlyName": "WAN_Ethernet-VoIP",
+          "Name": "vlan_voip",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "vlan_iptv1": {
+          "FriendlyName": "WAN_Ethernet-IPTV_VOD",
+          "Name": "vlan_iptv1",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "vlan_iptv2": {
+          "FriendlyName": "WAN_Ethernet-IPTV_Live",
+          "Name": "vlan_iptv2",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "veip0": {
+          "FriendlyName": "WAN_GPON",
+          "Name": "veip0",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 58
+        },
+        "gvlan_data": {
+          "FriendlyName": "WAN_GPON-Internet",
+          "Name": "gvlan_data",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "gvlan_multi": {
+          "FriendlyName": "WAN_GPON-MultiServices",
+          "Name": "gvlan_multi",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 58
+        },
+        "gvlan_voip": {
+          "FriendlyName": "WAN_GPON-VoIP",
+          "Name": "gvlan_voip",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "gvlan_iptv1": {
+          "FriendlyName": "WAN_GPON-IPTV_VOD",
+          "Name": "gvlan_iptv1",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 0
+        },
+        "gvlan_iptv2": {
+          "FriendlyName": "WAN_GPON-IPTV_Live",
+          "Name": "gvlan_iptv2",
+          "Alias": "WAN_Virtual",
+          "NumberOfStoredMeasures": 51
+        },
+        "vap2g0guest": {
+          "FriendlyName": "2.4GHz-Guest_SSID",
+          "Name": "vap2g0guest",
+          "Alias": "WiFi",
+          "NumberOfStoredMeasures": 0
+        },
+        "vap5g0guest": {
+          "FriendlyName": "5GHz-Guest_SSID",
+          "Name": "vap5g0guest",
+          "Alias": "WiFi",
+          "NumberOfStoredMeasures": 0
+        }
+      }
+    },
+    "HomeLan.async_get_results": {
+      "status": {
+        "2.4GHz-Private_SSID": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257986,
+              "Rx_Counter": 326576,
+              "Tx_Counter": 598456
+            },
+            {
+              "Timestamp": 1757257956,
+              "Rx_Counter": 138312,
+              "Tx_Counter": 285384
+            }
+          ]
+        },
+        "5GHz-Private_SSID": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257989,
+              "Rx_Counter": 10149424,
+              "Tx_Counter": 18103104
+            },
+            {
+              "Timestamp": 1757257959,
+              "Rx_Counter": 22223832,
+              "Tx_Counter": 34453064
+            }
+          ]
+        },
+        "LAN-10G": {
+          "Traffic": []
+        },
+        "eth1": {
+          "Traffic": []
+        },
+        "eth2": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257985,
+              "Rx_Counter": 537496,
+              "Tx_Counter": 622880
+            },
+            {
+              "Timestamp": 1757257955,
+              "Rx_Counter": 343544,
+              "Tx_Counter": 591008
+            }
+          ]
+        },
+        "eth3": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257979,
+              "Rx_Counter": 211472,
+              "Tx_Counter": 696520
+            },
+            {
+              "Timestamp": 1757257949,
+              "Rx_Counter": 221080,
+              "Tx_Counter": 534208
+            }
+          ]
+        },
+        "WAN_Ethernet": {
+          "Traffic": []
+        },
+        "eth4": {
+          "Traffic": []
+        },
+        "WAN_Ethernet-Internet": {
+          "Traffic": []
+        },
+        "WAN_Ethernet-MultiServices": {
+          "Traffic": []
+        },
+        "WAN_Ethernet-VoIP": {
+          "Traffic": []
+        },
+        "WAN_Ethernet-IPTV_VOD": {
+          "Traffic": []
+        },
+        "WAN_Ethernet-IPTV_Live": {
+          "Traffic": []
+        },
+        "WAN_GPON": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257985,
+              "Rx_Counter": 9030288,
+              "Tx_Counter": 2921240
+            },
+            {
+              "Timestamp": 1757257955,
+              "Rx_Counter": 15387264,
+              "Tx_Counter": 7450696
+            }
+          ]
+        },
+        "WAN_GPON-Internet": {
+          "Traffic": []
+        },
+        "WAN_GPON-MultiServices": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257985,
+              "Rx_Counter": 8952048,
+              "Tx_Counter": 2855624
+            },
+            {
+              "Timestamp": 1757257955,
+              "Rx_Counter": 15303184,
+              "Tx_Counter": 7394280
+            }
+          ]
+        },
+        "WAN_GPON-VoIP": {
+          "Traffic": []
+        },
+        "WAN_GPON-IPTV_VOD": {
+          "Traffic": []
+        },
+        "WAN_GPON-IPTV_Live": {
+          "Traffic": [
+            {
+              "Timestamp": 1757257955,
+              "Rx_Counter": 368,
+              "Tx_Counter": 368
+            }
+          ]
+        },
+        "2.4GHz-Guest_SSID": {
+          "Traffic": []
+        },
+        "5GHz-Guest_SSID": {
+          "Traffic": []
+        }
       }
     },
     "HomeLan.async_get_maxnumber_records": {

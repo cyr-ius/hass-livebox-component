@@ -40,6 +40,14 @@ async def test_sensors_state(
     assert state is not None
     assert int(state.state) >= 0
 
+    if AIOSysbus.__model == "7.1":
+        state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
+        assert state is not None
+        assert float(state.state) >= 0
+        state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_tx")
+        assert state is not None
+        assert float(state.state) >= 0
+
     # entity_registry_enabled_default=False
     state = er.async_get(hass).async_get(f"sensor.{AIOSysbus.__unique_name}_wifi_tx")
     assert state is not None

@@ -206,6 +206,17 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
             return_value=api["UserInterface.async_get_state"]
         )
         instance.upnpigd.async_get = AsyncMock(return_value=api["UPnPIGD.async_get"])
+
+        instance.homelan.async_get_interface = AsyncMock(
+            return_value=api.get("HomeLan.async_get_interface", {})
+        )
+
+        def _mock_get_results(*args, **kwargs):
+            """Mock for async_get_results to return different values based on first arg."""
+            return api.get("HomeLan.async_get_results", {})
+
+        instance.homelan.async_get_results = AsyncMock(side_effect=_mock_get_results)
+
         instance.homelan.async_get_results = AsyncMock(
             return_value=api.get("HomeLan.async_get_results", {})
         )
