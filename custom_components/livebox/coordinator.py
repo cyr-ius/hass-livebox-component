@@ -27,6 +27,7 @@ from .const import (
     DEFAULT_WIFI_TRACKING,
     DOMAIN,
 )
+from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
@@ -107,6 +108,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "fiber_status": await self.async_get_fiber_status(),
                 "fiber_stats": await self.async_get_fiber_stats(),
                 "remote_access": await self.async_is_remote_access(),
+                "lan": await self.async_get_lan(devices),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -114,8 +116,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_infos(self) -> dict[str, Any]:
         """Get router infos."""
-        infos = await self.api.deviceinfo.async_get_deviceinfo()
-        return infos.get("status", {})
+        infos = (await self.api.deviceinfo.async_get_deviceinfo()).get("status", {})
+        return infos
 
     async def async_get_devices(
         self, lan_tracking=False, wifi_tracking=True
@@ -140,19 +142,19 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
                 }
             }
-        devices = await self._make_request(
-            self.api.devices.async_get_devices, parameters
-        )
+        devices = (
+            await self._make_request(self.api.devices.async_get_devices, parameters)
+        ).get("status", {})
         _LOGGER.debug("Fetch Devices: %s", devices)
         if wifi_tracking:
-            devices_status_wireless = devices.get("status", {}).get("wifi", {})
+            devices_status_wireless = devices.get("wifi", {})
             device_counters["wireless"] = len(devices_status_wireless)
             for device in devices_status_wireless:
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if lan_tracking:
-            devices_status_wired = devices.get("status", {}).get("eth", {})
+            devices_status_wired = devices.get("eth", {})
             device_counters["wired"] = len(devices_status_wired)
             for device in devices_status_wired:
                 if device.get("Key"):
@@ -163,8 +165,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
         """Get caller missed."""
         cmisseds = []
-        calls = await self._make_request(self.api.voiceservice.async_get_calllist)
-        for call in calls.get("status", {}):
+        calls = (
+            await self._make_request(self.api.voiceservice.async_get_calllist)
+        ).get("status", {})
+        for call in calls:
             if call["callType"] != "succeeded":
                 utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
                 local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
@@ -181,10 +185,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
         parameters = {"mibs": "dsl", "flag": "", "traverse": "down"}
-        dsl0 = await self._make_request(
-            self.api.nemo.async_get_MIBs, "data", parameters
-        )
-        return dsl0.get("status", {}).get("dsl", {}).get("dsl0", {})
+        dsl0 = (
+            await self._make_request(self.api.nemo.async_get_MIBs, "data", parameters)
+        ).get("status", {})
+        return find_item(dsl0, "dsl.dsl0", {})
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
@@ -203,15 +207,68 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             }
 
         parameters = {"mibs": "gpon"}
-        veip0 = await self._make_request(
-            self.api.nemo.async_get_MIBs, "veip0", parameters
-        )
-        return veip0.get("status", {}).get("gpon", {}).get("veip0", {})
+        veip0 = (
+            await self._make_request(self.api.nemo.async_get_MIBs, "veip0", parameters)
+        ).get("status", {})
+        return find_item(veip0, "gpon.veip0", {})
+
+    async def async_get_lan(self, lan_devices):
+        """Get lan status."""
+        self_devices = (
+            await self._make_request(
+                self.api.devices.async_get_devices,
+                {"expression": {"wifi": "vap && lan", "eth": "eth && lan"}},
+            )
+        ).get("status", {})
+
+        wlanvap_data = (
+            await self._make_request(
+                self.api.nemo.async_get_MIBs, "lan", {"mibs": "wlanvap"}
+            )
+        ).get("status", {})
+
+        devices = []
+        for type, items in self_devices.items():
+            for item in items:
+                if type == "wifi":
+                    intf = item.get("Name", "Unknown")
+                    band = item.get("OperatingFrequencyBand", intf)
+                    ess_identifier = item.get("EssIdentifier", "guest").lower()
+                    wlanvap = wlanvap_data.get(intf, {})
+                    devices.append(
+                        {
+                            "name": f"{band} ({ess_identifier})",
+                            "status": item.get("Active"),
+                            "type": "Wireless",
+                            "extra_attributes": {
+                                "last_change": item.get("LastChanged"),
+                                "channel": item.get("Channel"),
+                                "ssid": item.get("SSID"),
+                                "associated_devices": wlanvap.get("AssociatedDevice"),
+                            },
+                        }
+                    )
+                if type == "eth":
+                    devices.append(
+                        {
+                            "name": item.get("Name", "Unknown"),
+                            "status": item.get("Active"),
+                            "type": "Ethernet",
+                            "extra_attributes": {
+                                "current_bitrate": item.get("CurrentBitRate"),
+                                "last_change": item.get("LastChanged"),
+                                "port_state": item.get("PortState"),
+                            },
+                        }
+                    )
+        return devices
 
     async def async_get_wifi_stats(self) -> bool:
         """Get wifi stats."""
-        stats = await self._make_request(self.api.nmc.async_get_wifi_stats)
-        return stats.get("data", {})
+        stats = (await self._make_request(self.api.nmc.async_get_wifi_stats)).get(
+            "data", {}
+        )
+        return stats
 
     async def async_get_fiber_stats(self) -> bool:
         """Get fiber stats."""
@@ -221,46 +278,56 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             intf = "bridge_vmulti"
         else:
             intf = "veip0"
-        stats = await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
-        return stats.get("status", {})
+        stats = (
+            await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
+        ).get("status", {})
+        return stats
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        wan_status = await self._make_request(self.api.nmc.async_get_wan_status)
-        return wan_status.get("data", {})
+        wan_status = (await self._make_request(self.api.nmc.async_get_wan_status)).get(
+            "data", {}
+        )
+        return wan_status
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        nmc = await self._make_request(self.api.nmc.async_get)
-        return nmc.get("status", {})
+        nmc = (await self._make_request(self.api.nmc.async_get)).get("status", {})
+        return nmc
 
     async def async_is_wifi(self) -> bool:
-        """Get dsl status."""
-        wifi = await self._make_request(self.api.nmc.async_get_wifi)
-        return wifi.get("status", {}).get("Enable") is True
+        """Get wireless status."""
+        wifi = (await self._make_request(self.api.nmc.async_get_wifi)).get("status", {})
+        return wifi.get("Enable") is True
 
     async def async_is_guest_wifi(self) -> bool:
         """Get Guest Wifi status."""
-        guest_wifi = await self._make_request(self.api.nmc.async_get_guest_wifi)
-        return guest_wifi.get("status", {}).get("Enable") is True
+        guest_wifi = (await self._make_request(self.api.nmc.async_get_guest_wifi)).get(
+            "status", {}
+        )
+        return guest_wifi.get("Enable") is True
 
-    async def async_get_ddns(self) -> bool:
+    async def async_get_ddns(self) -> list[Any]:
         """Get DDNS status."""
-        ddns = await self._make_request(self.api.dyndns.async_get_hosts)
-        return ddns.get("status") if isinstance(ddns.get("status"), list) else []
+        ddns = (await self._make_request(self.api.dyndns.async_get_hosts)).get(
+            "status", {}
+        )
+        return ddns if isinstance(ddns, list) else []
 
     async def async_get_device_schedule(self, device_key):
         """Get device schedule."""
         parameters = {"type": "ToD", "ID": device_key}
-        data = await self._make_request(
-            self.api.schedule.async_get_schedule, parameters
-        )
-        return data.get("data", {}).get("scheduleInfo", {})
+        data = (
+            await self._make_request(self.api.schedule.async_get_schedule, parameters)
+        ).get("data", {})
+        return data.get("scheduleInfo", {})
 
     async def async_is_remote_access(self) -> bool:
         """Get Remote access status."""
-        ra = await self._make_request(self.api.remoteaccess.async_get)
-        return ra.get("status", {}).get("Enable", False) is True
+        ra = (await self._make_request(self.api.remoteaccess.async_get)).get(
+            "status", {}
+        )
+        return ra.get("Enable", False) is True
 
     async def async_detect_new_dvices(self, devices) -> None:
         """New devices detected."""
