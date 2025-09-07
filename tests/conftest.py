@@ -179,9 +179,15 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
             return_value=api["Dhcp.async_get_dhcp6_status"]
         )
 
-        instance.dhcp.async_get_dhcp_leases = AsyncMock(
-            return_value=api.get("DHCP.async_get_dhcp_leases", {})
-        )
+        def _mock_dhcp_leases(*args, **kwargs):
+            """Mock for async_get_dhcp_leases to return different values based on first arg."""
+            if args[0] == "default":
+                return api.get("Dhcp.async_get_dhcp_leases", {})
+            if args[0] == "guest":
+                return api.get("Dhcp.async_get_dhcp_leases::guest", {})
+            return {}
+
+        instance.dhcp.async_get_dhcp_leases = AsyncMock(side_effect=_mock_dhcp_leases)
 
         instance.dyndns.async_get_hosts = AsyncMock(
             return_value=api["DynDNS.async_get_hosts"]
