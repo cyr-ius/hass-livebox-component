@@ -181,9 +181,9 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
 
         def _mock_dhcp_leases(*args, **kwargs):
             """Mock for async_get_dhcp_leases to return different values based on first arg."""
-            if args[0] == "default":
+            if args[1] == "default":
                 return api.get("Dhcp.async_get_dhcp_leases", {})
-            if args[0] == "guest":
+            if args[1] == "guest":
                 return api.get("Dhcp.async_get_dhcp_leases::guest", {})
             return {}
 

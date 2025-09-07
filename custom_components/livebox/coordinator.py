@@ -390,7 +390,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> list[dict[str, Any]]:
         """Get dhcp leases."""
         data = (
-            await self._make_request(self.api.dhcp.async_get_dhcp_leases, domain)
+            await self._make_request(self.api.dhcp.async_get_dhcp_leases, None, domain)
         ).get("status", {})
         leases = []
         for item in data.get(domain, {}).values():
