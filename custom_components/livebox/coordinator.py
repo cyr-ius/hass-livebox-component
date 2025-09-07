@@ -83,14 +83,14 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             lan_tracking = self.config_entry.options.get(
                 CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
             )
-            devices, device_counters = await self.async_get_devices(
-                lan_tracking, wifi_tracking
-            )
+            devices = await self.async_get_devices(lan_tracking, wifi_tracking)
+            callers, cmissed = await self.async_get_callers()
 
             await self.async_detect_new_dvices(devices)
 
             return {
-                "cmissed": await self.async_get_caller_missed(),
+                "cmissed": cmissed,
+                "callers": callers,
                 "devices": devices,
                 "dsl_status": await self.async_get_dsl_status(),
                 "infos": infos,
@@ -98,8 +98,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "wan_status": await self.async_get_wan_status(),
                 "wifi": await self.async_is_wifi(),
                 "guest_wifi": await self.async_is_guest_wifi(),
-                "count_wired_devices": device_counters["wired"],
-                "count_wireless_devices": device_counters["wireless"],
+                "count_wired_devices": len(devices.get("eth", {})),
+                "count_wireless_devices": len(devices.get("wifi", {})),
                 "devices_wan_access": {
                     key: await self.async_get_device_schedule(key) for key in devices
                 },
@@ -109,6 +109,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "fiber_stats": await self.async_get_fiber_stats(),
                 "remote_access": await self.async_is_remote_access(),
                 "lan": await self.async_get_lan(devices),
+                "upnp": await self.async_get_port_forwarding(),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -121,14 +122,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_devices(
         self, lan_tracking=False, wifi_tracking=True
-    ) -> tuple[dict[str, Any], dict[str, int]]:
+    ) -> dict[str, Any]:
         """Get all devices."""
         devices_tracker = {}
-        device_counters = {"wireless": 0, "wired": 0}
-        device_tracker_mode = self.config_entry.options.get(
+        mode = self.config_entry.options.get(
             CONF_DISPLAY_DEVICES, DEFAULT_DISPLAY_DEVICES
         )
-        if device_tracker_mode == "All":
+        if mode == "All":
             parameters = {
                 "expression": {
                     "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
@@ -147,20 +147,16 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         ).get("status", {})
         _LOGGER.debug("Fetch Devices: %s", devices)
         if wifi_tracking:
-            devices_status_wireless = devices.get("wifi", {})
-            device_counters["wireless"] = len(devices_status_wireless)
-            for device in devices_status_wireless:
+            for device in devices.get("wifi", {}):
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if lan_tracking:
-            devices_status_wired = devices.get("eth", {})
-            device_counters["wired"] = len(devices_status_wired)
-            for device in devices_status_wired:
+            for device in devices.get("eth", {}):
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
-        return devices_tracker, device_counters
+        return devices_tracker
 
     async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
         """Get caller missed."""
@@ -181,6 +177,29 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 )
 
         return cmisseds
+
+    async def async_get_callers(self) -> tuple(list[dict[str, Any] | None]):
+        """Get caller missed."""
+        callers = []
+        cmisseds = []
+        calls = (
+            await self._make_request(self.api.voiceservice.async_get_calllist)
+        ).get("status", {})
+        for call in calls:
+            utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
+            local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
+            caller = {
+                "phone_number": call.get("remoteNumber"),
+                "date": str(local_dt),
+                "status": call.get("callType"),
+                "duration": call.get("duration"),
+                "id": call.get("callId"),
+            }
+            callers.append(caller)
+            if call["callType"] == "missed":
+                cmisseds.append(caller)
+
+        return callers, cmisseds
 
     async def async_get_dsl_status(self) -> dict[str, Any]:
         """Get dsl status."""
@@ -338,6 +357,26 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     async_dispatcher_send(self.hass, self.signal_device_new)
                     async_dispatcher_send(self.hass, self.signal_wan_access_new)
                     break
+
+    async def async_get_port_forwarding(self) -> list[dict[str, Any]]:
+        """Get port forwarding."""
+        port_forwarding = (
+            await self._make_request(self.api.firewall.async_get_port_forwarding)
+        ).get("status", {})
+        ports = []
+        for port in port_forwarding.values():
+            if not port.get("Enable"):
+                continue
+            ports.append(
+                {
+                    "id": port.get("Id"),
+                    "Ext. Ip": port.get("DestinationIPAddress"),
+                    "Ext. Port": port.get("ExternalPort"),
+                    "internal port": port.get("InternalPort"),
+                }
+            )
+
+        return ports
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any

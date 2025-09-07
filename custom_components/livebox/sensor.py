@@ -21,7 +21,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .const import DOWNLOAD_ICON, UPLOAD_ICON
+from .const import DOWNLOAD_ICON, PHONE_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
@@ -176,6 +176,21 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_rx",
         attrs={"Rx errors": lambda x: find_item(x, "fiber_stats.RxErrors")},
+    ),
+    LiveboxSensorEntityDescription(
+        key="callers",
+        name="Callers",
+        icon=PHONE_ICON,
+        value_fn=lambda x: len(x.get("callers", {})),
+        translation_key="callers",
+        attrs={"callers": lambda x: x.get("callers")},
+    ),
+    LiveboxSensorEntityDescription(
+        key="upnp",
+        name="Ports forwarding",
+        value_fn=lambda x: len(x.get("upnp", {})),
+        translation_key="upnp",
+        attrs={"Ports": lambda x: x.get("upnp")},
     ),
 )
 
