@@ -156,6 +156,8 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.upnpigd.async_get,
         coordinator.api.schedule.async_get_scheduletypes,
         coordinator.api.dhcp.async_get_dhcp_pool,
+        coordinator.api.dhcp.async_get_dhcp_leases,
+        coordinator.api.dhcp.async_get_dhcp_staticleases,
         # coordinator.api.dhcp.async_get_dhcp_stats,
         coordinator.api.dhcp.async_get_dhcp6_status,
         coordinator.api.dyndns.async_get_hosts,
