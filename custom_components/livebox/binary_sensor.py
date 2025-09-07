@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import logging
 from typing import Any, Final
 
 from homeassistant.components.binary_sensor import (
@@ -21,6 +21,7 @@ from . import LiveboxConfigEntry
 from .const import DDNS_ICON, MISSED_ICON, RA_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
+from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,22 +41,20 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
         name="WAN Status",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda x: x.get("wan_status", {}).get("WanState", "").lower() == "up",
+        value_fn=lambda x: find_item(x, "wan_status.WanState", "").lower() == "up",
         attrs={
-            "link_type": lambda x: x.get("wan_status", {}).get("LinkType"),
-            "link_state": lambda x: x.get("wan_status", {}).get("LinkState"),
-            "last_connection_error": lambda x: x.get("wan_status", {}).get(
-                "LastConnectionError"
+            "link_type": lambda x: find_item(x, "wan_status.LinkType"),
+            "link_state": lambda x: find_item(x, "wan_status.LinkState"),
+            "last_connection_error": lambda x: find_item(
+                x, "wan_status.LastConnectionError"
             ),
-            "wan_ipaddress": lambda x: x.get("wan_status", {}).get("IPAddress"),
-            "wan_ipv6address": lambda x: x.get("wan_status", {}).get("IPv6Address"),
-            "wan_ipv6prefix": lambda x: x.get("wan_status", {}).get(
-                "IPv6DelegatedPrefix"
-            ),
+            "wan_ipaddress": lambda x: find_item(x, "wan_status.IPAddress"),
+            "wan_ipv6address": lambda x: find_item(x, "wan_status.IPv6Address"),
+            "wan_ipv6prefix": lambda x: find_item(x, "wan_status.IPv6DelegatedPrefix"),
             "wired clients": lambda x: x.get("count_wired_devices"),
             "wireless clients": lambda x: x.get("count_wireless_devices"),
             "uptime": lambda x: datetime.today()
-            - timedelta(seconds=x.get("infos", {}).get("UpTime", 0)),
+            - timedelta(seconds=find_item(x, "infos.UpTime", 0)),
         },
         translation_key="connectivity",
     ),
@@ -98,8 +97,9 @@ async def async_setup_entry(
             icon=DDNS_ICON,
             device_class=BinarySensorDeviceClass.PROBLEM,
             name=f"Dynamic DNS ({item.get('service')})",
-            value_fn=lambda x, y: x["ddns"][y].get("status", "").lower() != "updated",
-            attrs={"last_update": lambda x, y: x["ddns"][y].get("last_update")},
+            value_fn=lambda x, y: find_item(x, f"ddns.{y}.status", "").lower()
+            != "updated",
+            attrs={"last_update": lambda x, y: find_item(x, f"ddns.{y}.last_update")},
             translation_key=f"ddns_{idx}",
         )
         entities.append(LiveboxBinarySensor(coordinator, description))

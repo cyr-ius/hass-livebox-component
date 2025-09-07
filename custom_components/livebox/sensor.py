@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-import logging
 from typing import Any, Final
 
 from homeassistant.components.sensor import (
@@ -24,6 +24,7 @@ from . import LiveboxConfigEntry
 from .const import DOWNLOAD_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
+from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,23 +44,21 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         icon=DOWNLOAD_ICON,
         translation_key="down_rate",
         value_fn=lambda x: round(
-            x.get("dsl_status", {}).get("DownstreamCurrRate", 0) / 1024, 2
+            find_item(x, "dsl_status.DownstreamCurrRate", 0) / 1024, 2
         ),
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
         attrs={
-            "downstream_maxrate": lambda x: x.get("dsl_status", {}).get(
-                "DownstreamMaxRate"
+            "downstream_maxrate": lambda x: find_item(
+                x, "dsl_status.DownstreamMaxRate"
             ),
-            "downstream_lineattenuation": lambda x: x.get("", {}).get(
-                "DownstreamLineAttenuation"
+            "downstream_lineattenuation": lambda x: find_item(
+                x, "dsl_status.DownstreamLineAttenuation"
             ),
-            "downstream_noisemargin": lambda x: x.get("dsl_status", {}).get(
-                "DownstreamNoiseMargin"
+            "downstream_noisemargin": lambda x: find_item(
+                x, "dsl_status.DownstreamNoiseMargin"
             ),
-            "downstream_power": lambda x: x.get("dsl_status", {}).get(
-                "DownstreamPower"
-            ),
+            "downstream_power": lambda x: find_item(x, "dsl_status.DownstreamPower"),
         },
     ),
     LiveboxSensorEntityDescription(
@@ -73,24 +72,20 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
         attrs={
-            "upstream_maxrate": lambda x: x.get("dsl_status", {}).get(
-                "UpstreamMaxRate"
+            "upstream_maxrate": lambda x: find_item(x, "dsl_status.UpstreamMaxRate"),
+            "upstream_lineattenuation": lambda x: find_item(
+                x, "dsl_status.UpstreamLineAttenuation"
             ),
-            "upstream_lineattenuation": lambda x: x.get("dsl_status", {}).get(
-                "UpstreamLineAttenuation"
+            "upstream_noisemargin": lambda x: find_item(
+                x, "dsl_status.UpstreamNoiseMargin"
             ),
-            "upstream_noisemargin": lambda x: x.get("dsl_status", {}).get(
-                "UpstreamNoiseMargin"
-            ),
-            "upstream_power": lambda x: x.get("dsl_status", {}).get("UpstreamPower"),
+            "upstream_power": lambda x: find_item(x, "dsl_status.UpstreamPower"),
         },
     ),
     LiveboxSensorEntityDescription(
         key="wifi_rx",
         name="Wifi Rx",
-        value_fn=lambda x: round(
-            x.get("wifi_stats", {}).get("RxBytes", 0) / 1048576, 2
-        ),
+        value_fn=lambda x: round(find_item(x, "wifi_stats.RxBytes", 0) / 1048576, 2),
         native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_rx",
@@ -99,9 +94,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
     LiveboxSensorEntityDescription(
         key="wifi_tx",
         name="Wifi Tx",
-        value_fn=lambda x: round(
-            x.get("wifi_stats", {}).get("TxBytes", 0) / 1048576, 2
-        ),
+        value_fn=lambda x: round(find_item(x, "wifi_stats.TxBytes", 0) / 1048576, 2),
         native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="wifi_tx",
@@ -111,82 +104,78 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         key="fiber_power_rx",
         name="Fiber Power Rx",
         value_fn=lambda x: round(
-            x.get("fiber_status", {}).get("SignalRxPower", 0) / 1000, 2
+            find_item(x, "fiber_status.SignalRxPower", 0) / 1000, 2
         ),
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_power_rx",
         attrs={
-            "Downstream max rate Gbps": lambda x: x.get("fiber_status", {}).get(
-                "DownstreamMaxRate", 0
+            "Downstream max rate Gbps": lambda x: find_item(
+                x, "fiber_status.DownstreamMaxRate", 0
             )
             / 1000,
-            "Downstream current rate Gbps": lambda x: x.get("fiber_status", {}).get(
-                "DownstreamCurrRate", 0
+            "Downstream current rate Gbps": lambda x: find_item(
+                x, "fiber_status.DownstreamCurrRate", 0
             )
             / 1000,
-            "Max bitrate (Gbps)": lambda x: x.get("fiber_status", {}).get(
-                "MaxBitRateSupported", 0
+            "Max bitrate (Gbps)": lambda x: find_item(
+                x, "fiber_status.MaxBitRateSupported", 0
             )
             / 1000,
-            "Temperature (°C)": lambda x: x.get("fiber_status", {}).get("Temperature"),
-            "Voltage (V)": lambda x: x.get("fiber_status", {}).get("Voltage"),
-            "Bias (mA)": lambda x: x.get("fiber_status", {}).get("Bias"),
-            "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
+            "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
+            "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
+            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
+            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
         },
     ),
     LiveboxSensorEntityDescription(
         key="fiber_power_tx",
         name="Fiber Power Tx",
         value_fn=lambda x: round(
-            x.get("fiber_status", {}).get("SignalTxPower", 0) / 1000, 2
+            find_item(x, "fiber_status.SignalTxPower", 0) / 1000, 2
         ),
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_power_tx",
         attrs={
-            "Upstream max rate (Gbps)": lambda x: x.get("fiber_status", {}).get(
-                "UpstreamMaxRate", 0
+            "Upstream max rate (Gbps)": lambda x: find_item(
+                x, "fiber_status.UpstreamMaxRate", 0
             )
             / 1000,
-            "Upstream current rate (Gbps)": lambda x: x.get("fiber_status", {}).get(
-                "UpstreamCurrRate", 0
+            "Upstream current rate (Gbps)": lambda x: find_item(
+                x, "fiber_status.UpstreamCurrRate", 0
             )
             / 1000,
-            "Max bitrate (Gbps)": lambda x: x.get("fiber_status", {}).get(
-                "MaxBitRateSupported", 0
+            "Max bitrate (Gbps)": lambda x: find_item(
+                x, "fiber_status.MaxBitRateSupported", 0
             )
             / 1000,
-            "Tx power (dbm)": lambda x: x.get("fiber_status", {}).get("SignalTxPower"),
-            "Temperature (°C)": lambda x: x.get("fiber_status", {}).get("Temperature"),
-            "Voltage (V)": lambda x: x.get("fiber_status", {}).get("Voltage"),
-            "Bias (mA)": lambda x: x.get("fiber_status", {}).get("Bias"),
-            "ONU State": lambda x: x.get("fiber_status", {}).get("ONUState"),
+            "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
+            "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
+            "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
+            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
+            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
         },
     ),
     LiveboxSensorEntityDescription(
         key="fiber_tx",
         name="Fiber Tx",
         icon=UPLOAD_ICON,
-        value_fn=lambda x: round(
-            x.get("fiber_stats", {}).get("TxBytes", 0) / 1048576, 2
-        ),
+        value_fn=lambda x: round(find_item(x, "fiber_stats.TxBytes", 0) / 1048576, 2),
         native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_tx",
-        attrs={"Tx errors": lambda x: x.get("fiber_stats", {}).get("TxErrors")},
+        attrs={"Tx errors": lambda x: find_item(x, "fiber_stats.TxErrors")},
     ),
     LiveboxSensorEntityDescription(
         key="fiber_rx",
         name="Fiber Rx",
         icon=DOWNLOAD_ICON,
-        value_fn=lambda x: round(
-            x.get("fiber_stats", {}).get("RxBytes", 0) / 1048576, 2
-        ),
+        value_fn=lambda x: round(find_item(x, "fiber_stats.RxBytes", 0) / 1048576, 2),
         native_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="fiber_rx",
-        attrs={"Rx errors": lambda x: x.get("fiber_stats", {}).get("RxErrors")},
+        attrs={"Rx errors": lambda x: find_item(x, "fiber_stats.RxErrors")},
     ),
 )
 
