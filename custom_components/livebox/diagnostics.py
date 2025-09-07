@@ -178,6 +178,29 @@ async def async_get_config_entry_diagnostics(
                 }
             ],
         ),
+        (
+            coordinator.api.homelan.async_get_results,
+            [
+                {
+                    "InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"],
+                    "BeginTrafficTimestamp": start_time,
+                    "EndTrafficTimestamp": end_time,
+                }
+            ],
+        ),
+        (
+            coordinator.api.homelan.async_get_results,
+            [{"InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"], "Seconds": 60}],
+        ),
+        (
+            coordinator.api.homelan.async_get_results,
+            [
+                {
+                    "InterfaceName": ["ETH2", "ETH1", "ETH0", "vap2g0priv"],
+                    "NumberOfReadings": 10,
+                }
+            ],
+        ),
         # coordinator.api.homelan.async_get_devices_results,  # take 13s
         coordinator.api.homelan.async_get_maxnumber_records,
         coordinator.api.homelan.async_get_reading_interval,

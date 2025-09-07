@@ -112,8 +112,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "remote_access": await self.async_is_remote_access(),
                 "lan": await self.async_get_lan(devices),
                 "upnp": await self.async_get_port_forwarding(),
-                "dhcp_leases": await self.async_get_dhcp_leases(),
-                "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
+                # "dhcp_leases": await self.async_get_dhcp_leases(),
+                # "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
