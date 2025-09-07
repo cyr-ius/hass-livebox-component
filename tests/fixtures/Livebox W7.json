@@ -33736,6 +33736,16 @@
     "Dhcp.async_get_dhcp6_status": {
       "status": "Enabled"
     },
+    "DHCP.async_get_dhcp_leases": {
+      "status": [
+        {
+          "IPAddress": "***REDACTED***",
+          "MACAddress": "***REDACTED***",
+          "FriendlyName": "***REDACTED***",
+          "LeaseTime": "1900-01-01T00:00:00Z"
+        }
+      ]
+    },
     "DynDNS.async_get_hosts": {
       "status": []
     },

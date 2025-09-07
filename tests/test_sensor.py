@@ -29,6 +29,17 @@ async def test_sensors_state(
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_rx")
     assert state is not None
 
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_callers")
+    assert state is not None
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_ports_forwarding")
+    assert state is not None
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_dhcp_leases")
+    assert state is not None
+    assert int(state.state) >= 0
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_guest_dhcp_leases")
+    assert state is not None
+    assert int(state.state) >= 0
+
     # entity_registry_enabled_default=False
     state = er.async_get(hass).async_get(f"sensor.{AIOSysbus.__unique_name}_wifi_tx")
     assert state is not None
