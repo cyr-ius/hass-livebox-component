@@ -289,15 +289,24 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
             return_value=api["SpeedTest.async_get_wan_results"]
         )
         instance.sgcomci.async_get_optical = AsyncMock(return_value={})  # Livebox 5656
+
+        instance.firewall.async_get_protocol_forwarding = AsyncMock(
+            return_value=api["Firewall.async_get_protocol_forwarding"]
+        )
+        instance.firewall.async_get_port_forwarding = AsyncMock(
+            return_value=api["Firewall.async_get_port_forwarding"]
+        )
+
         instance.close = AsyncMock()
 
-        info = api["DeviceInfo.async_get_deviceinfo"]["status"]
         type(instance).__devices = PropertyMock(
             return_value=api["Devices.async_get_devices"]
         )
         type(instance).__model = PropertyMock(return_value=model)
         type(instance).__unique_name = PropertyMock(
-            return_value=slugify(info["ProductClass"])
+            return_value=slugify(
+                api["DeviceInfo.async_get_deviceinfo"]["status"]["ProductClass"]
+            )
         )
 
         yield instance
