@@ -424,7 +424,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         data = (
             await self._make_request(
                 self.api.homelan.async_get_results,
-                {"Interface": list(interfaces.keys()), "NumberOfReadings": 1},
+                {"InterfaceName": list(interfaces.keys()), "NumberOfReadings": 1},
             )
         ).get("status", {})
 
