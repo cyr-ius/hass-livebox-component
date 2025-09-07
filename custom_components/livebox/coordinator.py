@@ -83,7 +83,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             lan_tracking = self.config_entry.options.get(
                 CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
             )
-            devices = await self.async_get_devices(lan_tracking, wifi_tracking)
+            devices, device_counters = await self.async_get_devices(
+                lan_tracking, wifi_tracking
+            )
             callers, cmissed = await self.async_get_callers()
 
             await self.async_detect_new_dvices(devices)
@@ -98,8 +100,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "wan_status": await self.async_get_wan_status(),
                 "wifi": await self.async_is_wifi(),
                 "guest_wifi": await self.async_is_guest_wifi(),
-                "count_wired_devices": len(devices.get("eth", {})),
-                "count_wireless_devices": len(devices.get("wifi", {})),
+                "count_wired_devices": device_counters["wired"],
+                "count_wireless_devices": device_counters["wireless"],
                 "devices_wan_access": {
                     key: await self.async_get_device_schedule(key) for key in devices
                 },
@@ -110,6 +112,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "remote_access": await self.async_is_remote_access(),
                 "lan": await self.async_get_lan(devices),
                 "upnp": await self.async_get_port_forwarding(),
+                "dhcp_leases": await self.async_get_dhcp_leases(),
+                "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
             }
         except AiosysbusException as error:
             _LOGGER.error("Error while fetch data information: %s", error)
@@ -122,9 +126,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_devices(
         self, lan_tracking=False, wifi_tracking=True
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], dict[str, int]]:
         """Get all devices."""
         devices_tracker = {}
+        device_counters = {"wireless": 0, "wired": 0}
         mode = self.config_entry.options.get(
             CONF_DISPLAY_DEVICES, DEFAULT_DISPLAY_DEVICES
         )
@@ -147,16 +152,18 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         ).get("status", {})
         _LOGGER.debug("Fetch Devices: %s", devices)
         if wifi_tracking:
+            device_counters["wireless"] = len(devices.get("wifi", {}))
             for device in devices.get("wifi", {}):
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
         if lan_tracking:
+            device_counters["wireless"] = len(devices.get("eth", {}))
             for device in devices.get("eth", {}):
                 if device.get("Key"):
                     devices_tracker.setdefault(device.get("Key"), {}).update(device)
 
-        return devices_tracker
+        return devices_tracker, device_counters
 
     async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
         """Get caller missed."""
@@ -377,6 +384,25 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             )
 
         return ports
+
+    async def async_get_dhcp_leases(
+        self, domain: str = "default"
+    ) -> list[dict[str, Any]]:
+        """Get dhcp leases."""
+        data = (
+            await self._make_request(self.api.dhcp.async_get_dhcp_leases, domain)
+        ).get("status", {})
+        leases = []
+        for item in data:
+            leases.append(
+                {
+                    "id": item.get("IPAddress"),
+                    "mac_address": item.get("MACAddress"),
+                    "name": item.get("FriendlyName"),
+                    "time": item.get("LeaseTime"),
+                }
+            )
+        return leases
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any

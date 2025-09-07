@@ -182,6 +182,7 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         name="Callers",
         icon=PHONE_ICON,
         value_fn=lambda x: len(x.get("callers", {})),
+        state_class=SensorStateClass.TOTAL,
         translation_key="callers",
         attrs={"callers": lambda x: x.get("callers")},
     ),
@@ -189,8 +190,25 @@ SENSOR_TYPES: Final[tuple[SensorEntityDescription, ...]] = (
         key="upnp",
         name="Ports forwarding",
         value_fn=lambda x: len(x.get("upnp", {})),
+        state_class=SensorStateClass.TOTAL,
         translation_key="upnp",
         attrs={"Ports": lambda x: x.get("upnp")},
+    ),
+    LiveboxSensorEntityDescription(
+        key="dhcp_leases",
+        name="DHCP Leases",
+        value_fn=lambda x: len(x.get("dhcp_leases", {})),
+        state_class=SensorStateClass.TOTAL,
+        translation_key="dhcp_leases",
+        attrs={"Leases": lambda x: x.get("dhcp_leases")},
+    ),
+    LiveboxSensorEntityDescription(
+        key="guest_dhcp_leases",
+        name="Guest DHCP Leases",
+        value_fn=lambda x: len(x.get("guest_dhcp_leases", {})),
+        state_class=SensorStateClass.TOTAL,
+        translation_key="guest_dhcp_leases",
+        attrs={"Leases": lambda x: x.get("guest_dhcp_leases")},
     ),
 )
 

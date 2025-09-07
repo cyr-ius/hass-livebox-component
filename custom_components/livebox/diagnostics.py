@@ -157,6 +157,7 @@ async def async_get_config_entry_diagnostics(
         coordinator.api.schedule.async_get_scheduletypes,
         coordinator.api.dhcp.async_get_dhcp_pool,
         coordinator.api.dhcp.async_get_dhcp_leases,
+        (coordinator.api.dhcp.async_get_dhcp_leases, ["guest"]),
         coordinator.api.dhcp.async_get_dhcp_staticleases,
         # coordinator.api.dhcp.async_get_dhcp_stats,
         coordinator.api.dhcp.async_get_dhcp6_status,
@@ -172,19 +173,10 @@ async def async_get_config_entry_diagnostics(
             coordinator.api.homelan.async_get_results,
             [
                 {
-                    "InterfaceName": "ETH2",
                     "BeginTrafficTimestamp": start_time,
                     "EndTrafficTimestamp": end_time,
                 }
             ],
-        ),
-        (
-            coordinator.api.homelan.async_get_results,
-            [{"InterfaceName": "veip0", "NumberOfReadings": 1}],
-        ),
-        (
-            coordinator.api.homelan.async_get_results,
-            [{"InterfaceName": "vap2g0priv", "Seconds": 60}],
         ),
         # coordinator.api.homelan.async_get_devices_results,  # take 13s
         coordinator.api.homelan.async_get_maxnumber_records,
