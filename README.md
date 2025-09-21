@@ -63,6 +63,7 @@ Only the routers with Livebox OS are supported:
 Despite being labelled "Livebox", the following router models **cannot** be supported:
 
 - Arcadyan PRV3399 ("Livebox Plus")
+- Arcadyan ERV33AX349B-LT (ARLTFIBRA6 or "Livebox 6+")
 
 ## Presence Detection
 
