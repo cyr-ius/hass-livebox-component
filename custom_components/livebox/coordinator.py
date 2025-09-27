@@ -166,26 +166,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return devices_tracker, device_counters
 
-    async def async_get_caller_missed(self) -> list[dict[str, Any] | None]:
-        """Get caller missed."""
-        cmisseds = []
-        calls = (
-            await self._make_request(self.api.voiceservice.async_get_calllist)
-        ).get("status", {})
-        for call in calls:
-            if call["callType"] != "succeeded":
-                utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
-                local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
-                cmisseds.append(
-                    {
-                        "phone_number": call["remoteNumber"],
-                        "date": str(local_dt),
-                        "callId": call["callId"],
-                    }
-                )
-
-        return cmisseds
-
     async def async_get_callers(self) -> tuple(list[dict[str, Any] | None]):
         """Get caller missed."""
         callers = []
@@ -378,9 +358,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             ports.append(
                 {
                     "id": port.get("Id"),
-                    "Ext. Ip": port.get("DestinationIPAddress"),
-                    "Ext. Port": port.get("ExternalPort"),
-                    "internal port": port.get("InternalPort"),
+                    "WAN Ip": port.get("DestinationIPAddress"),
+                    "WAN Port": port.get("ExternalPort"),
+                    "Port": port.get("InternalPort"),
                 }
             )
 
@@ -397,12 +377,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         for item in data.get(domain, {}).values():
             leases.append(
                 {
-                    "id": item.get("IPAddress"),
-                    "mac_address": item.get("MACAddress"),
-                    "name": item.get("FriendlyName"),
-                    "time": item.get("LeaseTime"),
-                    "enable": item.get("Active"),
-                    "reserved": item.get("Reserved"),
+                    "IP Address": item.get("IPAddress"),
+                    "Mac Address": item.get("MACAddress"),
+                    "Name": item.get("FriendlyName", "No name"),
+                    "Time (s)": item.get("LeaseTime"),
+                    "Enable": item.get("Active"),
+                    "Reserved": item.get("Reserved"),
                 }
             )
         return leases
