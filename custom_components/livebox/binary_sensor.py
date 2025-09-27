@@ -49,6 +49,7 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
                 x, "wan_status.LastConnectionError"
             ),
             "wan_ipaddress": lambda x: find_item(x, "wan_status.IPAddress"),
+            "wan_gw": lambda x: find_item(x, "wan_status.RemoteGateway"),
             "wan_ipv6address": lambda x: find_item(x, "wan_status.IPv6Address"),
             "wan_ipv6prefix": lambda x: find_item(x, "wan_status.IPv6DelegatedPrefix"),
             "wired clients": lambda x: x.get("count_wired_devices"),
