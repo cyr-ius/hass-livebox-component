@@ -193,7 +193,17 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     @property
     def is_connected(self) -> bool:
         """Return true if the device is connected to the network via router."""
-        return self._attr_is_connected
+        timeout_tracking = self.coordinator.config_entry.options.get(
+            CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
+        )
+        status = self._device.get("Active", False)
+        if status is True:
+            self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
+        if status is False and self._old_status > datetime.today():
+            _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
+            return True
+        _LOGGER.debug("Is Connected: %s", status)
+        return status
 
     @property
     def device_info(self):
@@ -207,18 +217,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Respond to a DataUpdateCoordinator update."""
-        device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
-        self._attr_ip_address = device.get("IPAddress")
+        self._device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        self._attr_ip_address = self._device.get("IPAddress")
 
-        timeout_tracking = self.coordinator.config_entry.options.get(
-            CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
-        )
-        self._attr_is_connected = device.get("Active", False)
-        if self._attr_is_connected is True:
-            self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
-        if self._attr_is_connected is False and self._old_status > datetime.today():
-            _LOGGER.debug("%s will be disconnected at %s", self.name, self._old_status)
-            self._attr_is_connected = True
-
-        _LOGGER.debug("%s is connected: %s", self.name, self._attr_is_connected)
         self.async_write_ha_state()
