@@ -11,6 +11,7 @@ There is currently support for the following device types within Home Assistant:
 - Switch for enable/disable Wireless and Guest Wifi
 - Press button to restart box
 - Press button to ring phone
+- Press button to clear calls
 
 ![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
