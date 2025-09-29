@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
@@ -26,18 +25,16 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
 
-_LOGGER = logging.getLogger(__name__)
 
-
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class LiveboxSensorEntityDescription(SensorEntityDescription):
     """Represents an Flow Sensor."""
 
-    value_fn: Callable[..., Any] | None = None
+    value_fn: Callable[..., Any]
     attrs: dict[str, Callable[..., Any]] | None = None
 
 
-SENSOR_TYPES: Final[list[SensorEntityDescription]] = [
+SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="down",
         name="xDSL Download",
@@ -260,6 +257,8 @@ async def async_setup_entry(
 class LiveboxSensor(LiveboxEntity, SensorEntity):
     """Representation of a livebox sensor."""
 
+    entity_description: LiveboxSensorEntityDescription
+
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
@@ -274,11 +273,11 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):
         return self.entity_description.value_fn(self.coordinator.data)
 
     @property
-    def extra_state_attributes(self) -> dict[str, any]:
+    def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return the device state attributes."""
         if self.entity_description.attrs:
-            attributes = {
+            return {
                 key: attr(self.coordinator.data)
                 for key, attr in self.entity_description.attrs.items()
             }
-            return attributes
+        return None

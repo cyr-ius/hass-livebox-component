@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -13,8 +12,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
@@ -23,15 +22,13 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
 
-_LOGGER = logging.getLogger(__name__)
 
-
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class LiveboxBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Represents an Flow Sensor."""
 
-    value_fn: Callable[..., Any] | None = None
-    attrs: dict[str, Callable[..., Any]] | None = None
+    value_fn: Callable[..., Any]
+    attrs: dict[str, Callable[..., Any]]
     index: int | None = None
 
 
@@ -110,6 +107,8 @@ async def async_setup_entry(
 
 class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
     """Livebox binary sensor."""
+
+    entity_description: LiveboxBinarySensorEntityDescription
 
     def __init__(
         self,

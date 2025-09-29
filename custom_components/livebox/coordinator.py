@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
+import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -36,6 +37,9 @@ SCAN_INTERVAL = timedelta(minutes=1)
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     """Define an object to fetch data."""
 
+    unique_id: str
+    model: int | float
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -44,16 +48,17 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Class to manage fetching data API."""
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
         self.config_entry = config_entry
+
+    async def _async_setup(self) -> None:
+        """Coordinator setup."""
         self.api = AIOSysbus(
-            username=config_entry.data[CONF_USERNAME],
-            password=config_entry.data[CONF_PASSWORD],
-            session=async_create_clientsession(hass),
-            host=config_entry.data[CONF_HOST],
-            port=config_entry.data[CONF_PORT],
-            use_tls=config_entry.data.get(CONF_USE_TLS, False),
+            username=self.config_entry.data[CONF_USERNAME],
+            password=self.config_entry.data[CONF_PASSWORD],
+            session=async_create_clientsession(self.hass),
+            host=self.config_entry.data[CONF_HOST],
+            port=self.config_entry.data[CONF_PORT],
+            use_tls=self.config_entry.data.get(CONF_USE_TLS, False),
         )
-        self.unique_id: str | None = None
-        self.model: int | float | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -122,8 +127,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_infos(self) -> dict[str, Any]:
         """Get router infos."""
-        infos = (await self.api.deviceinfo.async_get_deviceinfo()).get("status", {})
-        return infos
+        return (await self.api.deviceinfo.async_get_deviceinfo()).get("status", {})
 
     async def async_get_devices(
         self, lan_tracking=False, wifi_tracking=True
@@ -166,7 +170,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return devices_tracker, device_counters
 
-    async def async_get_callers(self) -> tuple(list[dict[str, Any] | None]):
+    async def async_get_callers(
+        self,
+    ) -> tuple[list[dict[str, Any] | None], list[dict[str, Any] | None]]:
         """Get caller missed."""
         callers = []
         cmisseds = []
@@ -235,9 +241,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         ).get("status", {})
 
         devices = []
-        for type, items in self_devices.items():
+        for mode, items in self_devices.items():
             for item in items:
-                if type == "wifi":
+                if mode == "wifi":
                     intf = item.get("Name", "Unknown")
                     band = item.get("OperatingFrequencyBand", intf)
                     ess_identifier = item.get("EssIdentifier", "guest").lower()
@@ -255,7 +261,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                             },
                         }
                     )
-                if type == "eth":
+                if mode == "eth":
                     devices.append(
                         {
                             "name": item.get("Name", "Unknown"),
@@ -272,10 +278,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_wifi_stats(self) -> bool:
         """Get wifi stats."""
-        stats = (await self._make_request(self.api.nmc.async_get_wifi_stats)).get(
+        return (await self._make_request(self.api.nmc.async_get_wifi_stats)).get(
             "data", {}
         )
-        return stats
 
     async def async_get_fiber_stats(self) -> bool:
         """Get fiber stats."""
@@ -285,22 +290,19 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             intf = "bridge_vmulti"
         else:
             intf = "veip0"
-        stats = (
+        return (
             await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
         ).get("status", {})
-        return stats
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        wan_status = (await self._make_request(self.api.nmc.async_get_wan_status)).get(
+        return (await self._make_request(self.api.nmc.async_get_wan_status)).get(
             "data", {}
         )
-        return wan_status
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        nmc = (await self._make_request(self.api.nmc.async_get)).get("status", {})
-        return nmc
+        return (await self._make_request(self.api.nmc.async_get)).get("status", {})
 
     async def async_is_wifi(self) -> bool:
         """Get wireless status."""
@@ -373,19 +375,17 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         data = (
             await self._make_request(self.api.dhcp.async_get_dhcp_leases, None, domain)
         ).get("status", {})
-        leases = []
-        for item in data.get(domain, {}).values():
-            leases.append(
-                {
-                    "IP Address": item.get("IPAddress"),
-                    "Mac Address": item.get("MACAddress"),
-                    "Name": item.get("FriendlyName", "No name"),
-                    "Time (s)": item.get("LeaseTime"),
-                    "Enable": item.get("Active"),
-                    "Reserved": item.get("Reserved"),
-                }
-            )
-        return leases
+        return [
+            {
+                "IP Address": item.get("IPAddress"),
+                "Mac Address": item.get("MACAddress"),
+                "Name": item.get("FriendlyName", "No name"),
+                "Time (s)": item.get("LeaseTime"),
+                "Enable": item.get("Active"),
+                "Reserved": item.get("Reserved"),
+            }
+            for item in data.get(domain, {}).values()
+        ]
 
     async def async_get_results(self) -> dict[str, Any]:
         """Get interfaces."""

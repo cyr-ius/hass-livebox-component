@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
@@ -16,14 +15,12 @@ from .const import CLEARCALLS_ICON, RESTART_ICON, RING_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
-_LOGGER = logging.getLogger(__name__)
 
-
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class LiveboxButtonEntityDescription(ButtonEntityDescription):
     """Class describing Livebox button entities."""
 
-    value_fn: Callable[..., Any] | None = None
+    value_fn: Callable[..., Any]
 
 
 BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
@@ -32,21 +29,21 @@ BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
         name="Livebox restart",
         icon=RESTART_ICON,
         translation_key="restart_btn",
-        value_fn=lambda x: getattr(getattr(x, "nmc"), "async_reboot"),
+        value_fn=lambda x: x.nmc.async_reboot,
     ),
     LiveboxButtonEntityDescription(
         key="ring",
         name="Ring your phone",
         icon=RING_ICON,
         translation_key="ring_btn",
-        value_fn=lambda x: getattr(getattr(x, "voiceservice"), "async_ring"),
+        value_fn=lambda x: x.voiceservice.async_ring,
     ),
     LiveboxButtonEntityDescription(
         key="clear_calls",
         name="Clear calls",
         icon=CLEARCALLS_ICON,
         translation_key="cmissed_clear_btn",
-        value_fn=lambda x: getattr(getattr(x, "voiceservice"), "async_clear_calllist"),
+        value_fn=lambda x: x.voiceservice.async_clear_calllist,
     ),
 )
 
@@ -66,14 +63,15 @@ class Button(LiveboxEntity, ButtonEntity):
     """Representation of a livebox button."""
 
     _attr_should_poll = False
+    entity_description: LiveboxButtonEntityDescription
 
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        entity_description: LiveboxButtonEntityDescription,
+        description: LiveboxButtonEntityDescription,
     ) -> None:
         """Initialize."""
-        super().__init__(coordinator, entity_description)
+        super().__init__(coordinator, description)
 
     async def async_press(self) -> None:
         """Triggers the button press service."""

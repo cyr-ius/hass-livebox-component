@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping
+import logging
 from typing import Any
 
-import voluptuous as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -15,11 +14,12 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
+import voluptuous as vol
+
 from homeassistant import config_entries
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
@@ -66,13 +66,13 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Get option flow."""
         return LiveboxOptionsFlowHandler()
 
-    async def async_step_import(self, import_config) -> FlowResult:
+    async def async_step_import(self, import_config) -> ConfigFlowResult:
         """Import a config entry from configuration.yaml."""
         return await self.async_step_user(import_config)
 
     async def async_step_user(
         self, user_input: Mapping[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
         errors = {}
         if user_input:
@@ -122,7 +122,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_step_ssdp(self, discovery_info: SsdpServiceInfo) -> FlowResult:
+    async def async_step_ssdp(
+        self, discovery_info: SsdpServiceInfo
+    ) -> ConfigFlowResult:
         """Handle a discovered device."""
         unique_id = discovery_info.upnp[ATTR_UPNP_SERIAL]
         await self.async_set_unique_id(unique_id)
@@ -135,7 +137,7 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(
         self, user_input: Mapping[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
         if user_input:
             return self.async_create_entry(title="", data=user_input)

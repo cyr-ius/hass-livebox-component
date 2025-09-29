@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
@@ -10,6 +9,7 @@ from typing import Any, Final
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -18,16 +18,14 @@ from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
-_LOGGER = logging.getLogger(__name__)
 
-
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class LiveboxSwitchEntityDescription(SwitchEntityDescription):
     """Class describing Livebox button entities."""
 
-    value_fn: Callable[..., Any] | None = None
-    turn_on: Callable[..., Any] | None = None
-    turn_off: Callable[..., Any] | None = None
+    value_fn: Callable[..., Any]
+    turn_on: Callable[..., Any]
+    turn_off: Callable[..., Any]
 
 
 SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
@@ -116,13 +114,15 @@ async def async_setup_entry(
 class LiveboxSwitch(LiveboxEntity, SwitchEntity):
     """Representation of a livebox switch."""
 
+    entity_description: LiveboxSwitchEntityDescription
+
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        descrîption: LiveboxSwitchEntityDescription,
+        description: LiveboxSwitchEntityDescription,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, descrîption)
+        super().__init__(coordinator, description)
 
     @property
     def is_on(self) -> bool:
@@ -153,14 +153,14 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, description)
-        self._device_key = device.get("Key")
+        self._device_key = device.get("Key", self.name)
         self._device = device
         self._attr_unique_id = description.key
-        self._attr_device_info = {
-            "name": self._device.get("Name"),
-            "identifiers": {(DOMAIN, self._device_key)},
-            "via_device": (DOMAIN, coordinator.unique_id),
-        }
+        self._attr_device_info = DeviceInfo(
+            name=self._device.get("Name"),
+            identifiers={(DOMAIN, self._device_key)},
+            via_device=(DOMAIN, coordinator.unique_id),
+        )
 
     def _get_device_schedule(self) -> dict[str, Any]:
         """Get device schedule."""

@@ -3,7 +3,6 @@
 import logging
 
 import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
@@ -51,9 +50,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: LiveboxConfigEntry)
 
 
 async def async_remove_config_entry_device(
-    hass: HomeAssistant,  # pylint: disable=unused-argument
-    config_entry: ConfigEntry,  # pylint: disable=unused-argument
-    device_entry: dr.DeviceEntry,  # pylint: disable=unused-argument
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
 ) -> bool:
     """Remove config entry from a device."""
     return True

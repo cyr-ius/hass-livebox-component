@@ -6,15 +6,13 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any
 
-from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityDescription
-from homeassistant.helpers.entity_platform import (
-    AddConfigEntryEntitiesCallback,
-    AddEntitiesCallback,
-)
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
@@ -50,7 +48,7 @@ async def async_setup_entry(
 @callback
 def async_add_new_tracked_entities(
     coordinator: LiveboxDataUpdateCoordinator,
-    async_add_entities: AddConfigEntryEntitiesCallback,
+    async_add_entities: AddEntitiesCallback,
     tracked: set[str],
 ) -> None:
     """Add new tracker entities from the router."""
@@ -78,6 +76,7 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     """Represent a tracked device."""
 
     _attr_name = None
+    entity_description: EntityDescription
 
     def __init__(
         self,
@@ -87,9 +86,6 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     ) -> None:
         """Initialize the device tracker."""
         super().__init__(coordinator, description)
-        self.coordinator = coordinator
-        self.entity_description = description
-
         self._device = device
         self._old_status = datetime.today()
         self._attr_is_connected = device.get("Active", False)
@@ -206,13 +202,13 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         return status
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo | None:
         """Return device info to link entity to the Livebox device."""
-        return {
-            "name": self._device.get("Name"),
-            "identifiers": {(DOMAIN, self._device.get("Key"))},
-            "via_device": (DOMAIN, self.coordinator.unique_id),
-        }
+        return DeviceInfo(
+            name=self._device.get("Name"),
+            identifiers={(DOMAIN, self._device.get("Key", self.name))},
+            via_device=(DOMAIN, self.coordinator.unique_id),
+        )
 
     @callback
     def _handle_coordinator_update(self) -> None:
