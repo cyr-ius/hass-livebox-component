@@ -63,8 +63,9 @@ Only the routers with Livebox OS are supported:
 
 Despite being labelled "Livebox", the following router models **cannot** be supported:
 
-- Arcadyan PRV3399 ("Livebox Plus")
-- Arcadyan ERV33AX349B-LT (ARLTFIBRA6 or "Livebox 6+")
+- Arcadyan PRV3399 (["Livebox Plus"](https://ayuda.orange.es/dispositivos-y-routers/2381-router-livebox-plus))
+- Arcadyan ERV33AX349B-LT (ARLTFIBRA6 or ["Livebox 6+"](https://ayuda.orange.es/dispositivos-y-routers/2755-router-livebox-6plus))
+- ZTE ZTEGLB7xxxxxx (["Livebox 7 ZTE"](https://ayuda.orange.es/dispositivos-y-routers/3220-router-livebox-7))
 
 ## Presence Detection
 
