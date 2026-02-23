@@ -20,7 +20,7 @@ jobs:
       # - No PRs marked as no-stale
       # - No issues (-1)
       - name: 60 days stale PRs policy
-        uses: actions/stale@v10.1.1
+        uses: actions/stale@v10.2.0
         with:
           days-before-stale: 60
           days-before-close: 7
@@ -47,7 +47,7 @@ jobs:
       # - No issues marked as no-stale or help-wanted
       # - No PRs (-1)
       - name: 90 days stale issues
-        uses: actions/stale@v10.1.1
+        uses: actions/stale@v10.2.0
         with:
           days-before-stale: 90
           days-before-close: 7
@@ -76,7 +76,7 @@ jobs:
       # - No Issues marked as no-stale or help-wanted
       # - No PRs (-1)
       - name: Needs more information stale issues policy
-        uses: actions/stale@v10.1.1
+        uses: actions/stale@v10.2.0
         with:
           only-labels: "needs-more-information"
           days-before-stale: 14
