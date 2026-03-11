@@ -5,16 +5,19 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
+import logging
 
 from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
+    SensorDeviceClass
 )
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfDataRate,
     UnitOfInformation,
+    UnitOfTime
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -25,6 +28,7 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
 
+_LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True, kw_only=True)
 class LiveboxSensorEntityDescription(SensorEntityDescription):
@@ -34,17 +38,51 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
     attrs: dict[str, Callable[..., Any]] | None = None
 
 
+def get_rolling_32_bit_value_fn(path) -> Callable[..., Any]:
+    """Returns a closure function, that extracts a rolling 32-bit value from"""
+    """the coordinator data structure, and tweaks its result so that HASS"""
+    """properly accumulates the total rolling value."""
+    """Meant for monotonically increasing counters: fiber/DSL Tx/Rx, and WiFi Tx/Rx"""
+
+    previous_reading: int = 0
+    previous_uptime: int = 0
+    rolls: int = 0
+
+    def value_fn(coordinator_data) -> int:
+        nonlocal previous_reading
+        nonlocal previous_uptime
+        nonlocal rolls
+        current_uptime = coordinator_data.get("infos").get("UpTime") or 0
+        current_reading = find_item(coordinator_data, path, 0)
+
+        if current_uptime < previous_uptime:
+            # The router has reset, so clear up previous counter value
+            previous_reading = 0
+            rolls = 0
+
+        if current_reading < previous_reading:
+            _LOGGER.debug("Rolling over 32-bit integer counter: %s", path)
+            rolls += 1
+
+        previous_reading = current_reading
+        previous_uptime = current_uptime
+
+        return (rolls<<32) + current_reading
+
+    return value_fn
+
+
 SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="down",
         name="xDSL Download",
         icon=DOWNLOAD_ICON,
         translation_key="down_rate",
-        value_fn=lambda x: round(
-            find_item(x, "dsl_status.DownstreamCurrRate", 0) / 1024, 2
-        ),
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        value_fn=lambda x: find_item(x, "dsl_status.DownstreamCurrRate", 0),
+        native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
         attrs={
             "downstream_maxrate": lambda x: find_item(
                 x, "dsl_status.DownstreamMaxRate"
@@ -63,11 +101,11 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         name="xDSL Upload",
         icon=UPLOAD_ICON,
         translation_key="up_rate",
-        value_fn=lambda x: round(
-            x.get("dsl_status", {}).get("UpstreamCurrRate", 0) / 1024, 2
-        ),
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        value_fn=lambda x: x.get("dsl_status", {}).get("UpstreamCurrRate", 0) ,
+        native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DATA_RATE,
         attrs={
             "upstream_maxrate": lambda x: find_item(x, "dsl_status.UpstreamMaxRate"),
             "upstream_lineattenuation": lambda x: find_item(
@@ -82,18 +120,24 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="wifi_rx",
         name="Wifi Rx",
-        value_fn=lambda x: round(find_item(x, "wifi_stats.RxBytes", 0) / 1048576, 2),
-        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
-        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:wifi-arrow-down",
+        value_fn=get_rolling_32_bit_value_fn("wifi_stats.RxBytes"),
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="wifi_rx",
         entity_registry_enabled_default=False,
     ),
     LiveboxSensorEntityDescription(
         key="wifi_tx",
         name="Wifi Tx",
-        value_fn=lambda x: round(find_item(x, "wifi_stats.TxBytes", 0) / 1048576, 2),
-        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
-        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:wifi-arrow-up",
+        value_fn=get_rolling_32_bit_value_fn("wifi_stats.TxBytes"),
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="wifi_tx",
         entity_registry_enabled_default=False,
     ),
@@ -105,6 +149,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         ),
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_rx",
         attrs={
             "Downstream max rate Gbps": lambda x: find_item(
@@ -133,6 +178,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         ),
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_tx",
         attrs={
             "Upstream max rate (Gbps)": lambda x: find_item(
@@ -158,9 +204,11 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="fiber_tx",
         name="Fiber Tx",
         icon=UPLOAD_ICON,
-        value_fn=lambda x: round(find_item(x, "fiber_stats.TxBytes", 0) / 1048576, 2),
-        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
-        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=get_rolling_32_bit_value_fn("fiber_stats.TxBytes"),
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_tx",
         attrs={"Tx errors": lambda x: find_item(x, "fiber_stats.TxErrors")},
     ),
@@ -168,9 +216,11 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="fiber_rx",
         name="Fiber Rx",
         icon=DOWNLOAD_ICON,
-        value_fn=lambda x: round(find_item(x, "fiber_stats.RxBytes", 0) / 1048576, 2),
-        native_unit_of_measurement=UnitOfInformation.MEGABYTES,
-        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=get_rolling_32_bit_value_fn("fiber_stats.RxBytes"),
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_rx",
         attrs={"Rx errors": lambda x: find_item(x, "fiber_stats.RxErrors")},
     ),
@@ -210,6 +260,17 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         attrs={"Leases": lambda x: x.get("guest_dhcp_leases")},
         entity_registry_enabled_default=False,
     ),
+    LiveboxSensorEntityDescription(
+        key="uptime",
+        name="Uptime",
+        icon="progress-clock",
+        value_fn=lambda x: find_item(x, "infos.UpTime", 0),
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        state_class=SensorStateClass.TOTAL,
+        device_class=SensorDeviceClass.DURATION,
+        translation_key="uptime",
+        entity_registry_enabled_default=False,
+    ),
 ]
 
 
@@ -232,7 +293,9 @@ async def async_setup_entry(
                 value_fn=lambda x: find_item(x, f"stats.{name}.rate_rx"),
                 translation_key=f"{name}_rate_rx",
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+                suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 state_class=SensorStateClass.MEASUREMENT,
+                device_class=SensorDeviceClass.DATA_RATE,
             )
         )
         sensor_stats.append(
@@ -242,7 +305,9 @@ async def async_setup_entry(
                 value_fn=lambda x: find_item(x, f"stats.{name}.rate_tx"),
                 translation_key=f"{name}_rate_tx",
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+                suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 state_class=SensorStateClass.MEASUREMENT,
+                device_class=SensorDeviceClass.DATA_RATE,
             )
         )
 
