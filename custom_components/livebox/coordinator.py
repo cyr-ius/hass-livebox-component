@@ -288,6 +288,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             intf = "eth0"
         elif self.model == 3:
             intf = "bridge_vmulti"
+        elif self.model == 5656:
+            intf = "bridge"
         else:
             intf = "veip0"
         return (
@@ -372,6 +374,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self, domain: str = "default"
     ) -> list[dict[str, Any]]:
         """Get dhcp leases."""
+        if self.model == 5656:
+            return []
+
         data = (
             await self._make_request(self.api.dhcp.async_get_dhcp_leases, None, domain)
         ).get("status", {})
