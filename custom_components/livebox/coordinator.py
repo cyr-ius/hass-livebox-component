@@ -188,7 +188,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "status": call.get("callType"),
                 "duration": call.get("duration"),
                 "id": call.get("callId"),
-                "orgin": call.get("callOrigin")
+                "origin": call.get("callOrigin")
             }
             callers.append(caller)
             if call["callType"] == "missed":
