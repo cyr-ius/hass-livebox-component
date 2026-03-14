@@ -52,7 +52,7 @@ def get_rolling_32_bit_value_fn(path) -> Callable[..., Any]:
         nonlocal previous_reading
         nonlocal previous_uptime
         nonlocal rolls
-        current_uptime = coordinator_data.get("infos").get("UpTime") or 0
+        current_uptime = coordinator_data.get("infos", {}).get("UpTime") or 0
         current_reading = find_item(coordinator_data, path, 0)
 
         if current_uptime < previous_uptime:
