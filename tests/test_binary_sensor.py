@@ -51,7 +51,7 @@ async def test_binary_sensor_link_status(
     assert state.state == STATE_OFF
 
 
-@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1"], indirect=True)
 async def test_binary_sensor(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

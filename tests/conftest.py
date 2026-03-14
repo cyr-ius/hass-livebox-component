@@ -49,7 +49,9 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
     # "Livebox Nautilus": "Livebox S", 7.2
     # "Livebox S": "Livebox S", 7.2
 
-    if model == "5":
+    if model == "3":
+        api = load_json_object_fixture("Livebox 3.json")["api_raw"]
+    elif model == "5":
         api = load_json_object_fixture("Livebox Fibre.json")["api_raw"]
     elif model == "7":
         api = load_json_object_fixture("Livebox 7.json")["api_raw"]

@@ -1,0 +1,4979 @@
+{
+  "api_raw": {
+    "AIOSysbus.async_get_permissions": "http,admin",
+    "DeviceInfo.async_get_deviceinfo": {
+      "status": {
+        "Manufacturer": "Sagemcom",
+        "ManufacturerOUI": "A43E51",
+        "ModelName": "SagemcomFast3965_LB2.8",
+        "Description": "SagemcomFast3965_LB2.8 Sagemcom fr",
+        "ProductClass": "Livebox 3",
+        "SerialNumber": "012345678901234",
+        "HardwareVersion": "SG_LB3_1.2.4",
+        "SoftwareVersion": "SG30_sip-fr-7.52.10.1",
+        "RescueVersion": "SG30_sip-fr-7.51.0.1",
+        "ModemFirmwareVersion": "",
+        "EnabledOptions": "",
+        "AdditionalHardwareVersion": "",
+        "AdditionalSoftwareVersion": "g6-f-sip-fr",
+        "SpecVersion": "1.1",
+        "ProvisioningCode": "**REDACTED**",
+        "UpTime": 3134865,
+        "FirstUseDate": "0001-01-01T00:00:00Z",
+        "DeviceLog": "",
+        "VendorConfigFileNumberOfEntries": 1,
+        "ManufacturerURL": "http://www.sagemcom.com/",
+        "Country": "fr",
+        "ExternalIPAddress": "**REDACTED**",
+        "DeviceStatus": "Up",
+        "NumberOfReboots": 1,
+        "UpgradeOccurred": true,
+        "ResetOccurred": false,
+        "RestoreOccurred": true,
+        "X_SOFTATHOME-COM_AdditionalSoftwareVersions": "",
+        "BaseMAC": "**REDACTED**"
+      }
+    },
+    "VoiceService.async_get_calllist": {
+      "status": [
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-11T19:32:05Z",
+          "duration": 426,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "30"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-12T16:05:07Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": true,
+          "callId": "31"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-13T15:31:17Z",
+          "duration": 1095,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "32"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-13T15:56:07Z",
+          "duration": 842,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "33"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-13T17:36:05Z",
+          "duration": 929,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "34"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-13T19:07:17Z",
+          "duration": 94,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "35"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-14T16:57:36Z",
+          "duration": 1665,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "36"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-14T17:40:29Z",
+          "duration": 36,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "37"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-14T18:39:35Z",
+          "duration": 518,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "38"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T16:02:07Z",
+          "duration": 46,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "39"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T16:03:20Z",
+          "duration": 84,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "40"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T16:06:26Z",
+          "duration": 1271,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "41"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T16:55:24Z",
+          "duration": 4,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "42"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T18:19:59Z",
+          "duration": 121,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "43"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T18:53:03Z",
+          "duration": 6,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "44"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T19:24:48Z",
+          "duration": 23,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "45"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T19:25:54Z",
+          "duration": 0,
+          "callType": "failed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "46"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T19:26:12Z",
+          "duration": 92,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "47"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-15T19:40:42Z",
+          "duration": 66,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "48"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T03:39:19Z",
+          "duration": 6,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "49"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T03:41:43Z",
+          "duration": 3,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "50"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T09:13:24Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": true,
+          "callId": "51"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T13:45:11Z",
+          "duration": 11,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "52"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T15:54:28Z",
+          "duration": 26,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "53"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T16:06:42Z",
+          "duration": 223,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "54"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T16:21:45Z",
+          "duration": 511,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "55"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T17:19:20Z",
+          "duration": 255,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "56"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T17:26:01Z",
+          "duration": 435,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "57"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T17:33:41Z",
+          "duration": 532,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "58"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2025-12-16T20:47:18Z",
+          "duration": 0,
+          "callType": "failed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "59"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-01-18T20:12:41Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "60"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T09:54:21Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "61"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T10:19:08Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "62"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T10:21:02Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "63"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T10:38:36Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "64"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T11:12:01Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "65"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-02-20T11:45:02Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "66"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T13:40:17Z",
+          "duration": 3,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "67"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T18:32:06Z",
+          "duration": 47,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "68"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T18:34:28Z",
+          "duration": 218,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "69"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T18:50:53Z",
+          "duration": 12,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "70"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T18:55:34Z",
+          "duration": 3,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "71"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T19:10:29Z",
+          "duration": 4,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "72"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T19:11:40Z",
+          "duration": 304,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "73"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-06T19:27:58Z",
+          "duration": 12,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "74"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-07T08:06:46Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "75"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-08T19:40:18Z",
+          "duration": 749,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "76"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T13:10:03Z",
+          "duration": 0,
+          "callType": "missed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "77"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T17:05:49Z",
+          "duration": 58,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "78"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T17:26:56Z",
+          "duration": 0,
+          "callType": "failed",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "79"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T17:27:43Z",
+          "duration": 22,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "80"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T17:32:56Z",
+          "duration": 137,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "81"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-09T18:09:01Z",
+          "duration": 3,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "82"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-10T18:43:25Z",
+          "duration": 6,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "83"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-10T18:44:08Z",
+          "duration": 572,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "84"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-10T19:28:02Z",
+          "duration": 359,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "85"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-11T13:04:41Z",
+          "duration": 4,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "86"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-11T16:33:04Z",
+          "duration": 66,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "87"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-12T09:10:49Z",
+          "duration": 184,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "88"
+        },
+        {
+          "remoteNumber": "**REDACTED**",
+          "remoteName": "",
+          "terminal": "**REDACTED**",
+          "startTime": "2026-03-13T19:21:24Z",
+          "duration": 989,
+          "callType": "succeeded",
+          "callOrigin": "**REDACTED**",
+          "callDestination": "**REDACTED**",
+          "trunkLineNumber": "**REDACTED**",
+          "viewed": false,
+          "callId": "89"
+        }
+      ]
+    },
+    "NeMo.async_lucky_addr_address::lan": {
+      "status": "**REDACTED**"
+    },
+    "NeMo.async_lucky_addr_address::data": {
+      "status": "**REDACTED**"
+    },
+    "NeMo.async_get_MIBs::data": {
+      "status": {
+        "base": {
+          "data": {
+            "Name": "data",
+            "Enable": true,
+            "Status": true,
+            "Flags": "up nat-config enabled",
+            "ULIntf": {},
+            "LLIntf": {
+              "primdata": {
+                "Name": "primdata"
+              }
+            }
+          },
+          "primdata": {
+            "ULIntf": {
+              "data": {}
+            },
+            "LLIntf": {
+              "dhcp_data": {},
+              "dhcpv6_data": {}
+            }
+          },
+          "dhcp_data": {
+            "Name": "dhcp_data",
+            "Enable": true,
+            "Status": true,
+            "Flags": "dhcp logical enabled up",
+            "ULIntf": {
+              "primdata": {
+                "Name": "primdata"
+              }
+            },
+            "LLIntf": {
+              "bridge_vmulti": {
+                "Name": "bridge_vmulti"
+              }
+            }
+          },
+          "bridge_vmulti": {
+            "Name": "bridge_vmulti",
+            "Enable": true,
+            "Status": true,
+            "Flags": "bridge netdev ipv4 ipv6 nmc-ipv6 ra nat-enabled enabled netdev-bound netdev-up up ipv6-up ipv4-up",
+            "ULIntf": {
+              "dhcp_data": {
+                "Name": "dhcp_data"
+              },
+              "dhcpv6_data": {
+                "Name": "dhcpv6_data"
+              }
+            },
+            "LLIntf": {
+              "vlan_multi": {
+                "Name": "vlan_multi"
+              }
+            }
+          },
+          "vlan_multi": {
+            "Name": "vlan_multi",
+            "Enable": true,
+            "Status": true,
+            "Flags": "vlan netdev ipv4 vod-iptv ipv6 ra enabled up netdev-bound netdev-up inbridge ipv6-up",
+            "ULIntf": {
+              "bridge_vmulti": {
+                "Name": "bridge_vmulti"
+              }
+            },
+            "LLIntf": {
+              "eth1": {
+                "Name": "eth1"
+              }
+            }
+          },
+          "eth1": {
+            "Name": "eth1",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled netdev eth atheth physical wan netdev-bound netdev-up up",
+            "ULIntf": {
+              "vlan_data": {
+                "Name": "vlan_data"
+              },
+              "vlan_multi": {
+                "Name": "vlan_multi"
+              },
+              "vlan_voip": {
+                "Name": "vlan_voip"
+              },
+              "vlan_iptv1": {
+                "Name": "vlan_iptv1"
+              },
+              "vlan_iptv2": {
+                "Name": "vlan_iptv2"
+              }
+            },
+            "LLIntf": {}
+          },
+          "dhcpv6_data": {
+            "Name": "dhcpv6_data",
+            "Enable": true,
+            "Status": false,
+            "Flags": "dhcpv6 enabled",
+            "ULIntf": {
+              "primdata": {
+                "Name": "primdata"
+              }
+            },
+            "LLIntf": {
+              "bridge_vmulti": {
+                "Name": "bridge_vmulti"
+              }
+            }
+          }
+        },
+        "6rd": {},
+        "alias": {
+          "data": {
+            "Alias": "cpe-data"
+          },
+          "primdata": {},
+          "dhcp_data": {
+            "Alias": "cpe-dhcp_data"
+          },
+          "bridge_vmulti": {
+            "Alias": "cpe-bridge_vmulti"
+          },
+          "vlan_multi": {
+            "Alias": "cpe-vlan_multi"
+          },
+          "eth1": {
+            "Alias": "cpe-eth1"
+          },
+          "dhcpv6_data": {
+            "Alias": "cpe-dhcpv6_data"
+          }
+        },
+        "atm": {},
+        "bridge": {
+          "bridge_vmulti": {
+            "Ageing": 0
+          }
+        },
+        "copy": {
+          "data": {},
+          "primdata": {},
+          "dhcp_data": {},
+          "bridge_vmulti": {},
+          "vlan_multi": {},
+          "eth1": {},
+          "dhcpv6_data": {}
+        },
+        "dhcp-api": {
+          "data": {},
+          "primdata": {},
+          "dhcp_data": {},
+          "bridge_vmulti": {},
+          "vlan_multi": {},
+          "eth1": {},
+          "dhcpv6_data": {}
+        },
+        "dhcp": {
+          "dhcp_data": {
+            "DHCPStatus": "Bound",
+            "LastConnectionError": "None",
+            "Renew": false,
+            "IPAddress": "**REDACTED**",
+            "SubnetMask": "**REDACTED**",
+            "IPRouters": "**REDACTED**",
+            "DNSServers": "81.253.149.6,80.10.246.136",
+            "DHCPServer": "**REDACTED**",
+            "LeaseTime": 86400,
+            "LeaseTimeRemaining": 66120,
+            "Uptime": 810573,
+            "DSCPMark": 48,
+            "PriorityMark": 6,
+            "Formal": false,
+            "CheckAuthentication": true,
+            "AuthenticationInformation": "**REDACTED**",
+            "ResetOnPhysDownTimeout": 20,
+            "RetransmissionStrategy": "4000 8000 16000 32000 64000 128000 -1 0",
+            "RetransmissionRenewTimeout": -1,
+            "SentOption": {
+              "60": {
+                "Enable": true,
+                "Alias": "cpe-60",
+                "Tag": 60,
+                "Value": "736167656d"
+              },
+              "61": {
+                "Enable": true,
+                "Alias": "cpe-61",
+                "Tag": 61,
+                "Value": "01A43E51106B73"
+              },
+              "77": {
+                "Enable": true,
+                "Alias": "cpe-77",
+                "Tag": 77,
+                "Value": "2b46535644534c5f6c697665626f782e496e7465726e65742e736f66746174686f6d652e4c697665626f7833"
+              },
+              "90": {
+                "Enable": true,
+                "Alias": "cpe-90",
+                "Tag": 90,
+                "Value": "00000000000000000000001a0900000558010341010d6674692f777976716276753c125e67547d4e22317766226264286c434d0313230bd310ff33c24e583b2c5106389e0e84"
+              }
+            },
+            "ReqOption": {
+              "1": {
+                "Enable": true,
+                "Alias": "cpe-1",
+                "Tag": 1,
+                "Value": "ffffff00"
+              },
+              "3": {
+                "Enable": true,
+                "Alias": "cpe-3",
+                "Tag": 3,
+                "Value": "ac100101"
+              },
+              "6": {
+                "Enable": true,
+                "Alias": "cpe-6",
+                "Tag": 6,
+                "Value": "51fd9506500af688"
+              },
+              "15": {
+                "Enable": true,
+                "Alias": "cpe-15",
+                "Tag": 15,
+                "Value": "6f72616e67652e6672"
+              },
+              "28": {
+                "Enable": true,
+                "Alias": "cpe-28",
+                "Tag": 28,
+                "Value": "ac1001ff"
+              },
+              "51": {
+                "Enable": true,
+                "Alias": "cpe-51",
+                "Tag": 51,
+                "Value": "00015180"
+              },
+              "58": {
+                "Enable": true,
+                "Alias": "cpe-58",
+                "Tag": 58,
+                "Value": "00009642"
+              },
+              "59": {
+                "Enable": true,
+                "Alias": "cpe-59",
+                "Tag": 59,
+                "Value": "000114d2"
+              },
+              "90": {
+                "Enable": true,
+                "Alias": "cpe-90",
+                "Tag": 90,
+                "Value": "0000000000000000000000646863706c697665626f786672323530"
+              },
+              "119": {
+                "Enable": true,
+                "Alias": "cpe-119",
+                "Tag": 119,
+                "Value": "034f524c06616363657373116f72616e67652d6d756c74696d65646961036e657400"
+              },
+              "120": {
+                "Enable": true,
+                "Alias": "cpe-120",
+                "Tag": 120,
+                "Value": ""
+              },
+              "125": {
+                "Enable": true,
+                "Alias": "cpe-125",
+                "Tag": 125,
+                "Value": "000005580c010a0001000000ffffffffff"
+              }
+            }
+          }
+        },
+        "dhcpv6": {
+          "dhcpv6_data": {
+            "DHCPStatus": "Selecting",
+            "DUID": "",
+            "RequestAddresses": false,
+            "RequestPrefixes": true,
+            "RapidCommit": false,
+            "SuggestedT1": -1,
+            "SuggestedT2": -1,
+            "SupportedOptions": "",
+            "RequestedOptions": "11,17,23,24",
+            "Renew": false,
+            "ResetOnPhysDownTimeout": 20,
+            "CheckAuthentication": true,
+            "AuthenticationInfo": "dhcpliveboxfr250",
+            "RetryOnFailedAuth": true,
+            "SentOption": {
+              "11": {
+                "Enable": true,
+                "Alias": "cpe-11",
+                "Tag": 11,
+                "Value": "00000000000000000000001a0900000558010341010d6674692f777976716276753c12435c3d39794744634a6174214f712f5f031322ae657b87d91846789c726767d1040167"
+              },
+              "15": {
+                "Enable": true,
+                "Alias": "cpe-15",
+                "Tag": 15,
+                "Value": "002b46535644534c5f6c697665626f782e496e7465726e65742e736f66746174686f6d652e6c697665626f7833"
+              },
+              "16": {
+                "Enable": true,
+                "Alias": "cpe-16",
+                "Tag": 16,
+                "Value": "0000040e0005736167656d"
+              },
+              "17": {
+                "Enable": false,
+                "Alias": "cpe-17",
+                "Tag": 17,
+                "Value": "000005580006000e495056365f524551554553544544"
+              }
+            },
+            "ReceivedOption": {}
+          }
+        },
+        "dhcpv6impl": {
+          "dhcpv6_data": {
+            "ReleaseOnElectricalReboot": false
+          }
+        },
+        "dop-slave": {},
+        "dsl": {},
+        "dslbonding": {},
+        "dslite": {},
+        "dslline": {},
+        "eth": {
+          "eth1": {
+            "LastChangeTime": 53,
+            "LastChange": 3134812,
+            "CurrentBitRate": 1000,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "Full",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 4,
+            "ExternalPhy": false
+          }
+        },
+        "gre": {},
+        "nat": {
+          "bridge_vmulti": {
+            "NATEnabled": true
+          },
+          "vlan_multi": {
+            "NATEnabled": false
+          },
+          "eth1": {
+            "NATEnabled": false
+          }
+        },
+        "netdev-api": {
+          "data": {},
+          "primdata": {},
+          "dhcp_data": {},
+          "bridge_vmulti": {},
+          "vlan_multi": {},
+          "eth1": {},
+          "dhcpv6_data": {}
+        },
+        "netdev": {
+          "bridge_vmulti": {
+            "NetDevIndex": 14,
+            "NetDevType": "ether",
+            "NetDevFlags": "up broadcast allmulti multicast",
+            "NetDevName": "bridge_vmulti",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 0,
+            "MTU": 1500,
+            "NetDevState": "unknown",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 2,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": false,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": false,
+            "IPv6Disable": false,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "bridge",
+            "IPv4Addr": {
+              "dyn6": {
+                "Enable": true,
+                "Status": "dynamic",
+                "Address": "**REDACTED**",
+                "Peer": "",
+                "PrefixLen": 24,
+                "Flags": "permanent",
+                "Scope": "global"
+              }
+            },
+            "IPv6Addr": {
+              "dyn4": {
+                "Enable": true,
+                "Status": "dynamic",
+                "Address": "**REDACTED**",
+                "Peer": "",
+                "PrefixLen": 64,
+                "Flags": "permanent",
+                "Scope": "link",
+                "PreferredLifetime": 0,
+                "ValidLifetime": 0
+              }
+            },
+            "IPv4Route": {
+              "dyn17": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 24,
+                "Table": "main",
+                "Scope": "link",
+                "Protocol": "kernel",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": ""
+              },
+              "route_1": {
+                "Enable": true,
+                "Status": "bound",
+                "DstLen": 0,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": "**REDACTED**"
+              }
+            },
+            "IPv6Route": {
+              "dyn9": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 64,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "kernel",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 256,
+                "Gateway": ""
+              }
+            }
+          },
+          "vlan_multi": {
+            "NetDevIndex": 15,
+            "NetDevType": "ether",
+            "NetDevFlags": "up broadcast allmulti multicast",
+            "NetDevName": "vlan_multi",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 0,
+            "MTU": 1500,
+            "NetDevState": "up",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 0,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": true,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": false,
+            "IPv6Disable": false,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "",
+            "IPv4Addr": {},
+            "IPv6Addr": {
+              "dyn5": {
+                "Enable": true,
+                "Status": "dynamic",
+                "Address": "**REDACTED**",
+                "Peer": "",
+                "PrefixLen": 64,
+                "Flags": "permanent",
+                "Scope": "link",
+                "PreferredLifetime": 0,
+                "ValidLifetime": 0
+              }
+            },
+            "IPv4Route": {},
+            "IPv6Route": {
+              "dyn10": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 64,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "kernel",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 256,
+                "Gateway": ""
+              }
+            }
+          },
+          "eth1": {
+            "NetDevIndex": 6,
+            "NetDevType": "ether",
+            "NetDevFlags": "up broadcast multicast",
+            "NetDevName": "eth1",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 100,
+            "MTU": 1500,
+            "NetDevState": "unknown",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 0,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": true,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": false,
+            "IPv6Disable": true,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "",
+            "IPv4Addr": {},
+            "IPv6Addr": {},
+            "IPv4Route": {},
+            "IPv6Route": {}
+          }
+        },
+        "penable": {},
+        "ppp": {},
+        "ptm": {},
+        "ra-api": {
+          "data": {},
+          "primdata": {},
+          "dhcp_data": {},
+          "bridge_vmulti": {},
+          "vlan_multi": {},
+          "eth1": {},
+          "dhcpv6_data": {}
+        },
+        "ra": {
+          "bridge_vmulti": {
+            "IPv6RouterDownTimeout": 20,
+            "IPv6Router": {}
+          },
+          "vlan_multi": {
+            "IPv6RouterDownTimeout": 0,
+            "IPv6Router": {}
+          }
+        },
+        "switch": {},
+        "vlan": {
+          "vlan_multi": {
+            "LastChangeTime": 107,
+            "LastChange": 3134758,
+            "VLANID": "**REDACTED**",
+            "VLANPriority": -1
+          }
+        },
+        "wlanconfig": {},
+        "wlanendpoint": {},
+        "wlanradio": {},
+        "wlanvap": {}
+      }
+    },
+    "NeMo.async_get_MIBs::lan": {
+      "status": {
+        "base": {
+          "lan": {
+            "Name": "lan",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled up wlanconfig",
+            "ULIntf": {},
+            "LLIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            }
+          },
+          "bridge": {
+            "Name": "bridge",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled bridge netdev ipv4 ipv6 dns-server netdev-bound netdev-up up ipv4-up ipv6-up",
+            "ULIntf": {
+              "lan": {
+                "Name": "lan"
+              }
+            },
+            "LLIntf": {
+              "eth0": {
+                "Name": "eth0"
+              },
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl1": {
+                "Name": "wl1"
+              }
+            }
+          },
+          "eth0": {
+            "ULIntf": {
+              "bridge": {}
+            },
+            "LLIntf": {
+              "swport1": {},
+              "swport2": {},
+              "swport3": {},
+              "swport4": {}
+            }
+          },
+          "swport1": {
+            "Name": "swport1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport2": {
+            "Name": "swport2",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport3": {
+            "Name": "swport3",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport4": {
+            "Name": "swport4",
+            "Enable": true,
+            "Status": true,
+            "Flags": "eth atheth physical enabled up",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl0": {
+            "Name": "wl0",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi0_ath": {
+                "Name": "wifi0_ath"
+              }
+            }
+          },
+          "wifi0_ath": {
+            "Name": "wifi0_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl2": {
+                "Name": "wl2"
+              },
+              "wl3": {
+                "Name": "wl3"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl1": {
+            "Name": "wl1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi1_ath": {
+                "Name": "wifi1_ath"
+              }
+            }
+          },
+          "wifi1_ath": {
+            "Name": "wifi1_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl1": {
+                "Name": "wl1"
+              }
+            },
+            "LLIntf": {}
+          }
+        },
+        "6rd": {},
+        "alias": {
+          "lan": {
+            "Alias": "cpe-lan"
+          },
+          "bridge": {
+            "Alias": "cpe-bridge"
+          },
+          "eth0": {},
+          "swport1": {
+            "Alias": "cpe-swport1"
+          },
+          "swport2": {
+            "Alias": "cpe-swport2"
+          },
+          "swport3": {
+            "Alias": "cpe-swport3"
+          },
+          "swport4": {
+            "Alias": "cpe-swport4"
+          },
+          "wl0": {
+            "Alias": "cpe-wl0"
+          },
+          "wifi0_ath": {
+            "Alias": "cpe-wifi0_ath"
+          },
+          "wl1": {
+            "Alias": "cpe-wl1"
+          },
+          "wifi1_ath": {
+            "Alias": "cpe-wifi1_ath"
+          }
+        },
+        "atm": {},
+        "bridge": {
+          "bridge": {
+            "Ageing": 300
+          }
+        },
+        "copy": {
+          "lan": {},
+          "bridge": {},
+          "eth0": {},
+          "swport1": {},
+          "swport2": {},
+          "swport3": {},
+          "swport4": {},
+          "wl0": {},
+          "wifi0_ath": {},
+          "wl1": {},
+          "wifi1_ath": {}
+        },
+        "dhcp-api": {
+          "lan": {},
+          "bridge": {},
+          "eth0": {},
+          "swport1": {},
+          "swport2": {},
+          "swport3": {},
+          "swport4": {},
+          "wl0": {},
+          "wifi0_ath": {},
+          "wl1": {},
+          "wifi1_ath": {}
+        },
+        "dhcp": {},
+        "dhcpv6": {},
+        "dhcpv6impl": {},
+        "dop-slave": {},
+        "dsl": {},
+        "dslbonding": {},
+        "dslite": {},
+        "dslline": {},
+        "eth": {
+          "swport1": {
+            "LastChangeTime": 0,
+            "LastChange": 0,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 0,
+            "ExternalPhy": false
+          },
+          "swport2": {
+            "LastChangeTime": 87944,
+            "LastChange": 3046921,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 1,
+            "ExternalPhy": false
+          },
+          "swport3": {
+            "LastChangeTime": 0,
+            "LastChange": 0,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 2,
+            "ExternalPhy": false
+          },
+          "swport4": {
+            "LastChangeTime": 66,
+            "LastChange": 3134799,
+            "CurrentBitRate": 1000,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "Full",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 3,
+            "ExternalPhy": false
+          }
+        },
+        "gre": {},
+        "nat": {
+          "bridge": {
+            "NATEnabled": false
+          },
+          "eth0": {},
+          "wl0": {
+            "NATEnabled": false
+          },
+          "wl1": {
+            "NATEnabled": false
+          }
+        },
+        "netdev-api": {
+          "lan": {},
+          "bridge": {},
+          "eth0": {},
+          "swport1": {},
+          "swport2": {},
+          "swport3": {},
+          "swport4": {},
+          "wl0": {},
+          "wifi0_ath": {},
+          "wl1": {},
+          "wifi1_ath": {}
+        },
+        "netdev": {
+          "bridge": {
+            "NetDevIndex": 9,
+            "NetDevType": "ether",
+            "NetDevFlags": "up broadcast promisc multicast",
+            "NetDevName": "bridge",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 0,
+            "MTU": 1500,
+            "NetDevState": "unknown",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 0,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": true,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": true,
+            "IPv6Disable": false,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "",
+            "IPv4Addr": {
+              "lan": {
+                "Enable": true,
+                "Status": "bound",
+                "Address": "**REDACTED**",
+                "Peer": "",
+                "PrefixLen": 21,
+                "Flags": "permanent",
+                "Scope": "global"
+              }
+            },
+            "IPv6Addr": {
+              "dyn2": {
+                "Enable": true,
+                "Status": "dynamic",
+                "Address": "**REDACTED**",
+                "Peer": "",
+                "PrefixLen": 64,
+                "Flags": "permanent",
+                "Scope": "link",
+                "PreferredLifetime": 0,
+                "ValidLifetime": 0
+              }
+            },
+            "IPv4Route": {
+              "localmc": {
+                "Enable": true,
+                "Status": "bound",
+                "DstLen": 16,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": ""
+              },
+              "zeroconf": {
+                "Enable": true,
+                "Status": "bound",
+                "DstLen": 16,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": ""
+              },
+              "dyn3": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 21,
+                "Table": "main",
+                "Scope": "link",
+                "Protocol": "kernel",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": ""
+              },
+              "dyn7": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 8,
+                "Table": "main",
+                "Scope": "link",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 0,
+                "Gateway": ""
+              }
+            },
+            "IPv6Route": {
+              "mdns": {
+                "Enable": true,
+                "Status": "bound",
+                "DstLen": 16,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 1,
+                "Gateway": ""
+              },
+              "ssdp": {
+                "Enable": true,
+                "Status": "bound",
+                "DstLen": 16,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "boot",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 1,
+                "Gateway": ""
+              },
+              "dyn2": {
+                "Enable": true,
+                "Status": "dynamic",
+                "DstLen": 64,
+                "Table": "main",
+                "Scope": "global",
+                "Protocol": "kernel",
+                "Type": "unicast",
+                "Dst": "**REDACTED**",
+                "Priority": 256,
+                "Gateway": ""
+              }
+            }
+          },
+          "eth0": {
+            "IPv4Addr": {},
+            "IPv6Addr": {},
+            "IPv4Route": {},
+            "IPv6Route": {}
+          },
+          "wl0": {
+            "NetDevIndex": 10,
+            "NetDevType": "ether",
+            "NetDevFlags": "broadcast multicast",
+            "NetDevName": "wl0",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 0,
+            "MTU": 1500,
+            "NetDevState": "down",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 0,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": true,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": false,
+            "IPv6Disable": true,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "",
+            "IPv4Addr": {},
+            "IPv6Addr": {},
+            "IPv4Route": {},
+            "IPv6Route": {}
+          },
+          "wl1": {
+            "NetDevIndex": 13,
+            "NetDevType": "ether",
+            "NetDevFlags": "broadcast multicast",
+            "NetDevName": "wl1",
+            "LLAddress": "**REDACTED**",
+            "TxQueueLen": 0,
+            "MTU": 1500,
+            "NetDevState": "down",
+            "IPv4Forwarding": true,
+            "IPv4ForceIGMPVersion": 0,
+            "IPv4AcceptSourceRoute": true,
+            "IPv4AcceptRedirects": false,
+            "IPv6AcceptRA": true,
+            "IPv6ActAsRouter": true,
+            "IPv6AutoConf": true,
+            "IPv6MaxRtrSolicitations": 3,
+            "IPv6RtrSolicitationInterval": 4000,
+            "IPv6AcceptSourceRoute": false,
+            "IPv6AcceptRedirects": true,
+            "IPv6OptimisticDAD": false,
+            "IPv6Disable": true,
+            "RtTable": 0,
+            "IPv6AddrDelegate": "",
+            "IPv4Addr": {},
+            "IPv6Addr": {},
+            "IPv4Route": {},
+            "IPv6Route": {}
+          }
+        },
+        "penable": {
+          "wl0": {
+            "PersistentEnable": true
+          },
+          "wifi0_ath": {
+            "PersistentEnable": false
+          },
+          "wl1": {
+            "PersistentEnable": true
+          },
+          "wifi1_ath": {
+            "PersistentEnable": false
+          }
+        },
+        "ppp": {},
+        "ptm": {},
+        "ra-api": {
+          "lan": {},
+          "bridge": {},
+          "eth0": {},
+          "swport1": {},
+          "swport2": {},
+          "swport3": {},
+          "swport4": {},
+          "wl0": {},
+          "wifi0_ath": {},
+          "wl1": {},
+          "wifi1_ath": {}
+        },
+        "ra": {
+          "bridge": {
+            "IPv6RouterDownTimeout": 0,
+            "IPv6Router": {}
+          }
+        },
+        "switch": {},
+        "vlan": {},
+        "wlanconfig": {
+          "lan": {},
+          "wl0": {},
+          "wifi0_ath": {},
+          "wl1": {},
+          "wifi1_ath": {}
+        },
+        "wlanendpoint": {},
+        "wlanradio": {
+          "wifi0_ath": {
+            "RadioStatus": "Down",
+            "LastChangeTime": 60,
+            "LastChange": 3134805,
+            "MaxBitRate": 0,
+            "SupportedFrequencyBands": "2.4GHz,5GHz,AUTO",
+            "OperatingFrequencyBand": "2.4GHz",
+            "SupportedStandards": "b,g,n,bg,bgn",
+            "OperatingStandards": "bgn",
+            "PossibleChannels": "1,2,3,4,5,6,7,8,9,10,11,12,13",
+            "ChannelsInUse": "",
+            "Channel": 6,
+            "AutoChannelSupported": true,
+            "AutoChannelEnable": true,
+            "AutoChannelRefreshPeriod": 0,
+            "AutoChannelSelecting": false,
+            "ActiveAntennaCtrl": 3,
+            "OperatingChannelBandwidth": "Auto",
+            "ExtensionChannel": "Auto",
+            "GuardInterval": "Auto",
+            "MCS": 10,
+            "TransmitPowerSupported": "0,10,20,30,40,50,60,70,80,90,100",
+            "TransmitPower": -1,
+            "IEEE80211hSupported": false,
+            "IEEE80211hEnabled": false,
+            "RegulatoryDomain": "FR",
+            "ImplicitBeamFormingSupported": false,
+            "ImplicitBeamFormingEnabled": false,
+            "ExplicitBeamFormingSupported": false,
+            "ExplicitBeamFormingEnabled": false,
+            "AirtimeFairnessEnabled": false,
+            "MultiUserMIMOEnabled": false,
+            "DFSChannelChangeEventCounter": 0,
+            "DFSChannelChangeEventTimestamp": "1970-01-01T00:00:00Z",
+            "ChannelChangeReason": "Auto",
+            "ChannelMgt": {
+              "ClearedDfsChannels": "",
+              "RadarTriggeredDfsChannels": "",
+              "Status": false,
+              "ChannelSelectParams": {
+                "DfsWeight": 100,
+                "HighPowerWeight": 100,
+                "ApCountPenalty": 1,
+                "ApCountMaxPenalty": 20,
+                "AvailabilityWeight": 1,
+                "NoiseBonus": 1,
+                "WeightDifference": 50,
+                "LongWaitPenalty": 25
+              },
+              "ChannelSelectConfig": {
+                "EnableDFSChannels": true,
+                "EnableLongWaitChannels": false,
+                "LongWaitOnlyWhenCleared": true,
+                "OnlyNonOverlappingChans": true,
+                "NrMeasurements": 5,
+                "TimeBetweenScans": 900,
+                "TimeBetweenUpdates": 30
+              }
+            }
+          },
+          "wifi1_ath": {
+            "RadioStatus": "Down",
+            "LastChangeTime": 61,
+            "LastChange": 3134804,
+            "MaxBitRate": 0,
+            "SupportedFrequencyBands": "2.4GHz,5GHz,AUTO",
+            "OperatingFrequencyBand": "5GHz",
+            "SupportedStandards": "a,an",
+            "OperatingStandards": "an",
+            "PossibleChannels": "36,40,44,48,52,56,60,64,100,104,108,112,116,120,124,128,132,136,140",
+            "ChannelsInUse": "",
+            "Channel": 36,
+            "AutoChannelSupported": true,
+            "AutoChannelEnable": true,
+            "AutoChannelRefreshPeriod": 0,
+            "AutoChannelSelecting": false,
+            "ActiveAntennaCtrl": 7,
+            "OperatingChannelBandwidth": "Auto",
+            "ExtensionChannel": "Auto",
+            "GuardInterval": "Auto",
+            "MCS": 10,
+            "TransmitPowerSupported": "0,10,20,30,40,50,60,70,80,90,100",
+            "TransmitPower": -1,
+            "IEEE80211hSupported": true,
+            "IEEE80211hEnabled": false,
+            "RegulatoryDomain": "FR",
+            "ImplicitBeamFormingSupported": false,
+            "ImplicitBeamFormingEnabled": false,
+            "ExplicitBeamFormingSupported": false,
+            "ExplicitBeamFormingEnabled": false,
+            "AirtimeFairnessEnabled": false,
+            "MultiUserMIMOEnabled": false,
+            "DFSChannelChangeEventCounter": 0,
+            "DFSChannelChangeEventTimestamp": "1970-01-01T00:00:00Z",
+            "ChannelChangeReason": "Auto",
+            "ChannelMgt": {
+              "ClearedDfsChannels": "",
+              "RadarTriggeredDfsChannels": "",
+              "Status": false,
+              "ChannelSelectParams": {
+                "DfsWeight": 100,
+                "HighPowerWeight": 100,
+                "ApCountPenalty": 1,
+                "ApCountMaxPenalty": 20,
+                "AvailabilityWeight": 1,
+                "NoiseBonus": 1,
+                "WeightDifference": 50,
+                "LongWaitPenalty": 25
+              },
+              "ChannelSelectConfig": {
+                "EnableDFSChannels": true,
+                "EnableLongWaitChannels": false,
+                "LongWaitOnlyWhenCleared": true,
+                "OnlyNonOverlappingChans": true,
+                "NrMeasurements": 5,
+                "TimeBetweenScans": 900,
+                "TimeBetweenUpdates": 30
+              }
+            }
+          }
+        },
+        "wlanvap": {
+          "wl0": {
+            "VAPStatus": "Down",
+            "LastChangeTime": 88,
+            "LastChange": 3134777,
+            "BSSID": "**REDACTED**",
+            "SSID": "**REDACTED**",
+            "SSIDAdvertisementEnabled": true,
+            "RetryLimit": 0,
+            "WMMCapability": true,
+            "UAPSDCapability": true,
+            "WMMEnable": true,
+            "UAPSDEnable": true,
+            "MaxStations": -1,
+            "APBridgeDisable": false,
+            "BridgeInterface": "bridge",
+            "AssociatedDeviceNumberOfEntries": 0,
+            "Security": {
+              "ModesSupported": "None,WEP-64,WEP-128,WEP-128iv,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,E-None,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise",
+              "ModeEnabled": "WPA2-Personal",
+              "WEPKey": "**REDACTED**",
+              "PreSharedKey": "",
+              "KeyPassPhrase": "**REDACTED**",
+              "RekeyingInterval": 3600,
+              "RadiusServerIPAddr": "",
+              "RadiusServerPort": 1812,
+              "RadiusSecret": "",
+              "RadiusDefaultSessionTimeout": 0,
+              "RadiusOwnIPAddress": "",
+              "RadiusNASIdentifier": "",
+              "RadiusCalledStationId": "",
+              "RadiusChargeableUserId": false
+            },
+            "WPS": {
+              "Enable": true,
+              "ConfigMethodsSupported": "Ethernet,Label,Display,PushButton,Keypad,PIN",
+              "ConfigMethodsEnabled": "PushButton,Label,Ethernet",
+              "SelfPIN": "**REDACTED**",
+              "Configured": true,
+              "PairingInProgress": false
+            },
+            "MACFiltering": {
+              "Mode": "Off",
+              "Entry": {
+                "38:00:25:29:66:16": {
+                  "MACAddress": "**REDACTED**"
+                },
+                "80:38:fb:c1:34:69": {
+                  "MACAddress": "**REDACTED**"
+                }
+              }
+            },
+            "HotSpot2": {
+              "Enable": false,
+              "DgafDisable": false,
+              "L2TrafficInspect": true,
+              "IcmpV4Echo": true,
+              "Interworking": true,
+              "Internet": false,
+              "Hs2Ie": false,
+              "P2PEnable": false,
+              "GasDelay": 0,
+              "AccessNetworkType": 2,
+              "VenueType": 8,
+              "VenueGroup": 2
+            },
+            "AssociatedDevice": {}
+          },
+          "wl1": {
+            "VAPStatus": "Down",
+            "LastChangeTime": 78,
+            "LastChange": 3134787,
+            "BSSID": "**REDACTED**",
+            "SSID": "**REDACTED**",
+            "SSIDAdvertisementEnabled": true,
+            "RetryLimit": 0,
+            "WMMCapability": true,
+            "UAPSDCapability": true,
+            "WMMEnable": true,
+            "UAPSDEnable": true,
+            "MaxStations": -1,
+            "APBridgeDisable": false,
+            "BridgeInterface": "bridge",
+            "AssociatedDeviceNumberOfEntries": 0,
+            "Security": {
+              "ModesSupported": "None,WEP-64,WEP-128,WEP-128iv,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,E-None,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise",
+              "ModeEnabled": "WPA2-Personal",
+              "WEPKey": "**REDACTED**",
+              "PreSharedKey": "",
+              "KeyPassPhrase": "**REDACTED**",
+              "RekeyingInterval": 3600,
+              "RadiusServerIPAddr": "",
+              "RadiusServerPort": 1812,
+              "RadiusSecret": "",
+              "RadiusDefaultSessionTimeout": 0,
+              "RadiusOwnIPAddress": "",
+              "RadiusNASIdentifier": "",
+              "RadiusCalledStationId": "",
+              "RadiusChargeableUserId": false
+            },
+            "WPS": {
+              "Enable": true,
+              "ConfigMethodsSupported": "Ethernet,Label,Display,PushButton,Keypad,PIN",
+              "ConfigMethodsEnabled": "PushButton,Label,Ethernet",
+              "SelfPIN": "**REDACTED**",
+              "Configured": true,
+              "PairingInProgress": false
+            },
+            "MACFiltering": {
+              "Mode": "Off",
+              "Entry": {
+                "38:00:25:29:66:16": {
+                  "MACAddress": "**REDACTED**"
+                },
+                "80:38:fb:c1:34:69": {
+                  "MACAddress": "**REDACTED**"
+                }
+              }
+            },
+            "HotSpot2": {
+              "Enable": false,
+              "DgafDisable": false,
+              "L2TrafficInspect": true,
+              "IcmpV4Echo": true,
+              "Interworking": true,
+              "Internet": false,
+              "Hs2Ie": false,
+              "P2PEnable": false,
+              "GasDelay": 0,
+              "AccessNetworkType": 2,
+              "VenueType": 8,
+              "VenueGroup": 2
+            },
+            "AssociatedDevice": {}
+          }
+        }
+      }
+    },
+    "NeMo.async_get_MIBs::veip0": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.veip0'}]",
+    "NeMo.async_get_MIBs::lan_{'mibs': 'base eth'}": {
+      "status": {
+        "base": {
+          "lan": {
+            "Name": "lan",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled up wlanconfig",
+            "ULIntf": {},
+            "LLIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            }
+          },
+          "bridge": {
+            "Name": "bridge",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled bridge netdev ipv4 ipv6 dns-server netdev-bound netdev-up up ipv4-up ipv6-up",
+            "ULIntf": {
+              "lan": {
+                "Name": "lan"
+              }
+            },
+            "LLIntf": {
+              "eth0": {
+                "Name": "eth0"
+              },
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl1": {
+                "Name": "wl1"
+              }
+            }
+          },
+          "eth0": {
+            "ULIntf": {
+              "bridge": {}
+            },
+            "LLIntf": {
+              "swport1": {},
+              "swport2": {},
+              "swport3": {},
+              "swport4": {}
+            }
+          },
+          "swport1": {
+            "Name": "swport1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport2": {
+            "Name": "swport2",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport3": {
+            "Name": "swport3",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport4": {
+            "Name": "swport4",
+            "Enable": true,
+            "Status": true,
+            "Flags": "eth atheth physical enabled up",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl0": {
+            "Name": "wl0",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi0_ath": {
+                "Name": "wifi0_ath"
+              }
+            }
+          },
+          "wifi0_ath": {
+            "Name": "wifi0_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl2": {
+                "Name": "wl2"
+              },
+              "wl3": {
+                "Name": "wl3"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl1": {
+            "Name": "wl1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi1_ath": {
+                "Name": "wifi1_ath"
+              }
+            }
+          },
+          "wifi1_ath": {
+            "Name": "wifi1_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl1": {
+                "Name": "wl1"
+              }
+            },
+            "LLIntf": {}
+          }
+        },
+        "eth": {
+          "swport1": {
+            "LastChangeTime": 0,
+            "LastChange": 0,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 0,
+            "ExternalPhy": false
+          },
+          "swport2": {
+            "LastChangeTime": 87944,
+            "LastChange": 3046921,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 1,
+            "ExternalPhy": false
+          },
+          "swport3": {
+            "LastChangeTime": 0,
+            "LastChange": 0,
+            "CurrentBitRate": -1,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "None",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 2,
+            "ExternalPhy": false
+          },
+          "swport4": {
+            "LastChangeTime": 66,
+            "LastChange": 3134799,
+            "CurrentBitRate": 1000,
+            "MaxBitRateSupported": 1000,
+            "MaxBitRateEnabled": -1,
+            "CurrentDuplexMode": "Full",
+            "DuplexModeEnabled": "Auto",
+            "PowerSavingSupported": false,
+            "PowerSavingEnabled": false,
+            "PhyDevice": "eth0",
+            "PhyId": 3,
+            "ExternalPhy": false
+          }
+        }
+      }
+    },
+    "NeMo.async_get_MIBs::guest_{'mibs': 'base wlanradio wlanvap'}": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.guest'}]",
+    "NeMo.async_get_MIBs::lan_{'mibs': 'base wlanradio wlanvap'}": {
+      "status": {
+        "base": {
+          "lan": {
+            "Name": "lan",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled up wlanconfig",
+            "ULIntf": {},
+            "LLIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            }
+          },
+          "bridge": {
+            "Name": "bridge",
+            "Enable": true,
+            "Status": true,
+            "Flags": "enabled bridge netdev ipv4 ipv6 dns-server netdev-bound netdev-up up ipv4-up ipv6-up",
+            "ULIntf": {
+              "lan": {
+                "Name": "lan"
+              }
+            },
+            "LLIntf": {
+              "eth0": {
+                "Name": "eth0"
+              },
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl1": {
+                "Name": "wl1"
+              }
+            }
+          },
+          "eth0": {
+            "ULIntf": {
+              "bridge": {}
+            },
+            "LLIntf": {
+              "swport1": {},
+              "swport2": {},
+              "swport3": {},
+              "swport4": {}
+            }
+          },
+          "swport1": {
+            "Name": "swport1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport2": {
+            "Name": "swport2",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport3": {
+            "Name": "swport3",
+            "Enable": true,
+            "Status": false,
+            "Flags": "eth atheth physical enabled",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "swport4": {
+            "Name": "swport4",
+            "Enable": true,
+            "Status": true,
+            "Flags": "eth atheth physical enabled up",
+            "ULIntf": {
+              "eth0": {
+                "Name": "eth0"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl0": {
+            "Name": "wl0",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi0_ath": {
+                "Name": "wifi0_ath"
+              }
+            }
+          },
+          "wifi0_ath": {
+            "Name": "wifi0_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl0": {
+                "Name": "wl0"
+              },
+              "wl2": {
+                "Name": "wl2"
+              },
+              "wl3": {
+                "Name": "wl3"
+              }
+            },
+            "LLIntf": {}
+          },
+          "wl1": {
+            "Name": "wl1",
+            "Enable": true,
+            "Status": false,
+            "Flags": "wlanvap penable netdev enabled wlanvap-bound wlansta netdev-bound inbridge",
+            "ULIntf": {
+              "bridge": {
+                "Name": "bridge"
+              }
+            },
+            "LLIntf": {
+              "wifi1_ath": {
+                "Name": "wifi1_ath"
+              }
+            }
+          },
+          "wifi1_ath": {
+            "Name": "wifi1_ath",
+            "Enable": false,
+            "Status": false,
+            "Flags": "wlanradio penable physical wlanradio-bound",
+            "ULIntf": {
+              "wl1": {
+                "Name": "wl1"
+              }
+            },
+            "LLIntf": {}
+          }
+        },
+        "wlanradio": {
+          "wifi0_ath": {
+            "RadioStatus": "Down",
+            "LastChangeTime": 60,
+            "LastChange": 3134805,
+            "MaxBitRate": 0,
+            "SupportedFrequencyBands": "2.4GHz,5GHz,AUTO",
+            "OperatingFrequencyBand": "2.4GHz",
+            "SupportedStandards": "b,g,n,bg,bgn",
+            "OperatingStandards": "bgn",
+            "PossibleChannels": "1,2,3,4,5,6,7,8,9,10,11,12,13",
+            "ChannelsInUse": "",
+            "Channel": 6,
+            "AutoChannelSupported": true,
+            "AutoChannelEnable": true,
+            "AutoChannelRefreshPeriod": 0,
+            "AutoChannelSelecting": false,
+            "ActiveAntennaCtrl": 3,
+            "OperatingChannelBandwidth": "Auto",
+            "ExtensionChannel": "Auto",
+            "GuardInterval": "Auto",
+            "MCS": 10,
+            "TransmitPowerSupported": "0,10,20,30,40,50,60,70,80,90,100",
+            "TransmitPower": -1,
+            "IEEE80211hSupported": false,
+            "IEEE80211hEnabled": false,
+            "RegulatoryDomain": "FR",
+            "ImplicitBeamFormingSupported": false,
+            "ImplicitBeamFormingEnabled": false,
+            "ExplicitBeamFormingSupported": false,
+            "ExplicitBeamFormingEnabled": false,
+            "AirtimeFairnessEnabled": false,
+            "MultiUserMIMOEnabled": false,
+            "DFSChannelChangeEventCounter": 0,
+            "DFSChannelChangeEventTimestamp": "1970-01-01T00:00:00Z",
+            "ChannelChangeReason": "Auto",
+            "ChannelMgt": {
+              "ClearedDfsChannels": "",
+              "RadarTriggeredDfsChannels": "",
+              "Status": false,
+              "ChannelSelectParams": {
+                "DfsWeight": 100,
+                "HighPowerWeight": 100,
+                "ApCountPenalty": 1,
+                "ApCountMaxPenalty": 20,
+                "AvailabilityWeight": 1,
+                "NoiseBonus": 1,
+                "WeightDifference": 50,
+                "LongWaitPenalty": 25
+              },
+              "ChannelSelectConfig": {
+                "EnableDFSChannels": true,
+                "EnableLongWaitChannels": false,
+                "LongWaitOnlyWhenCleared": true,
+                "OnlyNonOverlappingChans": true,
+                "NrMeasurements": 5,
+                "TimeBetweenScans": 900,
+                "TimeBetweenUpdates": 30
+              }
+            }
+          },
+          "wifi1_ath": {
+            "RadioStatus": "Down",
+            "LastChangeTime": 61,
+            "LastChange": 3134804,
+            "MaxBitRate": 0,
+            "SupportedFrequencyBands": "2.4GHz,5GHz,AUTO",
+            "OperatingFrequencyBand": "5GHz",
+            "SupportedStandards": "a,an",
+            "OperatingStandards": "an",
+            "PossibleChannels": "36,40,44,48,52,56,60,64,100,104,108,112,116,120,124,128,132,136,140",
+            "ChannelsInUse": "",
+            "Channel": 36,
+            "AutoChannelSupported": true,
+            "AutoChannelEnable": true,
+            "AutoChannelRefreshPeriod": 0,
+            "AutoChannelSelecting": false,
+            "ActiveAntennaCtrl": 7,
+            "OperatingChannelBandwidth": "Auto",
+            "ExtensionChannel": "Auto",
+            "GuardInterval": "Auto",
+            "MCS": 10,
+            "TransmitPowerSupported": "0,10,20,30,40,50,60,70,80,90,100",
+            "TransmitPower": -1,
+            "IEEE80211hSupported": true,
+            "IEEE80211hEnabled": false,
+            "RegulatoryDomain": "FR",
+            "ImplicitBeamFormingSupported": false,
+            "ImplicitBeamFormingEnabled": false,
+            "ExplicitBeamFormingSupported": false,
+            "ExplicitBeamFormingEnabled": false,
+            "AirtimeFairnessEnabled": false,
+            "MultiUserMIMOEnabled": false,
+            "DFSChannelChangeEventCounter": 0,
+            "DFSChannelChangeEventTimestamp": "1970-01-01T00:00:00Z",
+            "ChannelChangeReason": "Auto",
+            "ChannelMgt": {
+              "ClearedDfsChannels": "",
+              "RadarTriggeredDfsChannels": "",
+              "Status": false,
+              "ChannelSelectParams": {
+                "DfsWeight": 100,
+                "HighPowerWeight": 100,
+                "ApCountPenalty": 1,
+                "ApCountMaxPenalty": 20,
+                "AvailabilityWeight": 1,
+                "NoiseBonus": 1,
+                "WeightDifference": 50,
+                "LongWaitPenalty": 25
+              },
+              "ChannelSelectConfig": {
+                "EnableDFSChannels": true,
+                "EnableLongWaitChannels": false,
+                "LongWaitOnlyWhenCleared": true,
+                "OnlyNonOverlappingChans": true,
+                "NrMeasurements": 5,
+                "TimeBetweenScans": 900,
+                "TimeBetweenUpdates": 30
+              }
+            }
+          }
+        },
+        "wlanvap": {
+          "wl0": {
+            "VAPStatus": "Down",
+            "LastChangeTime": 88,
+            "LastChange": 3134777,
+            "BSSID": "**REDACTED**",
+            "SSID": "**REDACTED**",
+            "SSIDAdvertisementEnabled": true,
+            "RetryLimit": 0,
+            "WMMCapability": true,
+            "UAPSDCapability": true,
+            "WMMEnable": true,
+            "UAPSDEnable": true,
+            "MaxStations": -1,
+            "APBridgeDisable": false,
+            "BridgeInterface": "bridge",
+            "AssociatedDeviceNumberOfEntries": 0,
+            "Security": {
+              "ModesSupported": "None,WEP-64,WEP-128,WEP-128iv,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,E-None,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise",
+              "ModeEnabled": "WPA2-Personal",
+              "WEPKey": "**REDACTED**",
+              "PreSharedKey": "",
+              "KeyPassPhrase": "**REDACTED**",
+              "RekeyingInterval": 3600,
+              "RadiusServerIPAddr": "",
+              "RadiusServerPort": 1812,
+              "RadiusSecret": "",
+              "RadiusDefaultSessionTimeout": 0,
+              "RadiusOwnIPAddress": "",
+              "RadiusNASIdentifier": "",
+              "RadiusCalledStationId": "",
+              "RadiusChargeableUserId": false
+            },
+            "WPS": {
+              "Enable": true,
+              "ConfigMethodsSupported": "Ethernet,Label,Display,PushButton,Keypad,PIN",
+              "ConfigMethodsEnabled": "PushButton,Label,Ethernet",
+              "SelfPIN": "**REDACTED**",
+              "Configured": true,
+              "PairingInProgress": false
+            },
+            "MACFiltering": {
+              "Mode": "Off",
+              "Entry": {
+                "38:00:25:29:66:16": {
+                  "MACAddress": "**REDACTED**"
+                },
+                "80:38:fb:c1:34:69": {
+                  "MACAddress": "**REDACTED**"
+                }
+              }
+            },
+            "HotSpot2": {
+              "Enable": false,
+              "DgafDisable": false,
+              "L2TrafficInspect": true,
+              "IcmpV4Echo": true,
+              "Interworking": true,
+              "Internet": false,
+              "Hs2Ie": false,
+              "P2PEnable": false,
+              "GasDelay": 0,
+              "AccessNetworkType": 2,
+              "VenueType": 8,
+              "VenueGroup": 2
+            },
+            "AssociatedDevice": {}
+          },
+          "wl1": {
+            "VAPStatus": "Down",
+            "LastChangeTime": 78,
+            "LastChange": 3134788,
+            "BSSID": "**REDACTED**",
+            "SSID": "**REDACTED**",
+            "SSIDAdvertisementEnabled": true,
+            "RetryLimit": 0,
+            "WMMCapability": true,
+            "UAPSDCapability": true,
+            "WMMEnable": true,
+            "UAPSDEnable": true,
+            "MaxStations": -1,
+            "APBridgeDisable": false,
+            "BridgeInterface": "bridge",
+            "AssociatedDeviceNumberOfEntries": 0,
+            "Security": {
+              "ModesSupported": "None,WEP-64,WEP-128,WEP-128iv,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,E-None,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise",
+              "ModeEnabled": "WPA2-Personal",
+              "WEPKey": "**REDACTED**",
+              "PreSharedKey": "",
+              "KeyPassPhrase": "**REDACTED**",
+              "RekeyingInterval": 3600,
+              "RadiusServerIPAddr": "",
+              "RadiusServerPort": 1812,
+              "RadiusSecret": "",
+              "RadiusDefaultSessionTimeout": 0,
+              "RadiusOwnIPAddress": "",
+              "RadiusNASIdentifier": "",
+              "RadiusCalledStationId": "",
+              "RadiusChargeableUserId": false
+            },
+            "WPS": {
+              "Enable": true,
+              "ConfigMethodsSupported": "Ethernet,Label,Display,PushButton,Keypad,PIN",
+              "ConfigMethodsEnabled": "PushButton,Label,Ethernet",
+              "SelfPIN": "**REDACTED**",
+              "Configured": true,
+              "PairingInProgress": false
+            },
+            "MACFiltering": {
+              "Mode": "Off",
+              "Entry": {
+                "38:00:25:29:66:16": {
+                  "MACAddress": "**REDACTED**"
+                },
+                "80:38:fb:c1:34:69": {
+                  "MACAddress": "**REDACTED**"
+                }
+              }
+            },
+            "HotSpot2": {
+              "Enable": false,
+              "DgafDisable": false,
+              "L2TrafficInspect": true,
+              "IcmpV4Echo": true,
+              "Interworking": true,
+              "Internet": false,
+              "Hs2Ie": false,
+              "P2PEnable": false,
+              "GasDelay": 0,
+              "AccessNetworkType": 2,
+              "VenueType": 8,
+              "VenueGroup": 2
+            },
+            "AssociatedDevice": {}
+          }
+        }
+      }
+    },
+    "NeMo.async_get_net_dev_stats::ETH0": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.ETH0'}]",
+    "NeMo.async_get_net_dev_stats::ETH1": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.ETH1'}]",
+    "NeMo.async_get_net_dev_stats::ETH2": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.ETH2'}]",
+    "NeMo.async_get_net_dev_stats::veip0": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.veip0'}]",
+    "NeMo.async_get_net_dev_stats::vap2g0priv": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.vap2g0priv'}]",
+    "NeMo.async_get_net_dev_stats::vap5g0priv": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'NeMo.Intf.vap5g0priv'}]",
+    "NeMo.async_get_dsl0_line_stats": {
+      "status": {
+        "stats": {
+          "BytesSent": 1,
+          "BytesReceived": 1,
+          "PacketsSent": 1,
+          "PacketsReceived": 1,
+          "ErrorsSent": 1,
+          "ErrorsReceived": 1
+        },
+        "Total": {
+          "ErroredSecs": 0,
+          "SeverelyErroredSecs": 0,
+          "LOS": 0,
+          "LOF": 0,
+          "UAS": 0,
+          "LOM": 0
+        },
+        "Showtime": {
+          "ErroredSecs": 0,
+          "SeverelyErroredSecs": 0,
+          "LOS": 0,
+          "LOF": 0,
+          "UAS": 0,
+          "LOM": 0
+        },
+        "LastShowtime": {
+          "ErroredSecs": 0,
+          "SeverelyErroredSecs": 0,
+          "LOS": 0,
+          "LOF": 0,
+          "UAS": 0,
+          "LOM": 0
+        },
+        "CurrentDay": {
+          "ErroredSecs": 0,
+          "SeverelyErroredSecs": 0,
+          "LOS": 0,
+          "LOF": 0,
+          "UAS": 0,
+          "LOM": 0
+        },
+        "QuarterHour": {
+          "ErroredSecs": 0,
+          "SeverelyErroredSecs": 0,
+          "LOS": 0,
+          "LOF": 0,
+          "UAS": 0,
+          "LOM": 0
+        }
+      }
+    },
+    "SFP.async_get": {},
+    "Firewall.async_get_protocol_forwarding": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getProtocolForwarding'}]",
+    "Firewall.async_get_port_forwarding": {
+      "status": {}
+    },
+    "UPnPIGD.async_get": {
+      "status": {
+        "Enable": true,
+        "WANAccessProvider": "Orange Livebox",
+        "ModelNumber": "3",
+        "ModelName": "Residential Livebox,(DSL,WAN Ethernet)",
+        "FriendlyName": "Orange Livebox"
+      }
+    },
+    "Schedule.async_get_scheduletypes": {
+      "status": true,
+      "data": {
+        "types": ["ToD", "WLAN"]
+      }
+    },
+    "Dhcp.async_get_dhcp_pool": {
+      "status": {
+        "default": {
+          "Enable": false,
+          "Name": "default",
+          "Status": "Disabled",
+          "Allocation": "dynamic",
+          "PersistentLeases": false,
+          "LeasesOnHold": false,
+          "ARPProtect": false,
+          "Interface": "bridge",
+          "MinAddress": "**REDACTED**",
+          "MaxAddress": "**REDACTED**",
+          "SubnetMask": "**REDACTED**",
+          "IPRouters": "**REDACTED**",
+          "Server": "10.0.32.4",
+          "MinLeaseTime": 0,
+          "LeaseTime": 86400,
+          "MaxLeaseTime": 86400,
+          "DNSServers": "10.0.32.4",
+          "DomainName": "home",
+          "Unnumbered": false,
+          "IncludeOption125": true,
+          "Flags": 0,
+          "ServerHostName": "",
+          "FileName": "",
+          "LeaseNumberOfEntries": 0,
+          "RuleNumberOfEntries": 1,
+          "OptionNumberOfEntries": 1
+        }
+      }
+    },
+    "Dhcp.async_get_dhcp_leases": {
+      "status": {
+        "default": {}
+      }
+    },
+    "Dhcp.async_get_dhcp_leases::None_guest": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'DHCPv4.Server.Pool.guest'}]",
+    "Dhcp.async_get_dhcp_staticleases": {
+      "status": []
+    },
+    "Dhcp.async_get_dhcp6_status": {
+      "status": "Disabled"
+    },
+    "DynDNS.async_get_hosts": {
+      "status": []
+    },
+    "DynDNS.async_get_services": {
+      "status": ["dyndns", "No-IP", "ChangeIP", "DNSdynamic"]
+    },
+    "DynDNS.async_get_global_enable": {
+      "status": true
+    },
+    "UserInterface.async_get_language": {
+      "status": "fr",
+      "data": {
+        "availableLanguages": ["en", "fr"]
+      }
+    },
+    "UserInterface.async_get_state": {
+      "status": "connected"
+    },
+    "HomeLan.async_get_interface": {
+      "status": {
+        "wl0": {
+          "FriendlyName": "802.11-2.4GHz",
+          "Name": "wl0",
+          "NumberOfStoredMeasures": 0
+        },
+        "wl1": {
+          "FriendlyName": "802.11-5GHz",
+          "Name": "wl1",
+          "NumberOfStoredMeasures": 0
+        },
+        "wl2": {
+          "FriendlyName": "Orange",
+          "Name": "wl2",
+          "NumberOfStoredMeasures": 0
+        },
+        "wl3": {
+          "FriendlyName": "Orange_autoconnect",
+          "Name": "wl3",
+          "NumberOfStoredMeasures": 0
+        },
+        "swport1": {
+          "FriendlyName": "Ethernet1",
+          "Name": "swport1",
+          "NumberOfStoredMeasures": 0
+        },
+        "swport2": {
+          "FriendlyName": "Ethernet2",
+          "Name": "swport2",
+          "NumberOfStoredMeasures": 0
+        },
+        "swport3": {
+          "FriendlyName": "Ethernet3",
+          "Name": "swport3",
+          "NumberOfStoredMeasures": 0
+        },
+        "swport4": {
+          "FriendlyName": "Ethernet4",
+          "Name": "swport4",
+          "NumberOfStoredMeasures": 2880
+        },
+        "wan": {
+          "FriendlyName": "Optical ONT",
+          "Name": "eth1",
+          "NumberOfStoredMeasures": 2880
+        }
+      }
+    },
+    "HomeLan.async_get_maxnumber_records": {
+      "status": 2880
+    },
+    "HomeLan.async_get_reading_interval": {
+      "status": 30
+    },
+    "HomeLan.async_get_devices_reading_interval": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getDevicesReadingInterval'}]",
+    "HomeLan.async_get_devices_status": "Exception: [{'error': 196618, 'description': 'Object or parameter not found', 'info': 'getDevicesStatus'}]",
+    "Screen.async_get_show_wifi_password": {
+      "status": true
+    },
+    "PnP.async_get": {
+      "status": {
+        "Status": "Disabled",
+        "LastName": "",
+        "FirstName": "",
+        "MobilePhoneNumber": "",
+        "ServerURL": "https://g2.spnp.orange.com",
+        "WakeUpURL": "",
+        "ValidationDomain": "se-connecter-au-reseau.orange.com",
+        "WakeUpPort": 52804,
+        "ConnectionMode": "",
+        "Enable": false
+      }
+    },
+    "IoTService.async_get_status": {},
+    "Time.async_get_time": {
+      "status": true,
+      "data": {
+        "time": "Sat, 14 Mar 2026 10:40:28 GMT+0100"
+      }
+    },
+    "Time.async_get_utctime": {
+      "status": null,
+      "data": {
+        "time": "Sat, 14 Mar 2026 09:40:28"
+      }
+    },
+    "Time.async_get_status": {
+      "status": null,
+      "data": {
+        "status": "Synchronized"
+      }
+    },
+    "Time.async_get_ntp": {
+      "status": null,
+      "data": {
+        "servers": {
+          "1": "thotfr1.orange.com",
+          "2": "thotfr2.orange.com",
+          "3": "",
+          "4": "",
+          "5": ""
+        }
+      }
+    },
+    "Time.async_get_localtime_zonename": {
+      "status": true,
+      "data": {
+        "timezone": "Paris"
+      }
+    },
+    "Nmc.async_get": {
+      "status": {
+        "WanModeList": "DSL_PPP;DSL_DHCP;VDSL_PPP;VDSL_DHCP;Ethernet_PPP;Ethernet_DHCP",
+        "WanMode": "Ethernet_DHCP",
+        "Username": "**REDACTED**",
+        "FactoryResetScheduled": false,
+        "ConnectionError": false,
+        "RunMode": "",
+        "DefaultsLoaded": true,
+        "ProvisioningState": "done",
+        "OfferType": "Res",
+        "IPTVMode": "Internet"
+      }
+    },
+    "Nmc.async_get_wifi": {
+      "status": {
+        "Enable": false,
+        "Status": false,
+        "ConfigurationMode": true,
+        "BGNUserBandwidth": "Auto"
+      }
+    },
+    "Nmc.async_get_guest_wifi": {
+      "status": {
+        "Enable": false,
+        "Status": "Disabled",
+        "ActivationTimeout": 0,
+        "ActivationDuration": 0,
+        "StartTime": "0001-01-01T00:00:00Z",
+        "ValidTime": "0001-01-01T00:00:00Z"
+      }
+    },
+    "Nmc.async_get_wifi_stats": {
+      "status": null,
+      "data": {
+        "RxBytes": 0,
+        "TxBytes": 0
+      }
+    },
+    "Nmc.async_get_lan_ip": {
+      "status": null,
+      "data": {
+        "Address": "**REDACTED**",
+        "Netmask": "**REDACTED**",
+        "DHCPEnable": false,
+        "DHCPMinAddress": "**REDACTED**",
+        "DHCPMaxAddress": "**REDACTED**"
+      }
+    },
+    "Nmc.async_get_wanmodelist": {
+      "status": "DSL_PPP;DSL_DHCP;VDSL_PPP;VDSL_DHCP;Ethernet_PPP;Ethernet_DHCP"
+    },
+    "Nmc.async_get_wan_status": {
+      "status": true,
+      "data": {
+        "WanState": "up",
+        "LinkType": "ethernet",
+        "LinkState": "up",
+        "MACAddress": "**REDACTED**",
+        "Protocol": "dhcp",
+        "ConnectionState": "Bound",
+        "LastConnectionError": "None",
+        "IPAddress": "**REDACTED**",
+        "RemoteGateway": "**REDACTED**",
+        "DNSServers": "81.253.149.6,80.10.246.136",
+        "IPv6Address": ""
+      }
+    },
+    "Nmc.async_update_versioninfo": {
+      "status": true
+    },
+    "Nmc.async_get_network": {
+      "status": {
+        "Enable": true,
+        "ConfigDate": "2026-02-06T04:08:30Z",
+        "Status": "Enabled"
+      }
+    },
+    "Nmc.async_get_iptv_status": {
+      "status": null,
+      "data": {
+        "IPTVStatus": "Available"
+      }
+    },
+    "Nmc.async_get_iptv_config": {
+      "status": [
+        {
+          "ChannelStatus": true,
+          "ChannelType": "VLAN",
+          "ChannelNumber": "840",
+          "ChannelFlags": "Multicast Zapping"
+        },
+        {
+          "ChannelStatus": true,
+          "ChannelType": "VLAN",
+          "ChannelNumber": "832",
+          "ChannelFlags": "VOD"
+        }
+      ]
+    },
+    "Nmc.async_get_iptv_multi_screens": {
+      "status": null,
+      "data": {
+        "Enable": false
+      }
+    },
+    "Nmc.async_autodetect": {
+      "status": {
+        "FirstBoot": false,
+        "LastConnectionError": "0000"
+      }
+    },
+    "Nmc.async_get_remote_access": {
+      "status": {
+        "username": "",
+        "timeout": 0,
+        "timeleft": 0,
+        "port": 0,
+        "sourcePrefix": "",
+        "enable": false
+      }
+    },
+    "UserManagement.async_get_users": {
+      "status": [
+        {
+          "name": "admin",
+          "enable": true,
+          "type": "system",
+          "linux_user": false,
+          "friendlyname": "",
+          "passwordstate": 0,
+          "groups": ["http", "admin"]
+        },
+        {
+          "name": "cwmpd",
+          "enable": true,
+          "type": "system",
+          "linux_user": false,
+          "friendlyname": "",
+          "passwordstate": 1,
+          "groups": []
+        }
+      ]
+    },
+    "UserManagement.async_get_groups": {
+      "status": [
+        {
+          "name": "http",
+          "enable": true
+        },
+        {
+          "name": "admin",
+          "enable": true
+        },
+        {
+          "name": "remoteadmin",
+          "enable": true
+        }
+      ]
+    },
+    "RemoteAccess.async_get": {
+      "status": {
+        "PortMode": "RANDOM",
+        "AllowedPorts": "",
+        "Port": 0,
+        "SupportedProtocols": "HTTPS",
+        "Protocol": "HTTPS",
+        "Timeout": 0,
+        "TimeLeft": 0,
+        "Interface": "data",
+        "EnableTime": "0001-01-01T00:00:00Z",
+        "DisabledAtStartup": false,
+        "ForcePortFailure": 0,
+        "EmulateHTTPService": false,
+        "Enable": false
+      }
+    },
+    "OrangeRemoteAccess.async_get": {
+      "status": {
+        "Enable": true,
+        "Activate": true,
+        "Status": false
+      }
+    },
+    "SpeedTest.async_get_wan_results": {},
+    "Devices.async_get_devices": {
+      "status": [
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "import",
+          "Name": "Dresde",
+          "DeviceType": "stb",
+          "Active": true,
+          "Tags": "lan edev mac physical eth ipv4 ipv6",
+          "FirstSeen": "2026-02-06T02:54:41Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-12T23:21:04Z",
+          "Master": "",
+          "IPAddress": "",
+          "IPAddressSource": "",
+          "Location": "",
+          "PhysAddress": "**REDACTED**",
+          "Ageing": false,
+          "Layer2Interface": "eth0",
+          "InterfaceName": "eth0",
+          "MACVendor": "",
+          "Owner": "",
+          "Index": "1",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "setType",
+              "Name": "Edit Type",
+              "Arguments": [
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            }
+          ],
+          "Names": [
+            {
+              "Name": "PC-12",
+              "Source": "default"
+            },
+            {
+              "Name": "Dresde",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "stb",
+              "Source": "webui"
+            }
+          ],
+          "IPv4Address": [],
+          "IPv6Address": "**REDACTED**",
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "import",
+          "Name": "Netgear",
+          "DeviceType": "homepoint",
+          "Active": true,
+          "Tags": "lan edev mac physical eth",
+          "FirstSeen": "2026-02-06T02:54:41Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "Location": "",
+          "PhysAddress": "**REDACTED**",
+          "Ageing": false,
+          "Layer2Interface": "eth0",
+          "InterfaceName": "eth0",
+          "MACVendor": "",
+          "Owner": "",
+          "Index": "2",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "setType",
+              "Name": "Edit Type",
+              "Arguments": [
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            }
+          ],
+          "Names": [
+            {
+              "Name": "PC-13",
+              "Source": "default"
+            },
+            {
+              "Name": "Netgear",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "homepoint",
+              "Source": "webui"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "import",
+          "Name": "Steyr",
+          "DeviceType": "stb",
+          "Active": true,
+          "Tags": "lan edev mac physical eth ipv4 ipv6",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-11T10:12:08Z",
+          "Master": "",
+          "IPAddress": "**REDACTED**",
+          "IPAddressSource": "Static",
+          "Location": "",
+          "PhysAddress": "**REDACTED**",
+          "Ageing": false,
+          "Layer2Interface": "eth0",
+          "InterfaceName": "eth0",
+          "MACVendor": "",
+          "Owner": "",
+          "Index": "3",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "setType",
+              "Name": "Edit Type",
+              "Arguments": [
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            }
+          ],
+          "Names": [
+            {
+              "Name": "PC-86",
+              "Source": "default"
+            },
+            {
+              "Name": "Steyr",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "stb",
+              "Source": "webui"
+            }
+          ],
+          "IPv4Address": [
+            {
+              "Address": "**REDACTED**",
+              "Status": "reachable",
+              "Scope": "global",
+              "AddressSource": "Static",
+              "Reserved": false
+            }
+          ],
+          "IPv6Address": "**REDACTED**",
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "import",
+          "Name": "CARP",
+          "DeviceType": "stb",
+          "Active": true,
+          "Tags": "lan edev mac physical eth",
+          "FirstSeen": "2026-02-06T02:54:41Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "Location": "",
+          "PhysAddress": "**REDACTED**",
+          "Ageing": false,
+          "Layer2Interface": "eth0",
+          "InterfaceName": "eth0",
+          "MACVendor": "",
+          "Owner": "",
+          "Index": "4",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "setType",
+              "Name": "Edit Type",
+              "Arguments": [
+                {
+                  "Name": "type",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            }
+          ],
+          "Names": [
+            {
+              "Name": "PC-121",
+              "Source": "default"
+            },
+            {
+              "Name": "CARP",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "stb",
+              "Source": "webui"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selfhgw",
+          "Name": "LIVEBOX",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self hgw physical wan",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "0001-01-01T00:00:00Z",
+          "LastChanged": "2026-03-05T00:30:54Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "Manufacturer": "Sagemcom",
+          "ModelName": "SagemcomFast3965_LB2.8",
+          "Description": "SagemcomFast3965_LB2.8 Sagemcom fr",
+          "SerialNumber": "**REDACTED**",
+          "ProductClass": "Livebox 3",
+          "HardwareVersion": "SG_LB3_1.2.4",
+          "SoftwareVersion": "SG30_sip-fr-7.52.10.1",
+          "BootLoaderVersion": "",
+          "FirewallLevel": "Medium",
+          "LinkType": "ethernet",
+          "LinkState": "up",
+          "ConnectionProtocol": "dhcp",
+          "ConnectionState": "Bound",
+          "LastConnectionError": "None",
+          "ConnectionIPv4Address": "**REDACTED**",
+          "ConnectionIPv6Address": "",
+          "RemoteGateway": "**REDACTED**",
+          "DNSServers": "81.253.149.6,80.10.246.136",
+          "Internet": true,
+          "IPTV": true,
+          "Telephony": false,
+          "Index": "5",
+          "Names": [
+            {
+              "Name": "LIVEBOX",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": [],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "DECT",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice interface dect physical",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "Index": "6",
+          "Actions": [
+            {
+              "Function": "ring",
+              "Name": "Ring all"
+            },
+            {
+              "Function": "startPairing",
+              "Name": "Pair handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "DECT",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "FXS",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice interface physical",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "Index": "7",
+          "Actions": [
+            {
+              "Function": "ring",
+              "Name": "Ring all"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "FXS",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selfusb",
+          "Name": "USBHost",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self usb interface sysbus",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "BusName": "sysbus",
+          "Index": "8",
+          "Names": [
+            {
+              "Name": "USBHost",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selflan",
+          "Name": "lan",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self lan bridge mac nemo interface ipv4 ipv6 dhcpserver upnp",
+          "FirstSeen": "2026-02-06T02:55:01Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-02-06T02:55:01Z",
+          "Master": "",
+          "PhysAddress": "**REDACTED**",
+          "Ageing": false,
+          "Layer2Interface": "",
+          "InterfaceName": "",
+          "MACVendor": "",
+          "NetDevName": "bridge",
+          "NetDevIndex": 9,
+          "IPAddress": "**REDACTED**",
+          "IPAddressSource": "self",
+          "DHCPv4ServerPool": "default",
+          "DHCPv4ServerEnable": false,
+          "DHCPv4ServerMinAddress": "**REDACTED**",
+          "DHCPv4ServerMaxAddress": "**REDACTED**",
+          "DHCPv4ServerNetmask": "**REDACTED**",
+          "DHCPv4DomainName": "home",
+          "Index": "9",
+          "Names": [
+            {
+              "Name": "lan",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": [],
+          "IPv4Address": [
+            {
+              "Address": "**REDACTED**",
+              "Status": "reachable",
+              "Scope": "global",
+              "AddressSource": "self",
+              "Reserved": true
+            }
+          ],
+          "IPv6Address": "**REDACTED**"
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selflan",
+          "Name": "wl0",
+          "DeviceType": "",
+          "Active": false,
+          "Tags": "self lan vap wifi nemo interface",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "0001-01-01T00:00:00Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "NetDevName": "wl0",
+          "NetDevIndex": 10,
+          "SSID": "**REDACTED**",
+          "BSSID": "**REDACTED**",
+          "OperatingFrequencyBand": "2.4GHz",
+          "OperatingStandards": "bgn",
+          "Channel": 6,
+          "Index": "10",
+          "Names": [
+            {
+              "Name": "wl0",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selflan",
+          "Name": "wl1",
+          "DeviceType": "",
+          "Active": false,
+          "Tags": "self lan vap wifi nemo interface",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "0001-01-01T00:00:00Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "NetDevName": "wl1",
+          "NetDevIndex": 13,
+          "SSID": "**REDACTED**",
+          "BSSID": "**REDACTED**",
+          "OperatingFrequencyBand": "5GHz",
+          "OperatingStandards": "an",
+          "Channel": 36,
+          "Index": "11",
+          "Names": [
+            {
+              "Name": "wl1",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selflan",
+          "Name": "eth0",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self lan eth nemo interface",
+          "FirstSeen": "2026-02-06T02:54:52Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-02-27T21:59:15Z",
+          "Master": "",
+          "MaxBitRateSupported": 1000,
+          "CurrentBitRate": 1000,
+          "NetDevName": "eth0",
+          "NetDevIndex": 5,
+          "Index": "12",
+          "Names": [
+            {
+              "Name": "eth0",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selfusb",
+          "Name": "Port2",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self usb port interface sysbus",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "BusName": "sysbus",
+          "Port": 0,
+          "USBHost": "sysbus.USBHosts.Host.1",
+          "Index": "13",
+          "Names": [
+            {
+              "Name": "Port2",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "selfusb",
+          "Name": "Port1",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "self usb port interface sysbus",
+          "FirstSeen": "2026-02-06T02:55:05Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "BusName": "sysbus",
+          "Port": 1,
+          "USBHost": "sysbus.USBHosts.Host.1",
+          "Index": "14",
+          "Names": [
+            {
+              "Name": "Port1",
+              "Source": "default"
+            }
+          ],
+          "DeviceTypes": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "FXS1",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice handset physical",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "0001-01-01T00:00:00Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "DirectoryNumber": "201",
+          "EndpointType": "FXS",
+          "OutgoingTrunkLine": "LINE1",
+          "Index": "15",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "ring",
+              "Name": "Ring handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "FXS1",
+              "Source": "default"
+            },
+            {
+              "Name": "FXS1",
+              "Source": "handset"
+            },
+            {
+              "Name": "FXS1",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "Cuisine",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice handset dect physical",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-11T16:33:08Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "DirectoryNumber": "202",
+          "EndpointType": "DECT CAT-iq 3.0",
+          "OutgoingTrunkLine": "LINE1",
+          "Index": "16",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "unPair",
+              "Name": "Unpair handset"
+            },
+            {
+              "Function": "ring",
+              "Name": "Ring handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "HS039BB4B296",
+              "Source": "default"
+            },
+            {
+              "Name": "Cuisine",
+              "Source": "handset"
+            },
+            {
+              "Name": "Cuisine",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "Chambre",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice handset dect physical",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-05T00:13:45Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "DirectoryNumber": "203",
+          "EndpointType": "DECT CAT-iq 3.0",
+          "OutgoingTrunkLine": "LINE1",
+          "Index": "17",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "unPair",
+              "Name": "Unpair handset"
+            },
+            {
+              "Function": "ring",
+              "Name": "Ring handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "HS039B940C60",
+              "Source": "default"
+            },
+            {
+              "Name": "Chambre",
+              "Source": "handset"
+            },
+            {
+              "Name": "Chambre",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "Bureau",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice handset dect physical",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-04T23:21:24Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "DirectoryNumber": "204",
+          "EndpointType": "DECT CAT-iq 3.0",
+          "OutgoingTrunkLine": "LINE1",
+          "Index": "18",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "unPair",
+              "Name": "Unpair handset"
+            },
+            {
+              "Function": "ring",
+              "Name": "Ring handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "HS03BF5E96A5",
+              "Source": "default"
+            },
+            {
+              "Name": "Bureau",
+              "Source": "handset"
+            },
+            {
+              "Name": "Bureau",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "voice_handsets",
+          "Name": "Couloir",
+          "DeviceType": "Phone",
+          "Active": true,
+          "Tags": "voice handset dect physical",
+          "FirstSeen": "2026-02-06T02:54:42Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-03-04T23:20:56Z",
+          "Master": "",
+          "Location": "",
+          "Owner": "",
+          "DirectoryNumber": "205",
+          "EndpointType": "DECT CAT-iq 3.0",
+          "OutgoingTrunkLine": "LINE1",
+          "Index": "19",
+          "Actions": [
+            {
+              "Function": "setName",
+              "Name": "Edit Name",
+              "Arguments": [
+                {
+                  "Name": "name",
+                  "Type": "string",
+                  "Mandatory": true
+                },
+                {
+                  "Name": "source",
+                  "Type": "string",
+                  "Mandatory": false
+                }
+              ]
+            },
+            {
+              "Function": "unPair",
+              "Name": "Unpair handset"
+            },
+            {
+              "Function": "ring",
+              "Name": "Ring handset"
+            }
+          ],
+          "Names": [
+            {
+              "Name": "HS03BF5EA275",
+              "Source": "default"
+            },
+            {
+              "Name": "Couloir",
+              "Source": "handset"
+            },
+            {
+              "Name": "Couloir",
+              "Source": "webui"
+            }
+          ],
+          "DeviceTypes": [
+            {
+              "Type": "Phone",
+              "Source": "tags"
+            },
+            {
+              "Type": "Computer",
+              "Source": "default"
+            }
+          ],
+          "Locations": [],
+          "Groups": []
+        },
+        {
+          "Key": "**REDACTED**",
+          "DiscoverySource": "upnpDev",
+          "Name": "device_20",
+          "DeviceType": "",
+          "Active": true,
+          "Tags": "upnp root logical",
+          "FirstSeen": "2026-02-06T02:54:59Z",
+          "LastConnection": "2026-03-14T09:40:29Z",
+          "LastChanged": "2026-02-06T02:55:00Z",
+          "Master": "",
+          "Type": "urn:schemas-wifialliance-org:device:WFADevice:1",
+          "Manufacturer": "Sagemcom",
+          "ManufacturerURL": "Sagemcom",
+          "ModelDescription": "",
+          "ModelName": "SagemcomFast3965_LB2.8",
+          "ModelNumber": "SG_LB3_1.2.4",
+          "ModelURL": "",
+          "SerialNumber": "**REDACTED**",
+          "UDN": "uuid:483b3a4c-3c38-f837-fd49-3e3a483b3a4c",
+          "UPC": "",
+          "PresentationURL": "",
+          "Server": "Unspecified, UPnP/1.0, Unspecified",
+          "Index": "20",
+          "Names": [
+            {
+              "Name": "device_20",
+              "Source": "default"
+            },
+            {
+              "Name": "WPS Access Point",
+              "Source": "upnpfriendlyname"
+            }
+          ],
+          "DeviceTypes": [],
+          "Service": [
+            {
+              "ServiceType": "urn:schemas-wifialliance-org:service:WFAWLANConfig:1",
+              "ServiceId": "urn:wifialliance-org:serviceId:WFAWLANConfig1",
+              "SCPDURL": "wps_scpd.xml",
+              "ControlURL": "wps_control",
+              "EventSubURL": "wps_event"
+            }
+          ]
+        }
+      ]
+    },
+    "Devices.async_get_devices::{'expression': {'wifi': 'wifi && (edev || hnid) and .PhysAddress!=\"\"', 'eth': 'eth && (edev || hnid) and .PhysAddress!=\"\"'}}": {
+      "status": {
+        "wifi": [],
+        "eth": [
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Dresde",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth ipv4 ipv6",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "2026-03-12T23:21:04Z",
+            "Master": "",
+            "IPAddress": "",
+            "IPAddressSource": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "1",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-12",
+                "Source": "default"
+              },
+              {
+                "Name": "Dresde",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "IPv4Address": [],
+            "IPv6Address": "**REDACTED**",
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Netgear",
+            "DeviceType": "homepoint",
+            "Active": true,
+            "Tags": "lan edev mac physical eth",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "0001-01-01T00:00:00Z",
+            "Master": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "2",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-13",
+                "Source": "default"
+              },
+              {
+                "Name": "Netgear",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "homepoint",
+                "Source": "webui"
+              }
+            ],
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Steyr",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth ipv4 ipv6",
+            "FirstSeen": "2026-02-06T02:54:42Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "2026-03-11T10:12:08Z",
+            "Master": "",
+            "IPAddress": "**REDACTED**",
+            "IPAddressSource": "Static",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "3",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-86",
+                "Source": "default"
+              },
+              {
+                "Name": "Steyr",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "IPv4Address": [
+              {
+                "Address": "**REDACTED**",
+                "Status": "reachable",
+                "Scope": "global",
+                "AddressSource": "Static",
+                "Reserved": false
+              }
+            ],
+            "IPv6Address": "**REDACTED**",
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "CARP",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "0001-01-01T00:00:00Z",
+            "Master": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "4",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-121",
+                "Source": "default"
+              },
+              {
+                "Name": "CARP",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "Locations": [],
+            "Groups": []
+          }
+        ]
+      }
+    },
+    "Devices.async_get_devices::{'expression': {'wifi': 'lan && vap && .Active==True', 'eth': 'lan && eth && .Active==True'}}": {
+      "status": {
+        "wifi": [],
+        "eth": [
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Dresde",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth ipv4 ipv6",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "2026-03-12T23:21:04Z",
+            "Master": "",
+            "IPAddress": "",
+            "IPAddressSource": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "1",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-12",
+                "Source": "default"
+              },
+              {
+                "Name": "Dresde",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "IPv4Address": [],
+            "IPv6Address": "**REDACTED**",
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Netgear",
+            "DeviceType": "homepoint",
+            "Active": true,
+            "Tags": "lan edev mac physical eth",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "0001-01-01T00:00:00Z",
+            "Master": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "2",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-13",
+                "Source": "default"
+              },
+              {
+                "Name": "Netgear",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "homepoint",
+                "Source": "webui"
+              }
+            ],
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "Steyr",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth ipv4 ipv6",
+            "FirstSeen": "2026-02-06T02:54:42Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "2026-03-11T10:12:08Z",
+            "Master": "",
+            "IPAddress": "**REDACTED**",
+            "IPAddressSource": "Static",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "3",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-86",
+                "Source": "default"
+              },
+              {
+                "Name": "Steyr",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "IPv4Address": [
+              {
+                "Address": "**REDACTED**",
+                "Status": "reachable",
+                "Scope": "global",
+                "AddressSource": "Static",
+                "Reserved": false
+              }
+            ],
+            "IPv6Address": "**REDACTED**",
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "import",
+            "Name": "CARP",
+            "DeviceType": "stb",
+            "Active": true,
+            "Tags": "lan edev mac physical eth",
+            "FirstSeen": "2026-02-06T02:54:41Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "0001-01-01T00:00:00Z",
+            "Master": "",
+            "Location": "",
+            "PhysAddress": "**REDACTED**",
+            "Ageing": false,
+            "Layer2Interface": "eth0",
+            "InterfaceName": "eth0",
+            "MACVendor": "",
+            "Owner": "",
+            "Index": "4",
+            "Actions": [
+              {
+                "Function": "setName",
+                "Name": "Edit Name",
+                "Arguments": [
+                  {
+                    "Name": "name",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              },
+              {
+                "Function": "setType",
+                "Name": "Edit Type",
+                "Arguments": [
+                  {
+                    "Name": "type",
+                    "Type": "string",
+                    "Mandatory": true
+                  },
+                  {
+                    "Name": "source",
+                    "Type": "string",
+                    "Mandatory": false
+                  }
+                ]
+              }
+            ],
+            "Names": [
+              {
+                "Name": "PC-121",
+                "Source": "default"
+              },
+              {
+                "Name": "CARP",
+                "Source": "webui"
+              }
+            ],
+            "DeviceTypes": [
+              {
+                "Type": "stb",
+                "Source": "webui"
+              }
+            ],
+            "Locations": [],
+            "Groups": []
+          },
+          {
+            "Key": "**REDACTED**",
+            "DiscoverySource": "selflan",
+            "Name": "eth0",
+            "DeviceType": "",
+            "Active": true,
+            "Tags": "self lan eth nemo interface",
+            "FirstSeen": "2026-02-06T02:54:52Z",
+            "LastConnection": "2026-03-14T09:40:29Z",
+            "LastChanged": "2026-02-27T21:59:15Z",
+            "Master": "",
+            "MaxBitRateSupported": 1000,
+            "CurrentBitRate": 1000,
+            "NetDevName": "eth0",
+            "NetDevIndex": 5,
+            "Index": "12",
+            "Names": [
+              {
+                "Name": "eth0",
+                "Source": "default"
+              }
+            ],
+            "DeviceTypes": []
+          }
+        ]
+      }
+    }
+  }
+}
