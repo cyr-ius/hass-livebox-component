@@ -32,7 +32,7 @@ async def test_sensors_state(
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_callers")
     assert state is not None
 
-    if AIOSysbus.__model == "7.1":
+    if AIOSysbus.__model in ["7.1"]:
         state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
         assert state is not None
         assert float(state.state) >= 0
