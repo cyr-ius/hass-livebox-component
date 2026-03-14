@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from sqlalchemy import false
 
 
-@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1", "7.2"], indirect=True)
 async def test_switch_wifi(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -57,7 +57,7 @@ async def test_switch_wifi(
     assert state.state == STATE_ON
 
 
-@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1","7.2"], indirect=True)
 async def test_switch_guest_wifi(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

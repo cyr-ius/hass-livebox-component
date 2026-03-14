@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 
-@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1", "7.2"], indirect=True)
 async def test_sensors_state(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

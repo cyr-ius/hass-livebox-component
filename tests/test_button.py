@@ -11,7 +11,7 @@ from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant, ServiceCall
 
 
-@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["5", "7", "7.1", "7.2"], indirect=True)
 async def test_button(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
