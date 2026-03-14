@@ -37,9 +37,6 @@ SCAN_INTERVAL = timedelta(minutes=1)
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     """Define an object to fetch data."""
 
-    unique_id: str
-    model: int | float
-
     def __init__(
         self,
         hass: HomeAssistant,
@@ -48,6 +45,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         """Class to manage fetching data API."""
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
         self.config_entry = config_entry
+
+        self.unique_id: str | None = None
+        self.model: int | float | None = None
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
