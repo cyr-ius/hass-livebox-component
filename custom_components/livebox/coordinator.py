@@ -381,7 +381,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             return []
 
         data = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get("status", {})
-        if data.get(domain, {}).get("Enable") is False:
+        if data.get(domain, {}).get("Enable", False) is False:
             return []
 
         data = (
