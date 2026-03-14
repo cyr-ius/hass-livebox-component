@@ -380,6 +380,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         if self.model == 5656:
             return []
 
+        data = await self._make_request(self.api.dhcp.async_get_dhcp_pool).get("status", {})
+        if data.get(domain, {}).get("Enable") is False:
+            return []
+
         data = (
             await self._make_request(self.api.dhcp.async_get_dhcp_leases, None, domain)
         ).get("status", {})
