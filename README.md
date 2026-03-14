@@ -58,6 +58,7 @@ Only the routers with Livebox OS are supported:
 - Livebox W7
 - KPN Box 12 (Firmware: V12.C.23.04.36)
 - Sagemcom f@st 5656
+- Livebox Nautilus (Arcadyan)
 
 ### Unsupported routers
 

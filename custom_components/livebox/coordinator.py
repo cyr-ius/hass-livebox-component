@@ -81,6 +81,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 7.1
                 case "SMBSLBFIBRA":
                     self.model = 5656  # Sagemcom f@st 5656
+                case "Livebox Nautilus":
+                    self.model = 7.1
             # Optionals
             wifi_tracking = self.config_entry.options.get(
                 CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
