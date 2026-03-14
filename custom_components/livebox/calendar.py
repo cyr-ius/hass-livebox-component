@@ -34,7 +34,7 @@ class LiveboxCallLogCalendar(LiveboxEntity, CalendarEntity):
         """Initialize calendar."""
 
         entity_description = EntityDescription(
-            key=f"call_log_calendar",
+            key="call_log_calendar",
             name="Call Log"
         )
 
