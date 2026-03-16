@@ -6,9 +6,8 @@ import datetime
 from dateutil import parser
 import logging
 
-from homeassistant.components.calendar import CalendarEntity, CalendarEvent
+from homeassistant.components.calendar import CalendarEntity, CalendarEvent, CalendarEntityDescription
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import LiveboxConfigEntry
@@ -27,6 +26,10 @@ async def async_setup_entry(
     coordinator = config_entry.runtime_data
     async_add_entities([LiveboxCallLogCalendar(coordinator)])
 
+class LiveboxCallLogCalendarEntityDescription(CalendarEntityDescription):
+    """A class that describes livebox call-log calendar entities."""
+    initial_color: str = "#ff6600"
+
 
 class LiveboxCallLogCalendar(LiveboxEntity, CalendarEntity):
     """A homeassistant calendar entity that represents the calls in the call log."""
@@ -34,7 +37,7 @@ class LiveboxCallLogCalendar(LiveboxEntity, CalendarEntity):
     def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
         """Initialize calendar."""
 
-        entity_description = EntityDescription(
+        entity_description = LiveboxCallLogCalendarEntityDescription(
             key="call_log_calendar",
             name="Call Log"
         )
