@@ -38,7 +38,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
     attrs: dict[str, Callable[..., Any]] | None = None
 
 
-def get_rolling_32_bit_value_fn(path) -> Callable[..., Any]:
+def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
     """Returns a closure function, that extracts a rolling 32-bit value from"""
     """the coordinator data structure, and tweaks its result so that HASS"""
     """properly accumulates the total rolling value."""
@@ -70,6 +70,10 @@ def get_rolling_32_bit_value_fn(path) -> Callable[..., Any]:
         return (rolls<<32) + current_reading
 
     return value_fn
+
+def get_closure_value_fn(path: str) -> Callable[..., Any]:
+    """Returns a closure function for value_fn of entities with variable name"""
+    return lambda x: find_item(x, path)
 
 
 SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
@@ -290,7 +294,7 @@ async def async_setup_entry(
             LiveboxSensorEntityDescription(
                 key=f"{name}_rate_rx",
                 name=f"{item['friendly_name']} Rate Rx",
-                value_fn=lambda x: find_item(x, f"stats.{name}.rate_rx"),
+                value_fn=get_closure_value_fn(f"stats.{name}.rate_rx"),
                 translation_key=f"{name}_rate_rx",
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
@@ -302,7 +306,7 @@ async def async_setup_entry(
             LiveboxSensorEntityDescription(
                 key=f"{name}_rate_tx",
                 name=f"{item['friendly_name']} Rate Tx",
-                value_fn=lambda x: find_item(x, f"stats.{name}.rate_tx"),
+                value_fn=get_closure_value_fn(f"stats.{name}.rate_tx"),
                 translation_key=f"{name}_rate_tx",
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
