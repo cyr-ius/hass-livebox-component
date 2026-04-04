@@ -46,3 +46,11 @@ repos:
           - --force
           - --keep-updates
         files: ^custom_components/.+\.py$
+  - repo: local
+    hooks:
+      - id: pyrefly-check
+        name: pyrefly-check
+        entry: uv run pyrefly check custom_components tests
+        language: system
+        pass_filenames: false
+        files: ^(custom_components|tests)/.+\.py$
