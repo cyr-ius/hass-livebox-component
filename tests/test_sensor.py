@@ -100,3 +100,22 @@ async def test_rate_sensors_match_issue_258_diagnostics(
     assert sensors["vap5g0priv_rate_tx"].native_value == 0.06
     assert sensors["ETH0_rate_rx"].native_value == 0.01
     assert sensors["ETH0_rate_tx"].native_value == 0.0
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7.1"], indirect=True)
+async def test_rate_sensors_use_megabits_per_second_math(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """Test rate sensors use Mbit/s math to match their declared unit."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    rx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
+    assert rx_state is not None
+    assert float(rx_state.state) == 0.01
+
+    tx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_tx")
+    assert tx_state is not None
+    assert float(tx_state.state) == 5.69

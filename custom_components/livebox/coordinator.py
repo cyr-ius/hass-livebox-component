@@ -436,17 +436,16 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 continue
             stats = traffic[0]
 
-            # Rx_Counter and Tx_Counter => bits/30seconds
-            #  /8 => octets , / 30 => 1seconds (8*30 => 240)
-            # /1048576 => MBytes
+            # Rx_Counter and Tx_Counter are collected over a 30-second window.
+            # Convert them to Mbit/s to match the sensor unit declaration.
 
             results.update(
                 {
                     item["Name"]: {
                         "friendly_name": key,
                         "alias": item.get("alias"),
-                        "rate_rx": round(stats.get("Rx_Counter", 0) / 240 / 1048576, 2),
-                        "rate_tx": round(stats.get("Tx_Counter", 0) / 240 / 1048576, 2),
+                        "rate_rx": round(stats.get("Rx_Counter", 0) / 30 / 1000000, 2),
+                        "rate_tx": round(stats.get("Tx_Counter", 0) / 30 / 1000000, 2),
                     }
                 }
             )
