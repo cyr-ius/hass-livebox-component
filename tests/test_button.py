@@ -1,6 +1,5 @@
 """The tests for the bbox component."""
 
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -15,7 +14,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 async def test_button(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
     service_calls: list[ServiceCall],
 ) -> None:
     """Test reboot button."""

@@ -1,6 +1,7 @@
 """Orange Livebox."""
 
 import logging
+from typing import TypeAlias
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
@@ -10,7 +11,7 @@ from homeassistant.helpers import device_registry as dr
 from .const import CALLID, DOMAIN, PLATFORMS
 from .coordinator import LiveboxDataUpdateCoordinator
 
-type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
+LiveboxConfigEntry: TypeAlias = ConfigEntry[LiveboxDataUpdateCoordinator]
 
 CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
 

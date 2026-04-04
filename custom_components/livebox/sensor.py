@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final
-import logging
+from typing import Any, Final, cast
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
-    SensorDeviceClass
 )
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfDataRate,
     UnitOfInformation,
-    UnitOfTime
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -323,10 +323,8 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class LiveboxSensor(LiveboxEntity, SensorEntity):
+class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsistent-inheritance]
     """Representation of a livebox sensor."""
-
-    entity_description: LiveboxSensorEntityDescription
 
     def __init__(
         self,
@@ -339,14 +337,16 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the native value of the device."""
-        return self.entity_description.value_fn(self.coordinator.data)
+        description = cast(LiveboxSensorEntityDescription, self.entity_description)
+        return description.value_fn(self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return the device state attributes."""
-        if self.entity_description.attrs:
+        description = cast(LiveboxSensorEntityDescription, self.entity_description)
+        if description.attrs:
             return {
                 key: attr(self.coordinator.data)
-                for key, attr in self.entity_description.attrs.items()
+                for key, attr in description.attrs.items()
             }
         return None

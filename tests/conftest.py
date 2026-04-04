@@ -1,17 +1,10 @@
 """The tests for the component."""
 
-from typing import Generator
+from collections.abc import Iterator
+from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.util import slugify
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    load_json_object_fixture,
-)
-
 from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
@@ -23,10 +16,22 @@ from custom_components.livebox.const import (
     DEFAULT_WIFI_TRACKING,
     DOMAIN,
 )
+from homeassistant.config_entries import SOURCE_USER, ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.util import slugify
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    load_json_object_fixture,
+)
 
 from .const import (
     MOCK_USER_INPUT,
 )
+
+
+def _load_api_fixture(name: str) -> dict[str, Any]:
+    """Load a typed API fixture payload."""
+    return cast(dict[str, Any], load_json_object_fixture(name))["api_raw"]
 
 
 @pytest.fixture(autouse=True)
@@ -36,9 +41,10 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 
 @pytest.fixture(name="AIOSysbus")
-def mock_router(request) -> Generator[MagicMock | AsyncMock]:
+def mock_router(request) -> Iterator[MagicMock]:
     """Mock a successful connection."""
     model = getattr(request, "param", "7")  # valeur par défaut
+    api: Any
 
     # "Livebox 3": "Livebox 3", 3
     # "Livebox 4": "Livebox 4", 4
@@ -50,15 +56,15 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
     # "Livebox S": "Livebox S", 7.2
 
     if model == "3":
-        api = load_json_object_fixture("Livebox 3.json")["api_raw"]
+        api = _load_api_fixture("Livebox 3.json")
     elif model == "5":
-        api = load_json_object_fixture("Livebox Fibre.json")["api_raw"]
+        api = _load_api_fixture("Livebox Fibre.json")
     elif model == "7":
-        api = load_json_object_fixture("Livebox 7.json")["api_raw"]
+        api = _load_api_fixture("Livebox 7.json")
     elif model == "7.1":
-        api = load_json_object_fixture("Livebox W7.json")["api_raw"]
+        api = _load_api_fixture("Livebox W7.json")
     elif model == "7.2":
-        api = load_json_object_fixture("Livebox Nautilus.json")["api_raw"]
+        api = _load_api_fixture("Livebox Nautilus.json")
     else:
         raise ValueError(f"Unknown model: {model}")
 
@@ -73,7 +79,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         )
 
         def _mock_get_devices(*args, **kwargs):
-            """Mock for async_get_devices to return different values based on first arg."""
+            """Return different values based on the first arg."""
 
             def _filtered_devices():
                 filtered_devices = {"status": {"eth": [], "wifi": []}}
@@ -109,8 +115,12 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
 
             if args[0] == {
                 "expression": {
-                    "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
-                    "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
+                    "wifi": (
+                        '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""'
+                    ),
+                    "eth": (
+                        '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
+                    ),
                 }
             }:
                 return _filtered_devices()
@@ -147,7 +157,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.nemo.async_get_MIBs = AsyncMock(side_effect=_mock_get_mibs)
 
         def _mock_get_net_dev_stats(*args, **kwargs):
-            """Mock for async_get_net_dev_stats to return different values based on first arg."""
+            """Return different values based on the first arg."""
             if args[0] == "eth0":
                 return api["NeMo.async_get_net_dev_stats::eth0"]
             if args[0] == "veip0":
@@ -165,7 +175,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.sfp.async_get = AsyncMock(return_value=api["SFP.async_get"])
 
         def _mock_get_schedule(*args, **kwargs):
-            """Mock for async_get_schedule to return different values based on first arg."""
+            """Return different values based on the first arg."""
             return {}
 
         instance.schedule.async_get_schedule = AsyncMock(side_effect=_mock_get_schedule)
@@ -184,7 +194,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         )
 
         def _mock_dhcp_leases(*args, **kwargs):
-            """Mock for async_get_dhcp_leases to return different values based on first arg."""
+            """Return different values based on the first arg."""
             if args[1] == "default":
                 return api.get("Dhcp.async_get_dhcp_leases", {})
             if args[1] == "guest":
@@ -216,7 +226,7 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         )
 
         def _mock_get_results(*args, **kwargs):
-            """Mock for async_get_results to return different values based on first arg."""
+            """Return different values based on the first arg."""
             return api.get("HomeLan.async_get_results", {})
 
         instance.homelan.async_get_results = AsyncMock(side_effect=_mock_get_results)
@@ -224,7 +234,9 @@ def mock_router(request) -> Generator[MagicMock | AsyncMock]:
         instance.homelan.async_get_results = AsyncMock(
             return_value=api.get("HomeLan.async_get_results", {})
         )
-        # instance.homelan.async_get_devices_results = AsyncMock(return_value=INFO)  # take 13s
+        # instance.homelan.async_get_devices_results = AsyncMock(
+        #     return_value=INFO
+        # )  # take 13s
         instance.homelan.async_get_maxnumber_records = AsyncMock(
             return_value=api["HomeLan.async_get_maxnumber_records"]
         )

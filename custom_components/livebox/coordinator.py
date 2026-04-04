@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-import logging
 from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -44,7 +43,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Class to manage fetching data API."""
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
-        self.config_entry = config_entry
+        self.config_entry: Any = config_entry
+        self.api: Any
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
@@ -150,8 +150,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         else:
             parameters = {
                 "expression": {
-                    "wifi": '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""',
-                    "eth": '.Active==true && eth && (edev || hnid) and .PhysAddress!=""',
+                    "wifi": (
+                        '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""'
+                    ),
+                    "eth": (
+                        '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
+                    ),
                 }
             }
         devices = (
@@ -162,19 +166,23 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             device_counters["wireless"] = len(devices.get("wifi", {}))
             for device in devices.get("wifi", {}):
                 if device.get("Key"):
-                    devices_tracker.setdefault(device.get("Key"), {}).update(device)
+                    tracked_device = devices_tracker.setdefault(device.get("Key"), {})
+                    if isinstance(tracked_device, dict):
+                        tracked_device.update(device)
 
         if lan_tracking:
             device_counters["wireless"] = len(devices.get("eth", {}))
             for device in devices.get("eth", {}):
                 if device.get("Key"):
-                    devices_tracker.setdefault(device.get("Key"), {}).update(device)
+                    tracked_device = devices_tracker.setdefault(device.get("Key"), {})
+                    if isinstance(tracked_device, dict):
+                        tracked_device.update(device)
 
         return devices_tracker, device_counters
 
     async def async_get_callers(
         self,
-    ) -> tuple[list[dict[str, Any] | None], list[dict[str, Any] | None]]:
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         """Get caller missed."""
         callers = []
         cmisseds = []
@@ -380,7 +388,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         if self.model == 5656:
             return []
 
-        data = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get("status", {})
+        data = (
+            await self._make_request(self.api.dhcp.async_get_dhcp_pool)
+        ).get("status", {})
         if data.get(domain, {}).get("Enable", False) is False:
             return []
 

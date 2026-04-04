@@ -72,11 +72,12 @@ def async_add_new_tracked_entities(
 
 
 @callback
-class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
+class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
+    LiveboxEntity, ScannerEntity
+):
     """Represent a tracked device."""
 
     _attr_name = None
-    entity_description: EntityDescription
 
     def __init__(
         self,
@@ -202,12 +203,13 @@ class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
         return status
 
     @property
-    def device_info(self) -> DeviceInfo | None:
+    def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
         """Return device info to link entity to the Livebox device."""
+        unique_id = self.coordinator.unique_id or DOMAIN
         return DeviceInfo(
             name=self._device.get("Name"),
             identifiers={(DOMAIN, self._device.get("Key", self.name))},
-            via_device=(DOMAIN, self.coordinator.unique_id),
+            via_device=(DOMAIN, unique_id),
         )
 
     @callback

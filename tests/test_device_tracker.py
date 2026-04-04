@@ -1,7 +1,6 @@
 """The tests for the bbox component."""
 
 from datetime import datetime
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -14,7 +13,7 @@ from homeassistant.core import HomeAssistant
 async def test_device_tracker(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ) -> None:
     """Test the device tracker platform."""
     await hass.config_entries.async_setup(config_entry.entry_id)
@@ -49,7 +48,7 @@ async def test_device_tracker(
 async def test_device_tracker_new_device(
     hass,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ):
     new_device = {
         "Key": "AA:BB:CC:DD:EE:FF",

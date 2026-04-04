@@ -8,12 +8,12 @@ from aiosysbus.exceptions import (
     AuthenticationFailed,
     HttpRequestFailed,
 )
-from homeassistant import config_entries, setup
+from custom_components.livebox.const import DOMAIN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.livebox.const import DOMAIN
+from homeassistant import config_entries, setup
 
 from .const import MOCK_USER_INPUT
 

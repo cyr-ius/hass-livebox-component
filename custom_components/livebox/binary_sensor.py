@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -105,10 +105,10 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
+class LiveboxBinarySensor(  # pyrefly: ignore[inconsistent-inheritance]
+    LiveboxEntity, BinarySensorEntity
+):
     """Livebox binary sensor."""
-
-    entity_description: LiveboxBinarySensorEntityDescription
 
     def __init__(
         self,
@@ -121,16 +121,22 @@ class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return state."""
-        if (idx := self.entity_description.index) is not None:
-            return self.entity_description.value_fn(self.coordinator.data, idx)
-        return self.entity_description.value_fn(self.coordinator.data)
+        description = cast(
+            LiveboxBinarySensorEntityDescription, self.entity_description
+        )
+        if (idx := description.index) is not None:
+            return description.value_fn(self.coordinator.data, idx)
+        return description.value_fn(self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
+        description = cast(
+            LiveboxBinarySensorEntityDescription, self.entity_description
+        )
         attributes = {}
-        for key, attr in self.entity_description.attrs.items():
-            if (idx := self.entity_description.index) is not None:
+        for key, attr in description.attrs.items():
+            if (idx := description.index) is not None:
                 attributes.update({key: attr(self.coordinator.data, idx)})
             else:
                 attributes.update({key: attr(self.coordinator.data)})

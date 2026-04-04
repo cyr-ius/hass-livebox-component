@@ -26,3 +26,9 @@ log_cli = true
 
 [tool.uv]
 package = false
+
+[tool.pyrefly]
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]

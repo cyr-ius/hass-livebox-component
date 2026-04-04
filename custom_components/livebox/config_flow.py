@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import logging
+from collections.abc import Mapping
 from typing import Any
 
+import voluptuous as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -14,15 +15,14 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
-import voluptuous as vol
-
-from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
+
+from homeassistant import config_entries
 
 from .const import (
     CONF_DISPLAY_DEVICES,
@@ -77,7 +77,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input:
             try:
-                api = AIOSysbus(
+                api: Any = AIOSysbus(
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
                     session=async_create_clientsession(self.hass),
@@ -96,7 +96,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "login_incorrect"
             except InsufficientPermissionsError as err:
                 _LOGGER.warning(
-                    "Insufficient permissions error occurred connecting to the Livebox: %s",
+                    "Insufficient permissions error occurred "
+                    "connecting to the Livebox: %s",
                     err,
                 )
                 errors["base"] = "insufficient_permission"
@@ -112,7 +113,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     self._abort_if_unique_id_configured()
 
                     return self.async_create_entry(
-                        title=f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})",
+                        title=(
+                            f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})"
+                        ),
                         data=user_input,
                     )
 

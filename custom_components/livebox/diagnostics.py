@@ -49,7 +49,6 @@ TO_REDACT = {
     "ip6_addr",
     "IPAddress",
     "IPRouters",
-    "IPRouters",
     "IPv6Address",
     "IPv6DelegatedPrefix",
     "Key",
@@ -84,7 +83,6 @@ TO_REDACT = {
     "remoteName",
     "remoteNumber",
     "SAEPassphrase",
-    "SelfPIN",
     "SelfPIN",
     "serial",
     "SerialNumber",
@@ -231,9 +229,10 @@ async def async_get_config_entry_diagnostics(
 
     _LOGGER.debug("Start building diagnostics data...")
     start_time = time()
-    api_raw = {}
+    api_raw: dict[str, Any] = {}
     for api_method in api_methods:
         params = None
+        qualified_name = "unknown"
         try:
             if isinstance(api_method, tuple):
                 api_method, params = api_method
@@ -251,7 +250,7 @@ async def async_get_config_entry_diagnostics(
                 else (
                     vars(result)
                     if hasattr(result, "__dict__")
-                    else f"Can't dump {str(type(result))} data"
+                    else f"Can't dump {type(result)!s} data"
                 )
             )
         except Exception as err:  # pylint: disable=broad-exception-caught
@@ -260,11 +259,11 @@ async def async_get_config_entry_diagnostics(
 
     lucky_address = api_raw.get("NeMo.async_lucky_addr_address::lan", {})
     if isinstance(lucky_address, dict) and lucky_address.get("status"):
-        api_raw["NeMo.async_lucky_addr_address::lan"]["status"] = "**REDACTED**"
+        lucky_address["status"] = "**REDACTED**"
 
     lucky_address = api_raw.get("NeMo.async_lucky_addr_address::data", {})
     if isinstance(lucky_address, dict) and lucky_address.get("status"):
-        api_raw["NeMo.async_lucky_addr_address::data"]["status"] = "**REDACTED**"
+        lucky_address["status"] = "**REDACTED**"
 
     return {
         "entry": {

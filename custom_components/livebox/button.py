@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.core import HomeAssistant
@@ -23,7 +23,7 @@ class LiveboxButtonEntityDescription(ButtonEntityDescription):
     value_fn: Callable[..., Any]
 
 
-BUTTON_TYPES: Final[tuple[ButtonEntityDescription, ...]] = (
+BUTTON_TYPES: Final[tuple[LiveboxButtonEntityDescription, ...]] = (
     LiveboxButtonEntityDescription(
         key="restart",
         name="Livebox restart",
@@ -59,11 +59,10 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class Button(LiveboxEntity, ButtonEntity):
+class Button(LiveboxEntity, ButtonEntity):  # pyrefly: ignore[inconsistent-inheritance]
     """Representation of a livebox button."""
 
     _attr_should_poll = False
-    entity_description: LiveboxButtonEntityDescription
 
     def __init__(
         self,
@@ -75,4 +74,5 @@ class Button(LiveboxEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Triggers the button press service."""
-        await self.entity_description.value_fn(self.coordinator.api)()
+        description = cast(LiveboxButtonEntityDescription, self.entity_description)
+        await description.value_fn(self.coordinator.api)()

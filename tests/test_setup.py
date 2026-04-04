@@ -1,6 +1,6 @@
 """Tests pour l'intégration Bbox2 utilisant config_entries."""
 
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest

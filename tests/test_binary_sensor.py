@@ -1,7 +1,6 @@
 """Tests for the Bbox binary sensor platform."""
 
 import copy
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -14,7 +13,7 @@ from homeassistant.core import HomeAssistant
 async def test_binary_sensor_link_status(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ):
     """Test the link status binary sensor."""
     # --- Test Setup ---
@@ -55,7 +54,7 @@ async def test_binary_sensor_link_status(
 async def test_binary_sensor(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ):
     """Test the binary sensor."""
 
