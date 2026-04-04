@@ -9,7 +9,7 @@ dependencies = []
 dev = [
   "aiosysbus",
   "async-upnp-client",
-  "pre-commit",
+  "prek",
   "pycares<5",
   "pyrefly",
   "pylint",
