@@ -1,0 +1,27 @@
+[project]
+name = "hass-livebox-component"
+version = "0.0.0"
+description = "Development environment for the Orange Livebox Home Assistant custom component"
+requires-python = ">=3.13.2"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "aiosysbus",
+  "async-upnp-client",
+  "pre-commit",
+  "pycares<5",
+  "pylint",
+  "pytest-homeassistant-custom-component==0.13.272",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+testpaths = ["tests/"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+log_cli = true
+
+[tool.uv]
+package = false

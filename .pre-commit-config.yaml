@@ -14,6 +14,7 @@ repos:
           - --ignore-words-list=hass
           - --skip="./.*,*.csv,*.json"
           - --quiet-level=2
+        exclude: ^uv\.lock$
         exclude_types: [csv, json]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
