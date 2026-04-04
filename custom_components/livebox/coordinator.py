@@ -171,7 +171,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                         tracked_device.update(device)
 
         if lan_tracking:
-            device_counters["wireless"] = len(devices.get("eth", {}))
+            device_counters["wired"] = len(devices.get("eth", {}))
             for device in devices.get("eth", {}):
                 if device.get("Key"):
                     tracked_device = devices_tracker.setdefault(device.get("Key"), {})
