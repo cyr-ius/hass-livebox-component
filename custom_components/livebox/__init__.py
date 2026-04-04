@@ -17,6 +17,11 @@ CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
 _LOGGER = logging.getLogger(__name__)
 
 
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the Livebox integration."""
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Set up Livebox as config entry."""
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
