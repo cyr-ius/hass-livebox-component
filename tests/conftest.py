@@ -328,6 +328,12 @@ def mock_router(request) -> Iterator[MagicMock]:
             return_value=api["SpeedTest.async_get_wan_results"]
         )
         instance.sgcomci.async_get_optical = AsyncMock(return_value={})  # Livebox 5656
+        instance.topologydiagnostics.async_set_topodiags_build = AsyncMock(
+            return_value=api.get("TopologyDiagnostics.async_set_topodiags_build", {})
+        )
+        instance.topologydiagnostics.async_get_topodiags = AsyncMock(
+            return_value=api.get("TopologyDiagnostics.async_get_topodiags", {})
+        )
 
         instance.firewall.async_get_protocol_forwarding = AsyncMock(
             return_value=api["Firewall.async_get_protocol_forwarding"]

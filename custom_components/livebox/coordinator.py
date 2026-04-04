@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, cast
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
@@ -31,6 +31,8 @@ from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
+TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=15)
+TOPOLOGY_BUILD_TIMEOUT = 30
 
 
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
@@ -48,6 +50,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
+        self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
+        self._topology_cache_at: datetime | None = None
+        self._topology_last_update: str | None = None
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
@@ -90,8 +95,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             lan_tracking = self.config_entry.options.get(
                 CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
             )
+            topology_via_device, topology_repeaters = await self.async_get_topology()
             devices, device_counters = await self.async_get_devices(
-                lan_tracking, wifi_tracking
+                lan_tracking, wifi_tracking, set(topology_repeaters)
             )
             callers, cmissed = await self.async_get_callers()
 
@@ -117,6 +123,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "fiber_status": await self.async_get_fiber_status(),
                 "fiber_stats": await self.async_get_fiber_stats(),
                 "remote_access": await self.async_is_remote_access(),
+                "topology_via_device": topology_via_device,
+                "topology_repeaters": topology_repeaters,
                 "lan": await self.async_get_lan(devices),
                 "upnp": await self.async_get_port_forwarding(),
                 "dhcp_leases": await self.async_get_dhcp_leases(),
@@ -132,7 +140,10 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         return (await self.api.deviceinfo.async_get_deviceinfo()).get("status", {})
 
     async def async_get_devices(
-        self, lan_tracking=False, wifi_tracking=True
+        self,
+        lan_tracking: bool = False,
+        wifi_tracking: bool = True,
+        repeater_keys: set[str] | None = None,
     ) -> tuple[dict[str, Any], dict[str, int]]:
         """Get all devices."""
         devices_tracker = {}
@@ -177,8 +188,110 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     tracked_device = devices_tracker.setdefault(device.get("Key"), {})
                     if isinstance(tracked_device, dict):
                         tracked_device.update(device)
+        elif wifi_tracking:
+            for device in devices.get("eth", {}):
+                device_key = device.get("Key")
+                if not isinstance(device_key, str) or device_key not in (
+                    repeater_keys or set()
+                ):
+                    continue
+                # Repeaters are needed for Home Assistant's via_device topology even
+                # when generic LAN tracking is disabled, so we keep only the
+                # Ethernet devices that buildTopology identified as repeaters.
+                tracked_device = devices_tracker.setdefault(device_key, {})
+                if isinstance(tracked_device, dict):
+                    tracked_device.update(device)
 
         return devices_tracker, device_counters
+
+    async def async_get_topology(self) -> tuple[dict[str, str], dict[str, str]]:
+        """Build a device-to-repeater map from topology diagnostics."""
+        now = datetime.now(tz=UTC)
+        topo_status = (
+            await self._make_request(self.api.topologydiagnostics.async_get_topodiags)
+        ).get("status", {})
+        if not isinstance(topo_status, dict):
+            return self._topology_cache
+
+        last_update = topo_status.get("LastUpdate")
+        if (
+            isinstance(last_update, str)
+            and self._topology_last_update is not None
+            and last_update == self._topology_last_update
+        ):
+            return self._topology_cache
+        if (
+            self._topology_cache_at is not None
+            and now - self._topology_cache_at < TOPOLOGY_SCAN_INTERVAL
+            and not isinstance(last_update, str)
+        ):
+            return self._topology_cache
+
+        data = (
+            await self._make_request(
+                self.api.topologydiagnostics.async_set_topodiags_build,
+                {
+                    "Timeout": TOPOLOGY_BUILD_TIMEOUT,
+                    "LLTDIcon": False,
+                    "SendXmlFile": False,
+                },
+            )
+        ).get("status", [])
+        if not data or not isinstance(data, list) or not isinstance(data[0], dict):
+            return self._topology_cache
+
+        topology_via_device: dict[str, str] = {}
+        topology_repeaters: dict[str, str] = {}
+
+        def _is_repeater(node: dict[str, Any]) -> bool:
+            ssw = node.get("SSW", {})
+            return isinstance(ssw, dict) and ssw.get("CurrentMode") == "Slave"
+
+        def _walk(node: dict[str, Any], repeater_key: str | None = None) -> None:
+            key = node.get("Key")
+            current_repeater = repeater_key
+
+            if isinstance(key, str) and _is_repeater(node):
+                current_repeater = key
+                topology_repeaters[key] = node.get("Name", key)
+            elif (
+                repeater_key
+                and isinstance(key, str)
+                and node.get("PhysAddress")
+            ):
+                topology_via_device[key] = repeater_key
+
+            for child in node.get("Children", []) or []:
+                if isinstance(child, dict):
+                    _walk(child, current_repeater)
+
+        _walk(data[0])
+        self._topology_cache = (topology_via_device, topology_repeaters)
+        self._topology_cache_at = now
+        self._topology_last_update = cast(str | None, data[0].get("LastUpdate")) or (
+            last_update if isinstance(last_update, str) else None
+        )
+        return self._topology_cache
+
+    def get_parent_device_identifier(self, device_key: str | None) -> tuple[str, str]:
+        """Return the parent device identifier for a tracked device."""
+        unique_id = self.unique_id or DOMAIN
+        data = self.data or {}
+        if isinstance(device_key, str):
+            parent_key = data.get("topology_via_device", {}).get(device_key)
+            if isinstance(parent_key, str):
+                return (DOMAIN, parent_key)
+        return (DOMAIN, unique_id)
+
+    def get_repeater_name(self, device_key: str | None) -> str | None:
+        """Return the repeater name for a tracked device, if any."""
+        data = self.data or {}
+        if not isinstance(device_key, str):
+            return None
+        parent_key = data.get("topology_via_device", {}).get(device_key)
+        if not isinstance(parent_key, str):
+            return None
+        return data.get("topology_repeaters", {}).get(parent_key)
 
     async def async_get_callers(
         self,

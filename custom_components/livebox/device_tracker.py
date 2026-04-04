@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityDescription
@@ -52,23 +53,27 @@ def async_add_new_tracked_entities(
     tracked: set[str],
 ) -> None:
     """Add new tracker entities from the router."""
-    new_tracked = []
+    repeater_entities = []
+    client_entities = []
+    repeater_keys = coordinator.data.get("topology_repeaters", {})
 
     _LOGGER.debug("Adding device trackers entities")
     for mac, device in coordinator.data.get("devices", {}).items():
         if mac in tracked:
             continue
         _LOGGER.debug("New device tracker: %s", device.get("Name", "Unknown"))
-        new_tracked.append(
-            LiveboxDeviceScannerEntity(
-                coordinator,
-                EntityDescription(key=f"{mac}_tracker", name=device.get("Name")),
-                device,
-            )
+        entity = LiveboxDeviceScannerEntity(
+            coordinator,
+            EntityDescription(key=f"{mac}_tracker", name=device.get("Name")),
+            device,
         )
+        if mac in repeater_keys:
+            repeater_entities.append(entity)
+        else:
+            client_entities.append(entity)
         tracked.add(mac)
 
-    async_add_entities(new_tracked)
+    async_add_entities(repeater_entities + client_entities)
 
 
 @callback
@@ -88,10 +93,12 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         """Initialize the device tracker."""
         super().__init__(coordinator, description)
         self._device = device
+        self._device_key = cast(str | None, device.get("Key"))
+        self._via_device = coordinator.get_parent_device_identifier(self._device_key)
         self._old_status = datetime.today()
         self._attr_is_connected = device.get("Active", False)
         self._attr_source_type = SourceType.ROUTER
-        self._attr_mac_address = device.get("Key")
+        self._attr_mac_address = self._device_key
         self._attr_ip_address = device.get("IPAddress")
 
     @property
@@ -205,17 +212,34 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
     @property
     def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
         """Return device info to link entity to the Livebox device."""
-        unique_id = self.coordinator.unique_id or DOMAIN
+        if isinstance(self._device_key, str):
+            device_identifier = self._device_key
+        elif isinstance(self.name, str):
+            device_identifier = self.name
+        else:
+            device_identifier = DOMAIN
         return DeviceInfo(
             name=self._device.get("Name"),
-            identifiers={(DOMAIN, self._device.get("Key", self.name))},
-            via_device=(DOMAIN, unique_id),
+            identifiers={(DOMAIN, device_identifier)},
+            via_device=self._via_device,
         )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Respond to a DataUpdateCoordinator update."""
-        self._device = self.coordinator.data.get("devices", {}).get(self.unique_id, {})
+        self._device = self.coordinator.data.get("devices", {}).get(
+            self._device_key, {}
+        )
         self._attr_ip_address = self._device.get("IPAddress")
+        via_device = self.coordinator.get_parent_device_identifier(self._device_key)
+        if via_device != self._via_device and self.device_entry is not None:
+            # Re-link the existing device when topology becomes available later.
+            self._via_device = via_device
+            self.device_entry = dr.async_get(self.hass).async_get_or_create(
+                config_entry_id=self.coordinator.config_entry.entry_id,
+                **cast(DeviceInfo, self.device_info),
+            )
+        else:
+            self._via_device = via_device
 
         self.async_write_ha_state()

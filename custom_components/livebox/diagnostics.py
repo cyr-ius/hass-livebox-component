@@ -225,6 +225,17 @@ async def async_get_config_entry_diagnostics(
                 }
             ],
         ),
+        coordinator.api.topologydiagnostics.async_get_topodiags,
+        (
+            coordinator.api.topologydiagnostics.async_set_topodiags_build,
+            [
+                {
+                    "Timeout": 30,
+                    "LLTDIcon": False,
+                    "SendXmlFile": False,
+                }
+            ],
+        ),
     ]
 
     _LOGGER.debug("Start building diagnostics data...")

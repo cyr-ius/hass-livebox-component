@@ -159,3 +159,4 @@ async def test_form_already_configured(
         # Assert the flow is aborted
         assert result2["type"] == FlowResultType.ABORT
         assert result2["reason"] == "already_configured"
+
