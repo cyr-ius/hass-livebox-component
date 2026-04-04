@@ -1,11 +1,12 @@
 from ipaddress import ip_address
 
-from custom_components.livebox.const import CONF_USE_TLS, CONF_VERIFY_TLS
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.helpers.service_info.zeroconf import (
     ATTR_PROPERTIES_ID,
     ZeroconfServiceInfo,
 )
+
+from custom_components.livebox.const import CONF_USE_TLS, CONF_VERIFY_TLS
 
 MOCK_USER_INPUT = {
     CONF_USERNAME: "192.168.1.1",

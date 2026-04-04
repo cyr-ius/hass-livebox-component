@@ -27,6 +27,14 @@ log_cli = true
 [tool.uv]
 package = false
 
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["UP040"]
+
 [tool.pyrefly]
 project-includes = [
     "**/*.py*",

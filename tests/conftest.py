@@ -5,6 +5,14 @@ from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
+from homeassistant.config_entries import SOURCE_USER, ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.util import slugify
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    load_json_object_fixture,
+)
+
 from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
@@ -15,13 +23,6 @@ from custom_components.livebox.const import (
     DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_WIFI_TRACKING,
     DOMAIN,
-)
-from homeassistant.config_entries import SOURCE_USER, ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.util import slugify
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    load_json_object_fixture,
 )
 
 from .const import (

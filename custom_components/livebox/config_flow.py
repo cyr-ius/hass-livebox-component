@@ -15,14 +15,13 @@ from aiosysbus.exceptions import (
     InsufficientPermissionsError,
     RetrieveFailed,
 )
+from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
-
-from homeassistant import config_entries
 
 from .const import (
     CONF_DISPLAY_DEVICES,
