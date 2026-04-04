@@ -11,6 +11,7 @@ dev = [
   "async-upnp-client",
   "pre-commit",
   "pycares<5",
+  "pyrefly",
   "pylint",
   "pytest-homeassistant-custom-component==0.13.272",
 ]
