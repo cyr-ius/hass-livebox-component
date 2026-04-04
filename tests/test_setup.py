@@ -1,6 +1,5 @@
 """Tests pour l'intégration Bbox2 utilisant config_entries."""
 
-from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -12,7 +11,7 @@ from homeassistant.core import HomeAssistant
 async def test_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ) -> None:
     """Test du setup via une config entry."""
 
@@ -26,7 +25,7 @@ async def test_setup_entry(
 async def test_coordinator_refresh(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
-    AIOSysbus: Generator[AsyncMock | MagicMock],
+    AIOSysbus: AsyncMock | MagicMock,
 ) -> None:
     """Test du setup via une config entry."""
 
