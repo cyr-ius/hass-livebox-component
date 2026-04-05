@@ -3,7 +3,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.9
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
           - --fix
   - repo: https://github.com/codespell-project/codespell
@@ -50,7 +50,17 @@ repos:
     hooks:
       - id: pyrefly-check
         name: pyrefly-check
-        entry: uv run pyrefly check custom_components tests
+        entry: |
+          bash -euo pipefail -c '
+          if ! command -v uv &>/dev/null; then
+            echo "uv is not installed; skipping pyrefly type check" >&2
+            exit 0
+          fi
+          if uv run pyrefly --version &>/dev/null; then
+            exec uv run pyrefly check custom_components tests
+          fi
+          echo "pyrefly is not installed; skipping type check" >&2
+          '
         language: system
         pass_filenames: false
         files: ^(custom_components|tests)/.+\.py$
