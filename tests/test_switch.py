@@ -58,7 +58,7 @@ async def test_switch_wifi(
     assert state.state == STATE_ON
 
 
-@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1","7.2"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
 async def test_switch_guest_wifi(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

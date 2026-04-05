@@ -254,11 +254,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             if isinstance(key, str) and _is_repeater(node):
                 current_repeater = key
                 topology_repeaters[key] = node.get("Name", key)
-            elif (
-                repeater_key
-                and isinstance(key, str)
-                and node.get("PhysAddress")
-            ):
+            elif repeater_key and isinstance(key, str) and node.get("PhysAddress"):
                 topology_via_device[key] = repeater_key
 
             for child in node.get("Children", []) or []:
@@ -311,7 +307,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "status": call.get("callType"),
                 "duration": call.get("duration"),
                 "id": call.get("callId"),
-                "origin": call.get("callOrigin")
+                "origin": call.get("callOrigin"),
             }
             callers.append(caller)
             if call["callType"] == "missed":
@@ -501,9 +497,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         if self.model == 5656:
             return []
 
-        data = (
-            await self._make_request(self.api.dhcp.async_get_dhcp_pool)
-        ).get("status", {})
+        data = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get(
+            "status", {}
+        )
         if data.get(domain, {}).get("Enable", False) is False:
             return []
 

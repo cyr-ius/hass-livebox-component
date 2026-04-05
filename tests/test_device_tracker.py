@@ -86,9 +86,9 @@ async def test_device_tracker_new_device(
     assert state is not None
 
 
-async def test_device_tracker_adds_repeaters_before_clients(
-) -> None:
+async def test_device_tracker_adds_repeaters_before_clients() -> None:
     """Create repeater entities before their children and set via_device."""
+
     def _get_parent_device_identifier(device_key: str | None) -> tuple[str, str]:
         if device_key == "DD:DD:DD:DD:DD:01":
             return (DOMAIN, "CC:CC:CC:CC:CC:01")

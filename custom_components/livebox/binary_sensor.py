@@ -51,8 +51,9 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
             "wan_ipv6prefix": lambda x: find_item(x, "wan_status.IPv6DelegatedPrefix"),
             "wired clients": lambda x: x.get("count_wired_devices"),
             "wireless clients": lambda x: x.get("count_wireless_devices"),
-            "uptime": lambda x: datetime.today()
-            - timedelta(seconds=find_item(x, "infos.UpTime", 0)),
+            "uptime": lambda x: (
+                datetime.today() - timedelta(seconds=find_item(x, "infos.UpTime", 0))
+            ),
         },
         translation_key="connectivity",
     ),
@@ -95,8 +96,9 @@ async def async_setup_entry(
             icon=DDNS_ICON,
             device_class=BinarySensorDeviceClass.PROBLEM,
             name=f"Dynamic DNS ({item.get('service')})",
-            value_fn=lambda x, y: find_item(x, f"ddns.{y}.status", "").lower()
-            != "updated",
+            value_fn=lambda x, y: (
+                find_item(x, f"ddns.{y}.status", "").lower() != "updated"
+            ),
             attrs={"last_update": lambda x, y: find_item(x, f"ddns.{y}.last_update")},
             translation_key=f"ddns_{idx}",
         )

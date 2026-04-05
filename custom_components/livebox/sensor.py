@@ -30,6 +30,7 @@ from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True, kw_only=True)
 class LiveboxSensorEntityDescription(SensorEntityDescription):
     """Represents an Flow Sensor."""
@@ -67,9 +68,10 @@ def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
         previous_reading = current_reading
         previous_uptime = current_uptime
 
-        return (rolls<<32) + current_reading
+        return (rolls << 32) + current_reading
 
     return value_fn
+
 
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
     """Returns a closure function for value_fn of entities with variable name"""
@@ -105,7 +107,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         name="xDSL Upload",
         icon=UPLOAD_ICON,
         translation_key="up_rate",
-        value_fn=lambda x: x.get("dsl_status", {}).get("UpstreamCurrRate", 0) ,
+        value_fn=lambda x: x.get("dsl_status", {}).get("UpstreamCurrRate", 0),
         native_unit_of_measurement=UnitOfDataRate.KILOBITS_PER_SECOND,
         suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
@@ -156,18 +158,15 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_rx",
         attrs={
-            "Downstream max rate Gbps": lambda x: find_item(
-                x, "fiber_status.DownstreamMaxRate", 0
-            )
-            / 1000,
-            "Downstream current rate Gbps": lambda x: find_item(
-                x, "fiber_status.DownstreamCurrRate", 0
-            )
-            / 1000,
-            "Max bitrate (Gbps)": lambda x: find_item(
-                x, "fiber_status.MaxBitRateSupported", 0
-            )
-            / 1000,
+            "Downstream max rate Gbps": lambda x: (
+                find_item(x, "fiber_status.DownstreamMaxRate", 0) / 1000
+            ),
+            "Downstream current rate Gbps": lambda x: (
+                find_item(x, "fiber_status.DownstreamCurrRate", 0) / 1000
+            ),
+            "Max bitrate (Gbps)": lambda x: (
+                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            ),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
             "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
@@ -185,18 +184,15 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_tx",
         attrs={
-            "Upstream max rate (Gbps)": lambda x: find_item(
-                x, "fiber_status.UpstreamMaxRate", 0
-            )
-            / 1000,
-            "Upstream current rate (Gbps)": lambda x: find_item(
-                x, "fiber_status.UpstreamCurrRate", 0
-            )
-            / 1000,
-            "Max bitrate (Gbps)": lambda x: find_item(
-                x, "fiber_status.MaxBitRateSupported", 0
-            )
-            / 1000,
+            "Upstream max rate (Gbps)": lambda x: (
+                find_item(x, "fiber_status.UpstreamMaxRate", 0) / 1000
+            ),
+            "Upstream current rate (Gbps)": lambda x: (
+                find_item(x, "fiber_status.UpstreamCurrRate", 0) / 1000
+            ),
+            "Max bitrate (Gbps)": lambda x: (
+                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            ),
             "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
