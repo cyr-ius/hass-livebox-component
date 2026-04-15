@@ -3,9 +3,10 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.10
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
           - --fix
+      - id: ruff-format
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
     hooks:
@@ -14,6 +15,7 @@ repos:
           - --ignore-words-list=hass
           - --skip="./.*,*.csv,*.json"
           - --quiet-level=2
+        exclude: ^uv\.lock$
         exclude_types: [csv, json]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -45,3 +47,21 @@ repos:
           - --force
           - --keep-updates
         files: ^custom_components/.+\.py$
+  - repo: local
+    hooks:
+      - id: pyrefly-check
+        name: pyrefly-check
+        entry: |
+          bash -euo pipefail -c '
+          if ! command -v uv &>/dev/null; then
+            echo "uv is not installed; skipping pyrefly type check" >&2
+            exit 0
+          fi
+          if uv run pyrefly --version &>/dev/null; then
+            exec uv run pyrefly check custom_components tests
+          fi
+          echo "pyrefly is not installed; skipping type check" >&2
+          '
+        language: system
+        pass_filenames: false
+        files: ^(custom_components|tests)/.+\.py$

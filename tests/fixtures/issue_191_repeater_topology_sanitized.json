@@ -1,0 +1,268 @@
+{
+  "api_raw": {
+    "TopologyDiagnostics.async_get_topodiags": {
+      "status": {
+        "DiagnosticsState": "Complete",
+        "LastUpdate": "2026-04-04T22:14:03Z",
+        "DiscoveryMode": "Absolute",
+        "APIVersion": "1.0.2"
+      }
+    },
+    "TopologyDiagnostics.async_set_topodiags_build": {
+      "status": [
+        {
+          "Key": "HGW",
+          "Name": "LIVEBOX",
+          "DeviceType": "SAH HGW",
+          "Active": true,
+          "Tags": "self physical hgw wan sswLocal ipv4 ipv6 events gpon",
+          "Master": "**REDACTED**",
+          "Location": "",
+          "Owner": "",
+          "SSW": {
+            "Capabilities": "Master",
+            "CurrentMode": "Master"
+          },
+          "Children": [
+            {
+              "Key": "lan",
+              "Name": "lan",
+              "DeviceType": "",
+              "Active": true,
+              "Tags": "self lan mac nemo interface ipv4 ipv6 bridge dhcpserver upnp",
+              "Master": "",
+              "PhysAddress": "**REDACTED**",
+              "Layer2Interface": "",
+              "InterfaceName": "",
+              "Children": [
+                {
+                  "Key": "vap5g0priv0",
+                  "Name": "vap5g0priv0",
+                  "DeviceType": "",
+                  "Active": true,
+                  "Tags": "self lan vap wifi nemo interface events",
+                  "Master": "",
+                  "OperatingFrequencyBand": "5GHz",
+                  "Children": [
+                    {
+                      "Key": "AA:AA:AA:AA:AA:01",
+                      "Name": "Device-Direct-5g-1",
+                      "DeviceType": "Computer",
+                      "Active": true,
+                      "Tags": "lan edev mac physical ssw_sta flowstats ipv4 ipv6 dhcp mdns events wifi",
+                      "Master": "",
+                      "Location": "",
+                      "PhysAddress": "**REDACTED**",
+                      "Layer2Interface": "wl0",
+                      "InterfaceName": "vap5g0priv0",
+                      "Owner": "",
+                      "SignalStrength": -61,
+                      "OperatingFrequencyBand": "5GHz"
+                    }
+                  ]
+                },
+                {
+                  "Key": "ETH0",
+                  "Name": "ETH0",
+                  "DeviceType": "",
+                  "Active": true,
+                  "Tags": "self lan eth nemo interface events",
+                  "Master": "",
+                  "Children": [
+                    {
+                      "Key": "BB:BB:BB:BB:BB:01",
+                      "Name": "Device-Wired-1",
+                      "DeviceType": "Computer",
+                      "Active": true,
+                      "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp eth events",
+                      "Master": "",
+                      "Location": "",
+                      "PhysAddress": "**REDACTED**",
+                      "Layer2Interface": "eth4",
+                      "InterfaceName": "ETH0",
+                      "Owner": ""
+                    },
+                    {
+                      "Key": "CC:CC:CC:CC:CC:01",
+                      "Name": "Repeater-1",
+                      "DeviceType": "repeteurwifi6",
+                      "Active": true,
+                      "Tags": "lan mac physical flowstats orange information ipv4 ipv6 dhcp hnid ssw ssw_sta eth manageable events",
+                      "Master": "",
+                      "Location": "",
+                      "PhysAddress": "**REDACTED**",
+                      "Layer2Interface": "eth4",
+                      "InterfaceName": "ETH0",
+                      "Owner": "",
+                      "SSW": {
+                        "State": "Synced",
+                        "Protocol": "MQTT",
+                        "Capabilities": "Slave",
+                        "CurrentMode": "Slave",
+                        "LocalUplinkInterface": "_CC:CC:CC:CC:CC:01_eth0",
+                        "UplinkType": "Ethernet"
+                      },
+                      "Children": [
+                        {
+                          "Key": "_CC:CC:CC:CC:CC:01_vap5g0priv",
+                          "Name": "vap5g0priv",
+                          "DeviceType": "",
+                          "Active": true,
+                          "Tags": "vap wifi interface lan bridge events",
+                          "Master": "",
+                          "OperatingFrequencyBand": "5GHz",
+                          "Children": [
+                            {
+                              "Key": "DD:DD:DD:DD:DD:01",
+                              "Name": "Device-Repeater-5g-1",
+                              "DeviceType": "Mobile",
+                              "Active": true,
+                              "Tags": "lan edev mac physical ipv4 ipv6 dhcp apple ssw_sta flowstats events wifi",
+                              "Master": "",
+                              "Location": "",
+                              "PhysAddress": "**REDACTED**",
+                              "Layer2Interface": "eth4",
+                              "InterfaceName": "ETH0",
+                              "Owner": "",
+                              "SignalStrength": -77,
+                              "OperatingFrequencyBand": "5GHz"
+                            }
+                          ]
+                        },
+                        {
+                          "Key": "_CC:CC:CC:CC:CC:01_vap2g0priv",
+                          "Name": "vap2g0priv",
+                          "DeviceType": "",
+                          "Active": true,
+                          "Tags": "vap wifi interface lan bridge events",
+                          "Master": "",
+                          "OperatingFrequencyBand": "2.4GHz",
+                          "Children": [
+                            {
+                              "Key": "EE:EE:EE:EE:EE:01",
+                              "Name": "Device-Repeater-2g-1",
+                              "DeviceType": "Computer",
+                              "Active": true,
+                              "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp ssw_sta events wifi",
+                              "Master": "",
+                              "Location": "",
+                              "PhysAddress": "**REDACTED**",
+                              "Layer2Interface": "eth4",
+                              "InterfaceName": "ETH0",
+                              "Owner": "",
+                              "SignalStrength": -68,
+                              "OperatingFrequencyBand": "2.4GHz"
+                            },
+                            {
+                              "Key": "FF:FF:FF:FF:FF:01",
+                              "Name": "Device-Repeater-2g-2",
+                              "DeviceType": "Computer",
+                              "Active": true,
+                              "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp mdns ssw_sta events wifi",
+                              "Master": "",
+                              "Location": "",
+                              "PhysAddress": "**REDACTED**",
+                              "Layer2Interface": "eth4",
+                              "InterfaceName": "ETH0",
+                              "Owner": "",
+                              "SignalStrength": -39,
+                              "OperatingFrequencyBand": "2.4GHz"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Devices.async_get_devices": {
+      "status": [
+        {
+          "Key": "AA:AA:AA:AA:AA:01",
+          "Name": "Device-Direct-5g-1",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.14",
+          "Active": true,
+          "Tags": "lan edev mac physical ssw_sta flowstats ipv4 ipv6 dhcp mdns events wifi",
+          "Layer2Interface": "wl0",
+          "InterfaceName": "vap5g0priv0",
+          "OperatingFrequencyBand": "5GHz"
+        },
+        {
+          "Key": "BB:BB:BB:BB:BB:01",
+          "Name": "Device-Wired-1",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.20",
+          "Active": true,
+          "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp eth events",
+          "Layer2Interface": "eth4",
+          "InterfaceName": "ETH0"
+        },
+        {
+          "Key": "CC:CC:CC:CC:CC:01",
+          "Name": "Repeater-1",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.39",
+          "Active": true,
+          "Tags": "lan mac physical flowstats orange information ipv4 ipv6 dhcp hnid ssw ssw_sta eth manageable events",
+          "Layer2Interface": "eth4",
+          "InterfaceName": "ETH0",
+          "DeviceType": "repeteurwifi6"
+        },
+        {
+          "Key": "DD:DD:DD:DD:DD:01",
+          "Name": "Device-Repeater-5g-1",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.21",
+          "Active": true,
+          "Tags": "lan edev mac physical ipv4 ipv6 dhcp apple ssw_sta flowstats events wifi",
+          "Layer2Interface": "eth4",
+          "InterfaceName": "ETH0",
+          "SignalStrength": -77,
+          "OperatingFrequencyBand": "5GHz"
+        },
+        {
+          "Key": "EE:EE:EE:EE:EE:01",
+          "Name": "Device-Repeater-2g-1",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.42",
+          "Active": true,
+          "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp ssw_sta events wifi",
+          "Layer2Interface": "eth4",
+          "InterfaceName": "ETH0",
+          "SignalStrength": -68,
+          "OperatingFrequencyBand": "2.4GHz"
+        },
+        {
+          "Key": "FF:FF:FF:FF:FF:01",
+          "Name": "Device-Repeater-2g-2",
+          "PhysAddress": "**REDACTED**",
+          "IPAddress": "192.168.1.44",
+          "Active": true,
+          "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp mdns ssw_sta events wifi",
+          "Layer2Interface": "eth4",
+          "InterfaceName": "ETH0",
+          "SignalStrength": -39,
+          "OperatingFrequencyBand": "2.4GHz"
+        },
+        {
+          "Key": "vap5g0priv0",
+          "Name": "vap5g0priv0",
+          "Active": true,
+          "Tags": "self lan vap wifi nemo interface events"
+        },
+        {
+          "Key": "ETH0",
+          "Name": "ETH0",
+          "Active": true,
+          "Tags": "self lan eth nemo interface events"
+        }
+      ]
+    }
+  }
+}

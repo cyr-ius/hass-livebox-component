@@ -1,0 +1,100 @@
+{
+  "custom_components": {
+    "livebox": {
+      "version": "2.4.8"
+    }
+  },
+  "data": {
+    "entry": {
+      "data": {
+        "host": "**REDACTED**",
+        "password": "**REDACTED**",
+        "port": 80,
+        "username": "**REDACTED**"
+      },
+      "options": {
+        "wifi_tracking": false,
+        "lan_tracking": false,
+        "timeout_tracking": 300,
+        "device_tracker_mode": "Active only"
+      }
+    },
+    "data": {
+      "infos": {
+        "ProductClass": "Livebox Nautilus",
+        "Manufacturer": "Arcadyan",
+        "ModelName": "PRV33AX346B-H2-OG",
+        "SoftwareVersion": "ARNA-fr-G01.R05.C01_06",
+        "UpTime": 3418357
+      },
+      "wan_status": {
+        "WanState": "up",
+        "LinkType": "gpon",
+        "LinkState": "up",
+        "GponState": "O5_Operation",
+        "MACAddress": "**REDACTED**",
+        "Protocol": "dhcp",
+        "ConnectionState": "Bound",
+        "LastConnectionError": "None",
+        "IPAddress": "**REDACTED**",
+        "RemoteGateway": "**REDACTED**",
+        "DNSServers": "80.10.246.1,81.253.149.9,2a01:cfc4:2000:f::1,2a01:cfc4:2180:4001::2",
+        "IPv6Address": "**REDACTED**",
+        "IPv6DelegatedPrefix": "**REDACTED**",
+        "ConnectionStateIPv6": "Bound",
+        "LastConnectionErrorIPv6": "RenewTimeout",
+        "RemoteGatewayIPv6": "fe80::ba0:bab"
+      },
+      "stats": {
+        "vap2g0priv": {
+          "friendly_name": "2.4GHz-Private_SSID",
+          "alias": null,
+          "rate_rx": 0.0,
+          "rate_tx": 0.0
+        },
+        "vap5g0priv": {
+          "friendly_name": "5GHz-Private_SSID",
+          "alias": null,
+          "rate_rx": 0.01,
+          "rate_tx": 0.06
+        },
+        "ETH0": {
+          "friendly_name": "eth1",
+          "alias": null,
+          "rate_rx": 0.01,
+          "rate_tx": 0.0
+        },
+        "ETH1": {
+          "friendly_name": "eth2",
+          "alias": null,
+          "rate_rx": 0.0,
+          "rate_tx": 0.0
+        },
+        "ETH2": {
+          "friendly_name": "eth3",
+          "alias": null,
+          "rate_rx": 0.0,
+          "rate_tx": 0.0
+        },
+        "veip0": {
+          "friendly_name": "WAN_GPON",
+          "alias": null,
+          "rate_rx": 0.06,
+          "rate_tx": 0.01
+        },
+        "vap2g0guest": {
+          "friendly_name": "2.4GHz-Guest_SSID",
+          "alias": null,
+          "rate_rx": 0.0,
+          "rate_tx": 0.0
+        },
+        "vap5g0guest": {
+          "friendly_name": "5GHz-Guest_SSID",
+          "alias": null,
+          "rate_rx": 0.0,
+          "rate_tx": 0.0
+        }
+      }
+    }
+  }
+}

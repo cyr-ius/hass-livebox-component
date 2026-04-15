@@ -1,3 +1,0 @@
-aiosysbus
-pytest-homeassistant-custom-component
-async-upnp-client

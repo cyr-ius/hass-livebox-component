@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.core import HomeAssistant, callback
@@ -111,10 +111,8 @@ async def async_setup_entry(
     async_update_wan_access()
 
 
-class LiveboxSwitch(LiveboxEntity, SwitchEntity):
+class LiveboxSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inconsistent-inheritance]
     """Representation of a livebox switch."""
-
-    entity_description: LiveboxSwitchEntityDescription
 
     def __init__(
         self,
@@ -127,20 +125,23 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        return self.entity_description.value_fn(self.coordinator.data) is True
+        description = cast(LiveboxSwitchEntityDescription, self.entity_description)
+        return description.value_fn(self.coordinator.data) is True
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        await self.entity_description.turn_on(self.coordinator.api)
+        description = cast(LiveboxSwitchEntityDescription, self.entity_description)
+        await description.turn_on(self.coordinator.api)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
-        await self.entity_description.turn_off(self.coordinator.api)
+        description = cast(LiveboxSwitchEntityDescription, self.entity_description)
+        await description.turn_off(self.coordinator.api)
         await self.coordinator.async_request_refresh()
 
 
-class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
+class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inconsistent-inheritance]
     """Representation of a livebox device WAN access switch."""
 
     _attr_icon = DEVICE_WANACCESS_ICON
@@ -156,10 +157,11 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
         self._device_key = device.get("Key", self.name)
         self._device = device
         self._attr_unique_id = description.key
+        unique_id = coordinator.unique_id or DOMAIN
         self._attr_device_info = DeviceInfo(
             name=self._device.get("Name"),
             identifiers={(DOMAIN, self._device_key)},
-            via_device=(DOMAIN, coordinator.unique_id),
+            via_device=(DOMAIN, unique_id),
         )
 
     def _get_device_schedule(self) -> dict[str, Any]:
@@ -172,13 +174,11 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
     def is_on(self) -> bool:
         """Return true if device currently have WAN access."""
         schedule = self._get_device_schedule()
-        if (
+        return not (
             schedule
             and (schedule.get("override") == "Disable")
             and (schedule.get("value") == "Disable")
-        ):
-            return False
-        return True
+        )
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
@@ -188,7 +188,8 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
             result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to unlock device {self._device.get('Name')} ({self._device_key}) "
+                    f"Fail to unlock device "
+                    f"{self._device.get('Name')} ({self._device_key}) "
                     "WAN access"
                 )
             await self.coordinator.async_request_refresh()
@@ -201,7 +202,8 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
             result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
+                    f"Fail to lock device "
+                    f"{self._device.get('Name')} ({self._device_key}) "
                     "WAN access"
                 )
             await self.coordinator.async_request_refresh()
@@ -221,7 +223,8 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):
             result = await self.coordinator.api.schedule.async_add_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to lock device {self._device.get('Name')} ({self._device_key}) "
+                    f"Fail to lock device "
+                    f"{self._device.get('Name')} ({self._device_key}) "
                     "WAN access"
                 )
             await self.coordinator.async_request_refresh()

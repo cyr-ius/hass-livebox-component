@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Final
+from typing import Any, Final, cast
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -51,8 +51,9 @@ BINARYSENSOR_TYPES: Final[tuple[LiveboxBinarySensorEntityDescription, ...]] = (
             "wan_ipv6prefix": lambda x: find_item(x, "wan_status.IPv6DelegatedPrefix"),
             "wired clients": lambda x: x.get("count_wired_devices"),
             "wireless clients": lambda x: x.get("count_wireless_devices"),
-            "uptime": lambda x: datetime.today()
-            - timedelta(seconds=find_item(x, "infos.UpTime", 0)),
+            "uptime": lambda x: (
+                datetime.today() - timedelta(seconds=find_item(x, "infos.UpTime", 0))
+            ),
         },
         translation_key="connectivity",
     ),
@@ -95,8 +96,9 @@ async def async_setup_entry(
             icon=DDNS_ICON,
             device_class=BinarySensorDeviceClass.PROBLEM,
             name=f"Dynamic DNS ({item.get('service')})",
-            value_fn=lambda x, y: find_item(x, f"ddns.{y}.status", "").lower()
-            != "updated",
+            value_fn=lambda x, y: (
+                find_item(x, f"ddns.{y}.status", "").lower() != "updated"
+            ),
             attrs={"last_update": lambda x, y: find_item(x, f"ddns.{y}.last_update")},
             translation_key=f"ddns_{idx}",
         )
@@ -105,10 +107,10 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
+class LiveboxBinarySensor(  # pyrefly: ignore[inconsistent-inheritance]
+    LiveboxEntity, BinarySensorEntity
+):
     """Livebox binary sensor."""
-
-    entity_description: LiveboxBinarySensorEntityDescription
 
     def __init__(
         self,
@@ -121,16 +123,22 @@ class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return state."""
-        if (idx := self.entity_description.index) is not None:
-            return self.entity_description.value_fn(self.coordinator.data, idx)
-        return self.entity_description.value_fn(self.coordinator.data)
+        description = cast(
+            LiveboxBinarySensorEntityDescription, self.entity_description
+        )
+        if (idx := description.index) is not None:
+            return description.value_fn(self.coordinator.data, idx)
+        return description.value_fn(self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
+        description = cast(
+            LiveboxBinarySensorEntityDescription, self.entity_description
+        )
         attributes = {}
-        for key, attr in self.entity_description.attrs.items():
-            if (idx := self.entity_description.index) is not None:
+        for key, attr in description.attrs.items():
+            if (idx := description.index) is not None:
                 attributes.update({key: attr(self.coordinator.data, idx)})
             else:
                 attributes.update({key: attr(self.coordinator.data)})

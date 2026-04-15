@@ -9,7 +9,8 @@ def find_item(data: dict[str, Any], key_chain: str, default: Any = None) -> Any:
     Parameters:
         data (dict[str, Any]) : dictionary to search
         key (str): searched string with dot for key delimited (ex: "key.key.key")
-            It is possible to integrate an element of an array by indicating its index number
+            It is possible to integrate an element of an array
+            by indicating its index number
         default (Any): default value to return if key not found
     Returns:
         Any: value of the key or default if not found
@@ -19,15 +20,16 @@ def find_item(data: dict[str, Any], key_chain: str, default: Any = None) -> Any:
         >>> find_item({"a": {"b": [{"c": "value"}]}}, "a.b.1.c", "default")
         "default"
     """
+    current: Any = data
     if (keys := key_chain.split(".")) and isinstance(keys, list):
         for key in keys:
-            if isinstance(data, dict):
-                data = data.get(key)
+            if isinstance(current, dict):
+                current = current.get(key)
             elif (
-                isinstance(data, list)
-                and len(data) > 0
+                isinstance(current, list)
+                and len(current) > 0
                 and key.isdigit()
-                and int(key) < len(data)
+                and int(key) < len(current)
             ):
-                data = data[int(key)]
-    return default if data is None and default is not None else data
+                current = current[int(key)]
+    return default if current is None and default is not None else current
