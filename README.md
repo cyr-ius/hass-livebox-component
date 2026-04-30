@@ -16,6 +16,17 @@ There is currently support for the following device types within Home Assistant:
 ![GitHub release](https://img.shields.io/github/release/Cyr-ius/hass-livebox-component)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
 
+## Development
+
+This repository uses [`uv`](https://docs.astral.sh/uv/) for local development.
+
+```bash
+uv sync --group dev
+uv run pytest
+uv run pyrefly check custom_components tests
+uv run pre-commit run --all-files
+```
+
 ## Configuration
 
 The preferred way to setup the Orange Livebox platform is by enabling the discovery component.

@@ -5,6 +5,7 @@ import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 
 from .const import CALLID, DOMAIN, PLATFORMS
@@ -13,6 +14,7 @@ from .coordinator import LiveboxDataUpdateCoordinator
 type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
 
 CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
 

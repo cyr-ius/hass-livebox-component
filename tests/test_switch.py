@@ -24,9 +24,9 @@ async def test_switch_wifi(
     wifi_data["status"]["Enable"] = false
     AIOSysbus.nmc.async_get_wifi.return_value = wifi_data
 
-    # This function will be the side effect of our mock to simulate the state change on the Bbox
+    # This side effect simulates the state change on the Bbox.
     async def mock_set_wireless_guest(enable):
-        wifi_data["status"]["Enable"] = True if enable else False
+        wifi_data["status"]["Enable"] = bool(enable)
 
     # Configure the mock to use the side effect
     AIOSysbus.nmc.async_set_wifi.side_effect = mock_set_wireless_guest
@@ -54,10 +54,11 @@ async def test_switch_wifi(
     await hass.async_block_till_done()
 
     state = hass.states.get(f"switch.{AIOSysbus.__unique_name}_wifi")
+    assert state is not None
     assert state.state == STATE_ON
 
 
-@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1","7.2"], indirect=True)
+@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
 async def test_switch_guest_wifi(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -73,9 +74,9 @@ async def test_switch_guest_wifi(
     wifi_data["status"]["Enable"] = false
     AIOSysbus.nmc.async_get_guest_wifi.return_value = wifi_data
 
-    # This function will be the side effect of our mock to simulate the state change on the Bbox
+    # This side effect simulates the state change on the Bbox.
     async def mock_set_wireless_guest(enable):
-        wifi_data["status"]["Enable"] = True if enable else False
+        wifi_data["status"]["Enable"] = bool(enable)
 
     # Configure the mock to use the side effect
     AIOSysbus.nmc.async_set_guest_wifi.side_effect = mock_set_wireless_guest
@@ -103,6 +104,7 @@ async def test_switch_guest_wifi(
     await hass.async_block_till_done()
 
     state = hass.states.get(f"switch.{AIOSysbus.__unique_name}_guest_wifi")
+    assert state is not None
     assert state.state == STATE_ON
 
 

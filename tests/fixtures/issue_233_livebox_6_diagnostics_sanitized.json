@@ -1,0 +1,420 @@
+{
+  "custom_components": {
+    "livebox": {
+      "version": "2.4.8"
+    }
+  },
+  "data": {
+    "entry": {
+      "data": {
+        "host": "**REDACTED**",
+        "password": "**REDACTED**",
+        "port": 80,
+        "username": "**REDACTED**"
+      },
+      "options": {
+        "device_tracker_mode": "All",
+        "lan_tracking": true,
+        "timeout_tracking": 120,
+        "wifi_tracking": true
+      }
+    },
+    "data": {
+      "infos": {
+        "ProductClass": "Livebox 6"
+      },
+      "count_wired_devices": 0,
+      "count_wireless_devices": 4
+    },
+    "api_raw": {
+      "Devices.async_get_devices::{'expression': {'wifi': 'wifi && (edev || hnid) and .PhysAddress!=\"\"', 'eth': 'eth && (edev || hnid) and .PhysAddress!=\"\"'}}": {
+        "status": {
+          "wifi": [
+            {
+              "Key": "wifi-1",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ssw_sta flowstats ipv4 ipv6 dhcp mdns events",
+              "PhysAddress": "wifi-phys-1"
+            },
+            {
+              "Key": "wifi-2",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp mdns events",
+              "PhysAddress": "wifi-phys-2"
+            },
+            {
+              "Key": "wifi-3",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-3"
+            },
+            {
+              "Key": "wifi-4",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-4"
+            },
+            {
+              "Key": "wifi-5",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-5"
+            },
+            {
+              "Key": "wifi-6",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-6"
+            },
+            {
+              "Key": "wifi-7",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-7"
+            },
+            {
+              "Key": "wifi-8",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp events",
+              "PhysAddress": "wifi-phys-8"
+            },
+            {
+              "Key": "wifi-9",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats ssw_sta wifi events",
+              "PhysAddress": "wifi-phys-9"
+            },
+            {
+              "Key": "wifi-10",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp flowstats wifi ssw_sta events",
+              "PhysAddress": "wifi-phys-10"
+            },
+            {
+              "Key": "wifi-11",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 ssw_sta dhcp android mdns events",
+              "PhysAddress": "wifi-phys-11"
+            },
+            {
+              "Key": "wifi-12",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp mdns apple events",
+              "PhysAddress": "wifi-phys-12"
+            },
+            {
+              "Key": "wifi-13",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp events",
+              "PhysAddress": "wifi-phys-13"
+            },
+            {
+              "Key": "wifi-14",
+              "Active": false,
+              "Tags": "lan edev mac physical wifi ssw_sta ipv4 ipv6 dhcp mdns apple flowstats events",
+              "PhysAddress": "wifi-phys-14"
+            },
+            {
+              "Key": "wifi-15",
+              "Active": true,
+              "Tags": "lan mac physical wifi flowstats ssw_sta ipv4 ipv6 dhcp hnid wifi_bridge events",
+              "PhysAddress": "wifi-phys-15"
+            },
+            {
+              "Key": "wifi-16",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-16"
+            },
+            {
+              "Key": "wifi-17",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ssw_sta flowstats ipv4 ipv6 dhcp events",
+              "PhysAddress": "wifi-phys-17"
+            },
+            {
+              "Key": "wifi-18",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-18"
+            },
+            {
+              "Key": "wifi-19",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta mdns events",
+              "PhysAddress": "wifi-phys-19"
+            },
+            {
+              "Key": "wifi-20",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-20"
+            },
+            {
+              "Key": "wifi-21",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta mdns events",
+              "PhysAddress": "wifi-phys-21"
+            },
+            {
+              "Key": "wifi-22",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp android ssw_sta vowifi events",
+              "PhysAddress": "wifi-phys-22"
+            },
+            {
+              "Key": "wifi-23",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ipv4 ipv6 dhcp ssw_sta flowstats events",
+              "PhysAddress": "wifi-phys-23"
+            },
+            {
+              "Key": "wifi-24",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-24"
+            },
+            {
+              "Key": "wifi-25",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp wifi flowstats ssw_sta events",
+              "PhysAddress": "wifi-phys-25"
+            },
+            {
+              "Key": "wifi-26",
+              "Active": false,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-26"
+            },
+            {
+              "Key": "wifi-27",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-27"
+            },
+            {
+              "Key": "wifi-28",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-28"
+            },
+            {
+              "Key": "wifi-29",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-29"
+            },
+            {
+              "Key": "wifi-30",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta mdns events",
+              "PhysAddress": "wifi-phys-30"
+            },
+            {
+              "Key": "wifi-31",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-31"
+            },
+            {
+              "Key": "wifi-32",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-32"
+            },
+            {
+              "Key": "wifi-33",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ipv4 ipv6 flowstats ssw_sta events",
+              "PhysAddress": "wifi-phys-33"
+            },
+            {
+              "Key": "wifi-34",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ipv4 ipv6 dhcp flowstats ssw_sta events",
+              "PhysAddress": "wifi-phys-34"
+            },
+            {
+              "Key": "wifi-35",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-35"
+            },
+            {
+              "Key": "wifi-36",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp ssw_sta wifi flowstats events",
+              "PhysAddress": "wifi-phys-36"
+            },
+            {
+              "Key": "wifi-37",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp wifi flowstats ssw_sta events",
+              "PhysAddress": "wifi-phys-37"
+            },
+            {
+              "Key": "wifi-38",
+              "Active": false,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp wifi flowstats ssw_sta upnp samsung tv events",
+              "PhysAddress": "wifi-phys-38"
+            },
+            {
+              "Key": "wifi-39",
+              "Active": true,
+              "Tags": "lan mac physical ipv4 ipv6 dhcp stb orange power_state stellar upnp wifi hnid flowstats events ssw_sta wifi_bridge",
+              "PhysAddress": "wifi-phys-39"
+            },
+            {
+              "Key": "wifi-40",
+              "Active": false,
+              "Tags": "lan mac physical ipv4 ipv6 dhcp wifi flowstats ssw_sta apple hnid wifi_bridge events",
+              "PhysAddress": "wifi-phys-40"
+            },
+            {
+              "Key": "wifi-41",
+              "Active": false,
+              "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-41"
+            },
+            {
+              "Key": "wifi-42",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 wifi flowstats dhcp ssw_sta events",
+              "PhysAddress": "wifi-phys-42"
+            },
+            {
+              "Key": "wifi-43",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp wifi flowstats android ssw_sta events",
+              "PhysAddress": "wifi-phys-43"
+            },
+            {
+              "Key": "wifi-44",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 flowstats events dhcp apple wifi ssw_sta",
+              "PhysAddress": "wifi-phys-44"
+            },
+            {
+              "Key": "wifi-45",
+              "Active": true,
+              "Tags": "lan edev mac physical ipv4 ipv6 flowstats events dhcp apple wifi ssw_sta",
+              "PhysAddress": "wifi-phys-45"
+            },
+            {
+              "Key": "wifi-46",
+              "Active": true,
+              "Tags": "lan edev mac physical wifi ipv4 ipv6 dhcp ssw_sta upnp",
+              "PhysAddress": "wifi-phys-46"
+            },
+            {
+              "Key": "wifi-47",
+              "Active": true,
+              "Tags": "lan mac physical wifi orange information hnid ipv4 ipv6 dhcp manageable ssw",
+              "PhysAddress": "wifi-phys-47"
+            },
+            {
+              "Key": "wifi-48",
+              "Active": false,
+              "Tags": "lan edev mac physical ipv4 ipv6 dhcp wifi",
+              "PhysAddress": "wifi-phys-48"
+            }
+          ],
+          "eth": [
+            {
+              "Key": "eth-1",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 dhcp mdns upnp events",
+              "PhysAddress": "eth-phys-1"
+            },
+            {
+              "Key": "eth-2",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 upnp mdns events",
+              "PhysAddress": "eth-phys-2"
+            },
+            {
+              "Key": "eth-3",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 dhcp microsoft lltd upnp events",
+              "PhysAddress": "eth-phys-3"
+            },
+            {
+              "Key": "eth-4",
+              "Active": false,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 upnp events",
+              "PhysAddress": "eth-phys-4"
+            }
+          ]
+        }
+      },
+      "Devices.async_get_devices::{'expression': {'wifi': 'lan && vap && .Active==True', 'eth': 'lan && eth && .Active==True'}}": {
+        "status": {
+          "wifi": [
+            {
+              "Key": "interface-wifi-1",
+              "Active": true,
+              "Tags": "self lan vap wifi nemo interface events",
+              "PhysAddress": "interface-wifi-phys-1"
+            },
+            {
+              "Key": "interface-wifi-2",
+              "Active": true,
+              "Tags": "self lan vap wifi nemo interface events",
+              "PhysAddress": "interface-wifi-phys-2"
+            },
+            {
+              "Key": "interface-wifi-3",
+              "Active": true,
+              "Tags": "self lan vap wifi nemo interface events",
+              "PhysAddress": "interface-wifi-phys-3"
+            }
+          ],
+          "eth": [
+            {
+              "Key": "interface-eth-1",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 dhcp mdns upnp events",
+              "PhysAddress": "interface-eth-phys-1"
+            },
+            {
+              "Key": "interface-eth-2",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 upnp mdns events",
+              "PhysAddress": "interface-eth-phys-2"
+            },
+            {
+              "Key": "interface-eth-3",
+              "Active": true,
+              "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 dhcp microsoft lltd upnp events",
+              "PhysAddress": "interface-eth-phys-3"
+            },
+            {
+              "Key": "interface-eth-4",
+              "Active": true,
+              "Tags": "self lan eth nemo interface events",
+              "PhysAddress": "interface-eth-phys-4"
+            },
+            {
+              "Key": "interface-eth-5",
+              "Active": true,
+              "Tags": "self lan eth nemo interface events",
+              "PhysAddress": "interface-eth-phys-5"
+            },
+            {
+              "Key": "interface-eth-6",
+              "Active": true,
+              "Tags": "self lan eth nemo interface events",
+              "PhysAddress": "interface-eth-phys-6"
+            },
+            {
+              "Key": "interface-eth-7",
+              "Active": true,
+              "Tags": "self lan eth nemo interface events",
+              "PhysAddress": "interface-eth-phys-7"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
