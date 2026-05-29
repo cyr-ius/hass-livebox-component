@@ -88,6 +88,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 5656  # Sagemcom f@st 5656
                 case "Livebox Nautilus":
                     self.model = 7.2
+                case _:
+                    _LOGGER.warning(
+                        "Unknown Livebox ProductClass: %s", product_class
+                    )
+                    self.model = None
             # Optionals
             wifi_tracking = self.config_entry.options.get(
                 CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
@@ -125,7 +130,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "remote_access": await self.async_is_remote_access(),
                 "topology_via_device": topology_via_device,
                 "topology_repeaters": topology_repeaters,
-                "lan": await self.async_get_lan(devices),
+                "lan": await self.async_get_lan(),
                 "upnp": await self.async_get_port_forwarding(),
                 "dhcp_leases": await self.async_get_dhcp_leases(),
                 "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
@@ -345,7 +350,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         ).get("status", {})
         return find_item(veip0, "gpon.veip0", {})
 
-    async def async_get_lan(self, lan_devices):
+    async def async_get_lan(self):
         """Get lan status."""
         self_devices = (
             await self._make_request(

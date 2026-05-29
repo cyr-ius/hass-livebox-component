@@ -131,6 +131,47 @@ async def test_form_unknown(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
         assert result["errors"] == {"base": "unknown"}
 
 
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_options_flow_active(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
+    """Test options flow accepts 'Active' as display_devices value."""
+    from custom_components.livebox.const import (
+        CONF_DISPLAY_DEVICES,
+        CONF_LAN_TRACKING,
+        CONF_TRACKING_TIMEOUT,
+        CONF_WIFI_TRACKING,
+    )
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data=MOCK_USER_INPUT,
+        options={
+            CONF_WIFI_TRACKING: True,
+            CONF_LAN_TRACKING: False,
+            CONF_TRACKING_TIMEOUT: 300,
+            CONF_DISPLAY_DEVICES: "Active",
+        },
+        unique_id="options-test-1234",
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    result2 = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_WIFI_TRACKING: True,
+            CONF_LAN_TRACKING: False,
+            CONF_TRACKING_TIMEOUT: 300,
+            CONF_DISPLAY_DEVICES: "Active",
+        },
+    )
+    assert result2["type"] == FlowResultType.CREATE_ENTRY
+    assert result2["data"][CONF_DISPLAY_DEVICES] == "Active"
+
+
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
 async def test_form_already_configured(
     hass: HomeAssistant, AIOSysbus: AsyncMock

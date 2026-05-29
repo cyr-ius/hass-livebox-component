@@ -93,7 +93,7 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
 
                 self._calls[call_id] = CalendarEvent(
                     start=call_time,
-                    end=call_time + +datetime.timedelta(seconds=call["duration"]),
+                    end=call_time + datetime.timedelta(seconds=call["duration"]),
                     summary="{} {} {}".format(
                         call_type,
                         call_direction,
@@ -105,8 +105,10 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
 
         return cast(
             list[CalendarEvent],
-            filter(
-                lambda ev: ev.start > start_date and ev.end < end_date,
-                self._calls.values(),
+            list(
+                filter(
+                    lambda ev: ev.start > start_date and ev.end < end_date,
+                    self._calls.values(),
+                )
             ),
         )

@@ -263,7 +263,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="uptime",
         name="Uptime",
-        icon="progress-clock",
+        icon="mdi:progress-clock",
         value_fn=lambda x: find_item(x, "infos.UpTime", 0),
         native_unit_of_measurement=UnitOfTime.SECONDS,
         state_class=SensorStateClass.TOTAL,

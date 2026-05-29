@@ -173,3 +173,103 @@ async def test_async_get_topology_returns_cached_value_on_invalid_status() -> No
         {"DD:DD:DD:DD:DD:01": "CC:CC:CC:CC:CC:01"},
         {"CC:CC:CC:CC:CC:01": "Repeater-1"},
     )
+
+
+async def test_unknown_product_class_logs_warning_and_sets_model_none(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """An unmapped ProductClass should log a warning and set model to None."""
+    import logging
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock, MagicMock
+
+    coordinator = object.__new__(LiveboxDataUpdateCoordinator)
+    coordinator.config_entry = SimpleNamespace(
+        options={
+            CONF_DISPLAY_DEVICES: DEFAULT_DISPLAY_DEVICES,
+            "wifi_tracking": True,
+            "lan_tracking": False,
+        },
+        data={
+            "username": "admin",
+            "password": "password",
+            "host": "192.168.1.1",
+            "port": 80,
+            "use_tls": False,
+            "verify_tls": False,
+        },
+    )
+    coordinator.model = None
+    coordinator.unique_id = None
+    coordinator.data = None
+    coordinator._topology_cache = ({}, {})
+    coordinator._topology_cache_at = None
+    coordinator._topology_last_update = None
+    coordinator.hass = MagicMock()
+
+    async def _make_request(func, *args):
+        name = getattr(func, "__name__", str(func))
+        if "get_deviceinfo" in name:
+            return {
+                "status": {
+                    "SerialNumber": "ABC123",
+                    "ProductClass": "FutureBox 99",
+                }
+            }
+        if "get_topodiags" in name:
+            return {"status": {}}
+        if "get_devices" in name:
+            return {"status": {"wifi": [], "eth": []}}
+        if "get_calllist" in name:
+            return {"status": []}
+        return {"status": {}, "data": {}}
+
+    coordinator._make_request = cast(Any, _make_request)
+    coordinator.api = SimpleNamespace(
+        deviceinfo=SimpleNamespace(
+            async_get_deviceinfo=AsyncMock(
+                return_value={
+                    "status": {
+                        "SerialNumber": "ABC123",
+                        "ProductClass": "FutureBox 99",
+                    }
+                }
+            )
+        ),
+        devices=SimpleNamespace(async_get_devices=AsyncMock(return_value={"status": {"wifi": [], "eth": []}})),
+        voiceservice=SimpleNamespace(async_get_calllist=AsyncMock(return_value={"status": []})),
+        nemo=SimpleNamespace(
+            async_get_MIBs=AsyncMock(return_value={"status": {}}),
+            async_get_net_dev_stats=AsyncMock(return_value={"status": {}}),
+        ),
+        nmc=SimpleNamespace(
+            async_get=AsyncMock(return_value={"status": {}}),
+            async_get_wifi=AsyncMock(return_value={"status": {}}),
+            async_get_guest_wifi=AsyncMock(return_value={"status": {}}),
+            async_get_wan_status=AsyncMock(return_value={"data": {}}),
+            async_get_wifi_stats=AsyncMock(return_value={"data": {}}),
+        ),
+        topologydiagnostics=SimpleNamespace(
+            async_get_topodiags=AsyncMock(return_value={"status": {}}),
+            async_set_topodiags_build=AsyncMock(return_value={"status": []}),
+        ),
+        dyndns=SimpleNamespace(async_get_hosts=AsyncMock(return_value={"status": []})),
+        remoteaccess=SimpleNamespace(async_get=AsyncMock(return_value={"status": {}})),
+        firewall=SimpleNamespace(async_get_port_forwarding=AsyncMock(return_value={"status": {}})),
+        dhcp=SimpleNamespace(
+            async_get_dhcp_pool=AsyncMock(return_value={"status": {}}),
+            async_get_dhcp_leases=AsyncMock(return_value={"status": {}}),
+        ),
+        homelan=SimpleNamespace(
+            async_get_interface=AsyncMock(return_value={"status": {}}),
+            async_get_results=AsyncMock(return_value={"status": {}}),
+        ),
+        schedule=SimpleNamespace(async_get_schedule=AsyncMock(return_value={"data": {}})),
+        sgcomci=SimpleNamespace(async_get_optical=AsyncMock(return_value={"status": {}})),
+    )
+
+    with caplog.at_level(logging.WARNING, logger="custom_components.livebox.coordinator"):
+        await LiveboxDataUpdateCoordinator._async_update_data(coordinator)
+
+    assert coordinator.model is None
+    assert any("FutureBox 99" in r.message for r in caplog.records)
