@@ -132,3 +132,46 @@ async def test_switch_wan_access(
     await hass.services.async_call(Platform.SWITCH, "turn_on", data, blocking=True)
 
     assert len(service_calls) == 1
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_switch_wan_access_override_without_value_disable(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+    service_calls: list[ServiceCall],
+):
+    """Regression test for #281: WAN access switch flips back ON.
+
+    When override=Disable but value=Enable (the box computed value from
+    the weekly schedule doesn't match the manual override), the switch
+    must still report OFF. The old code required BOTH override==Disable
+    AND value==Disable, which caused the switch to flip back to ON.
+    """
+    # Mock schedule to return override=Disable but value=Enable (the bug case)
+    schedule_data = {
+        "data": {
+            "scheduleInfo": {
+                "base": "Weekly",
+                "def": "Enable",
+                "ID": "AA:BB:CC:DD:EE:FF",
+                "override": "Disable",
+                "value": "Enable",
+                "enable": True,
+                "schedule": [],
+            }
+        }
+    }
+
+    def _mock_get_schedule(*args, **kwargs):
+        return schedule_data
+
+    AIOSysbus.schedule.async_get_schedule = AsyncMock(side_effect=_mock_get_schedule)
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # The switch must be OFF because override=Disable, regardless of value
+    state = hass.states.get("switch.pc_408_wan_access")
+    assert state is not None
+    assert state.state == STATE_OFF
