@@ -21,6 +21,7 @@ from .const import (
     CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
     CONF_USE_TLS,
+    CONF_VERIFY_TLS,
     CONF_WIFI_TRACKING,
     DEFAULT_DISPLAY_DEVICES,
     DEFAULT_LAN_TRACKING,
@@ -63,6 +64,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             host=self.config_entry.data[CONF_HOST],
             port=self.config_entry.data[CONF_PORT],
             use_tls=self.config_entry.data.get(CONF_USE_TLS, False),
+            verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
 
     async def _async_update_data(self) -> dict[str, Any]:
@@ -70,8 +72,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             # Mandatory information
             infos = await self.async_get_infos()
-            self.unique_id = infos["SerialNumber"]
-            match infos["ProductClass"]:
+            serial = infos.get("SerialNumber")
+            product_class = infos.get("ProductClass")
+            if not serial or not product_class:
+                raise UpdateFailed(
+                    "Livebox returned incomplete device info "
+                    f"(SerialNumber={serial!r}, ProductClass={product_class!r})"
+                )
+            self.unique_id = serial
+            match product_class:
                 case "Livebox 3":
                     self.model = 3
                 case "Livebox 4":
@@ -299,7 +308,14 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             await self._make_request(self.api.voiceservice.async_get_calllist)
         ).get("status", {})
         for call in calls:
-            utc_dt = datetime.strptime(call["startTime"], "%Y-%m-%dT%H:%M:%SZ")
+            start_time = call.get("startTime")
+            if not start_time:
+                continue
+            try:
+                utc_dt = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
+            except (ValueError, TypeError):
+                _LOGGER.debug("Skipping call with unparseable startTime: %s", start_time)
+                continue
             local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
             caller = {
                 "phone_number": call.get("remoteNumber"),
@@ -310,7 +326,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "origin": call.get("callOrigin"),
             }
             callers.append(caller)
-            if call["callType"] == "missed":
+            if call.get("callType") == "missed":
                 cmisseds.append(caller)
 
         return callers, cmisseds
