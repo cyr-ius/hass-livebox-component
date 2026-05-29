@@ -5,6 +5,7 @@ import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.helpers import entity_registry as er
 from sqlalchemy import false
 
 
@@ -132,3 +133,89 @@ async def test_switch_wan_access(
     await hass.services.async_call(Platform.SWITCH, "turn_on", data, blocking=True)
 
     assert len(service_calls) == 1
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_switch_wan_access_override_without_value_disable(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+    service_calls: list[ServiceCall],
+):
+    """Regression test for #281: WAN access switch flips back ON.
+
+    When override=Disable but value=Enable (the box computed value from
+    the weekly schedule doesn't match the manual override), the switch
+    must still report OFF. The old code required BOTH override==Disable
+    AND value==Disable, which caused the switch to flip back to ON.
+    """
+    # Mock schedule to return override=Disable but value=Enable (the bug case)
+    schedule_data = {
+        "data": {
+            "scheduleInfo": {
+                "base": "Weekly",
+                "def": "Enable",
+                "ID": "AA:BB:CC:DD:EE:FF",
+                "override": "Disable",
+                "value": "Enable",
+                "enable": True,
+                "schedule": [],
+            }
+        }
+    }
+
+    def _mock_get_schedule(*args, **kwargs):
+        return schedule_data
+
+    AIOSysbus.schedule.async_get_schedule = AsyncMock(side_effect=_mock_get_schedule)
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # The switch must be OFF because override=Disable, regardless of value
+    state = hass.states.get("switch.pc_408_wan_access")
+    assert state is not None
+    assert state.state == STATE_OFF
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_wan_access_switch_unique_id_migration(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """Migration test for issue #287: legacy unique_id without serial prefix.
+
+    Prior to this fix, DeviceWANAccessSwitch stored unique_id = "{mac}_wan_access"
+    without the serial-number prefix. The migration in async_setup_entry must
+    rename existing entries to "{serial}_{mac}_wan_access" so they are not
+    orphaned after upgrade.
+    """
+    serial = config_entry.unique_id  # "012345678901234" from fixture
+    mac = "AA:BB:CC:DD:EE:FF"
+    legacy_uid = f"{mac}_wan_access"
+    expected_uid = f"{serial}_{legacy_uid}"
+
+    entity_registry = er.async_get(hass)
+
+    # Pre-register an entity with the legacy unique_id (simulates a pre-upgrade entry)
+    old_entry = entity_registry.async_get_or_create(
+        domain="switch",
+        platform="livebox",
+        unique_id=legacy_uid,
+        config_entry=config_entry,
+        suggested_object_id="test_device_wan_access",
+    )
+    assert old_entry.unique_id == legacy_uid
+
+    # Run integration setup — migration should happen inside async_setup_entry
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # The entity must now carry the new prefixed unique_id
+    migrated = entity_registry.async_get(old_entry.entity_id)
+    assert migrated is not None
+    assert migrated.unique_id == expected_uid
+
+    # No duplicate entry should exist under the old unique_id
+    assert entity_registry.async_get_entity_id("switch", "livebox", legacy_uid) is None

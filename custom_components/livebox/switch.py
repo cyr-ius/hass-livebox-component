@@ -156,7 +156,7 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
         super().__init__(coordinator, description)
         self._device_key = device.get("Key", self.name)
         self._device = device
-        self._attr_unique_id = description.key
+        self._attr_unique_id = f"{coordinator.unique_id or DOMAIN}_{description.key}"
         unique_id = coordinator.unique_id or DOMAIN
         self._attr_device_info = DeviceInfo(
             name=self._device.get("Name"),
