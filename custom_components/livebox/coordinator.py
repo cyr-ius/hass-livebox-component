@@ -89,9 +89,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 case "Livebox Nautilus":
                     self.model = 7.2
                 case _:
-                    _LOGGER.warning(
-                        "Unknown Livebox ProductClass: %s", product_class
-                    )
+                    _LOGGER.warning("Unknown Livebox ProductClass: %s", product_class)
                     self.model = None
             # Optionals
             wifi_tracking = self.config_entry.options.get(

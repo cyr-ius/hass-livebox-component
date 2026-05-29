@@ -134,13 +134,14 @@ async def test_form_unknown(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_options_flow_active(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
     """Test options flow accepts 'Active' as display_devices value."""
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
+
     from custom_components.livebox.const import (
         CONF_DISPLAY_DEVICES,
         CONF_LAN_TRACKING,
         CONF_TRACKING_TIMEOUT,
         CONF_WIFI_TRACKING,
     )
-    from pytest_homeassistant_custom_component.common import MockConfigEntry
 
     entry = MockConfigEntry(
         domain=DOMAIN,

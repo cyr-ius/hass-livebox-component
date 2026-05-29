@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime
-from types import SimpleNamespace
 from typing import Any
 from unittest.mock import MagicMock
 
@@ -67,8 +66,8 @@ async def test_async_get_events_returns_list() -> None:
     """async_get_events must return a list (not a lazy iterator)."""
     calendar = _make_calendar(_CALLERS)
 
-    start = datetime.datetime(2024, 6, 1, 0, 0, 0, tzinfo=datetime.timezone.utc)
-    end = datetime.datetime(2024, 6, 2, 0, 0, 0, tzinfo=datetime.timezone.utc)
+    start = datetime.datetime(2024, 6, 1, 0, 0, 0, tzinfo=datetime.UTC)
+    end = datetime.datetime(2024, 6, 2, 0, 0, 0, tzinfo=datetime.UTC)
 
     result = await calendar.async_get_events(MagicMock(), start, end)
 
@@ -82,8 +81,8 @@ async def test_async_get_events_filters_by_range() -> None:
     calendar = _make_calendar(_CALLERS)
 
     # Window that only covers the first call (10:00–11:00)
-    start = datetime.datetime(2024, 6, 1, 9, 0, 0, tzinfo=datetime.timezone.utc)
-    end = datetime.datetime(2024, 6, 1, 10, 30, 0, tzinfo=datetime.timezone.utc)
+    start = datetime.datetime(2024, 6, 1, 9, 0, 0, tzinfo=datetime.UTC)
+    end = datetime.datetime(2024, 6, 1, 10, 30, 0, tzinfo=datetime.UTC)
 
     result = await calendar.async_get_events(MagicMock(), start, end)
 

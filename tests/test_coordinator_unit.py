@@ -236,8 +236,14 @@ async def test_unknown_product_class_logs_warning_and_sets_model_none(
                 }
             )
         ),
-        devices=SimpleNamespace(async_get_devices=AsyncMock(return_value={"status": {"wifi": [], "eth": []}})),
-        voiceservice=SimpleNamespace(async_get_calllist=AsyncMock(return_value={"status": []})),
+        devices=SimpleNamespace(
+            async_get_devices=AsyncMock(
+                return_value={"status": {"wifi": [], "eth": []}}
+            )
+        ),
+        voiceservice=SimpleNamespace(
+            async_get_calllist=AsyncMock(return_value={"status": []})
+        ),
         nemo=SimpleNamespace(
             async_get_MIBs=AsyncMock(return_value={"status": {}}),
             async_get_net_dev_stats=AsyncMock(return_value={"status": {}}),
@@ -255,7 +261,9 @@ async def test_unknown_product_class_logs_warning_and_sets_model_none(
         ),
         dyndns=SimpleNamespace(async_get_hosts=AsyncMock(return_value={"status": []})),
         remoteaccess=SimpleNamespace(async_get=AsyncMock(return_value={"status": {}})),
-        firewall=SimpleNamespace(async_get_port_forwarding=AsyncMock(return_value={"status": {}})),
+        firewall=SimpleNamespace(
+            async_get_port_forwarding=AsyncMock(return_value={"status": {}})
+        ),
         dhcp=SimpleNamespace(
             async_get_dhcp_pool=AsyncMock(return_value={"status": {}}),
             async_get_dhcp_leases=AsyncMock(return_value={"status": {}}),
@@ -264,11 +272,17 @@ async def test_unknown_product_class_logs_warning_and_sets_model_none(
             async_get_interface=AsyncMock(return_value={"status": {}}),
             async_get_results=AsyncMock(return_value={"status": {}}),
         ),
-        schedule=SimpleNamespace(async_get_schedule=AsyncMock(return_value={"data": {}})),
-        sgcomci=SimpleNamespace(async_get_optical=AsyncMock(return_value={"status": {}})),
+        schedule=SimpleNamespace(
+            async_get_schedule=AsyncMock(return_value={"data": {}})
+        ),
+        sgcomci=SimpleNamespace(
+            async_get_optical=AsyncMock(return_value={"status": {}})
+        ),
     )
 
-    with caplog.at_level(logging.WARNING, logger="custom_components.livebox.coordinator"):
+    with caplog.at_level(
+        logging.WARNING, logger="custom_components.livebox.coordinator"
+    ):
         await LiveboxDataUpdateCoordinator._async_update_data(coordinator)
 
     assert coordinator.model is None
