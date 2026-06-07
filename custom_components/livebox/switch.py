@@ -174,11 +174,7 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
     def is_on(self) -> bool:
         """Return true if device currently have WAN access."""
         schedule = self._get_device_schedule()
-        return not (
-            schedule
-            and (schedule.get("override") == "Disable")
-            and (schedule.get("value") == "Disable")
-        )
+        return not (schedule and (schedule.get("override") == "Disable"))
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
