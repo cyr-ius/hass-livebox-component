@@ -1,5 +1,6 @@
 """Tests for the Bbox sensor platform."""
 
+from types import SimpleNamespace
 from typing import Any, cast
 from unittest.mock import AsyncMock
 
@@ -42,6 +43,12 @@ async def test_sensors_state(
 
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_callers")
     assert state is not None
+
+    if AIOSysbus.__model in ["7"]:
+        state = er.async_get(hass).async_get("sensor.pc_408_downlink_rate")
+        assert state is not None
+        state = er.async_get(hass).async_get("sensor.pc_408_uplink_rate")
+        assert state is not None
 
     if AIOSysbus.__model in ["7.1"]:
         state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
@@ -119,3 +126,77 @@ async def test_rate_sensors_use_megabits_per_second_math(
     tx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_tx")
     assert tx_state is not None
     assert float(tx_state.state) == 5.69
+
+
+async def test_device_metric_sensors_are_created_for_wifi_clients(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """Test per-device Wi-Fi sensors expose the expected metrics."""
+    coordinator = cast(
+        LiveboxDataUpdateCoordinator,
+        SimpleNamespace(
+            unique_id="LIVEBOX",
+            config_entry=SimpleNamespace(
+                data={"host": "192.168.1.1", "port": 80},
+                options={},
+            ),
+            signal_device_new="livebox-LIVEBOX-device-new",
+            get_parent_device_identifier=lambda _device_key: ("livebox", "LIVEBOX"),
+            data={
+                "devices": {
+                    "AA:BB:CC:DD:EE:FF": {
+                        "Key": "AA:BB:CC:DD:EE:FF",
+                        "Name": "Test device",
+                        "InterfaceName": "vap5g0priv",
+                        "SignalStrength": -41,
+                        "SignalNoiseRatio": 32,
+                        "LastDataDownlinkRate": 7777,
+                        "LastDataUplinkRate": 8888,
+                    }
+                },
+                "lan": [
+                    {
+                        "type": "Wireless",
+                        "name": "5GHz (home)",
+                        "extra_attributes": {
+                            "associated_devices": {
+                                "1": {
+                                    "MACAddress": "AA:BB:CC:DD:EE:FF",
+                                    "TxBytes": 321,
+                                    "RxBytes": 654,
+                                }
+                            }
+                        },
+                    }
+                ],
+            },
+        ),
+    )
+    config_entry.runtime_data = coordinator
+
+    entities: list[LiveboxSensor] = []
+
+    def _add_entities(
+        new_entities: list[LiveboxSensor], update_before_add: bool = False
+    ) -> None:
+        del update_before_add
+        entities.extend(new_entities)
+
+    await async_setup_entry(
+        hass, config_entry, cast(AddEntitiesCallback, _add_entities)
+    )
+
+    sensors = {entity.entity_description.key: entity for entity in entities}
+
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7777
+    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8888
+    assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].native_value == 321
+    assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].native_value == 654
+    assert sensors["aa_bb_cc_dd_ee_ff_signal_strength"].native_value == -41
+    assert sensors["aa_bb_cc_dd_ee_ff_signal_noise_ratio"].native_value == 32
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].name == "Downlink Rate"
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info is not None
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info["identifiers"] == {
+        ("livebox", "AA:BB:CC:DD:EE:FF")
+    }

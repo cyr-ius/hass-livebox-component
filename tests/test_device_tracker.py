@@ -9,11 +9,19 @@ import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import (
+    CONF_TRACKING_TIMEOUT,
+    DEFAULT_TRACKING_TIMEOUT,
+    DOMAIN,
+)
 from custom_components.livebox.coordinator import LiveboxDataUpdateCoordinator
-from custom_components.livebox.device_tracker import async_add_new_tracked_entities
+from custom_components.livebox.device_tracker import (
+    LiveboxDeviceScannerEntity,
+    async_add_new_tracked_entities,
+)
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
@@ -30,6 +38,15 @@ async def test_device_tracker(
     assert state is not None
     assert state.state == STATE_HOME
     assert state.attributes.get("ip") == "10.1.2.3"
+    assert state.attributes.get("connection") == "wifi"
+    assert state.attributes.get("frequency_band") == "5GHz"
+    assert state.attributes.get("signal_quality") is not None
+    assert "last_data_downlink_rate" not in state.attributes
+    assert "last_data_uplink_rate" not in state.attributes
+    assert "signal_noise_ratio" not in state.attributes
+    assert "avg_signal_strength_by_chain" not in state.attributes
+    assert "link_bandwidth" not in state.attributes
+    assert "signal_strength" not in state.attributes
 
     # Disable device PC-408
     AIOSysbus.__devices["status"][69]["Active"] = False
@@ -150,3 +167,69 @@ async def test_device_tracker_adds_repeaters_before_clients() -> None:
     assert created[0].device_info["via_device"] == (DOMAIN, "LIVEBOX-1")
     assert created[1].device_info is not None
     assert created[1].device_info["via_device"] == (DOMAIN, "CC:CC:CC:CC:CC:01")
+
+
+def test_device_tracker_adds_associated_wifi_stats() -> None:
+    """Wi-Fi device trackers should keep only contextual attributes."""
+
+    coordinator = cast(
+        LiveboxDataUpdateCoordinator,
+        SimpleNamespace(
+            data={
+                "lan": [
+                    {
+                        "type": "Wireless",
+                        "name": "5GHz (home)",
+                        "extra_attributes": {
+                            "associated_devices": {
+                                "1": {
+                                    "MACAddress": "AA:BB:CC:DD:EE:FF",
+                                    "TxBytes": 321,
+                                    "RxBytes": 654,
+                                    "LastDataDownlinkRate": 1234,
+                                    "LastDataUplinkRate": 5678,
+                                }
+                            }
+                        },
+                    }
+                ]
+            },
+            config_entry=SimpleNamespace(
+                data={"host": "192.168.1.1", "port": 80},
+                options={CONF_TRACKING_TIMEOUT: DEFAULT_TRACKING_TIMEOUT},
+            ),
+            get_parent_device_identifier=lambda _device_key: (DOMAIN, "LIVEBOX"),
+            unique_id="LIVEBOX",
+        ),
+    )
+    device = {
+        "Key": "AA:BB:CC:DD:EE:FF",
+        "Name": "Test device",
+        "InterfaceName": "vap5g0priv",
+        "DeviceType": "Mobile",
+        "Active": True,
+        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp events",
+        "IPAddress": "10.0.0.10",
+        "OperatingFrequencyBand": "5GHz",
+        "SignalStrength": -41,
+        "SignalNoiseRatio": 32,
+        "AvgSignalStrengthByChain": -42,
+        "LastDataDownlinkRate": 7777,
+        "LastDataUplinkRate": 8888,
+    }
+    entity = LiveboxDeviceScannerEntity(
+        coordinator,
+        EntityDescription(key="test_device_tracker", name="Test device"),
+        device,
+    )
+
+    attrs = cast(dict[str, Any], entity.extra_state_attributes)
+
+    assert attrs["connection"] == "wifi"
+    assert attrs["frequency_band"] == "5GHz"
+    assert attrs["signal_quality"] == "excellent"
+    assert "tx_bytes" not in attrs
+    assert "rx_bytes" not in attrs
+    assert "last_data_downlink_rate" not in attrs
+    assert "last_data_uplink_rate" not in attrs
+    assert "signal_strength" not in attrs
