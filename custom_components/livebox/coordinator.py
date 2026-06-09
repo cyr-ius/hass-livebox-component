@@ -557,9 +557,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         for key, item in interfaces.items():
             traffic = data.get(key, {}).get("Traffic", [])
-            if len(traffic) == 0:
-                continue
-            stats = traffic[0]
+            stats = traffic[0] if traffic else {}
 
             # Rx_Counter and Tx_Counter are collected over a 30-second window.
             # Convert them to Mbit/s to match the sensor unit declaration.
