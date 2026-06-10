@@ -10,10 +10,9 @@ dev = [
   "aiosysbus",
   "async-upnp-client",
   "prek",
-  "pycares<5",
   "pyrefly",
   "pylint",
-  "pytest-homeassistant-custom-component==0.13.272",
+  "pytest-homeassistant-custom-component",
 ]
 
 [tool.pytest.ini_options]
