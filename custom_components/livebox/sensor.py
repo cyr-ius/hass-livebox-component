@@ -89,9 +89,9 @@ def get_closure_value_fn(path: str) -> Callable[..., Any]:
     return lambda x: find_item(x, path)
 
 
-def kilobits_per_second_to_bits_per_second(value: Any) -> float:
-    """Convert a Kbit/s API value to bit/s."""
-    return value * 1000
+def kilobits_per_second_to_megabits_per_second(value: Any) -> float:
+    """Convert a Kbit/s API value to Mbit/s."""
+    return value / 1000
 
 
 def kilobits_per_second_to_gigabits_per_second(value: Any) -> float:
@@ -119,8 +119,8 @@ def _get_wireless_device_value_fn(
 def _get_wireless_device_rate_value_fn(
     device_key: str, path: str
 ) -> Callable[..., Any]:
-    """Return a bit/s sensor value function for a Kbit/s device rate field."""
-    return lambda data: kilobits_per_second_to_bits_per_second(
+    """Return a Mbit/s sensor value function for a Kbit/s device rate field."""
+    return lambda data: kilobits_per_second_to_megabits_per_second(
         find_item(data, f"devices.{device_key}.{path}", 0)
     )
 
@@ -178,7 +178,7 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
         "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
             device_key, "LastDataDownlinkRate"
         ),
-        "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "native_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "state_class": SensorStateClass.MEASUREMENT,
         "device_class": SensorDeviceClass.DATA_RATE,
@@ -190,7 +190,7 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
         "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
             device_key, "LastDataUplinkRate"
         ),
-        "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "native_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "state_class": SensorStateClass.MEASUREMENT,
         "device_class": SensorDeviceClass.DATA_RATE,
@@ -203,6 +203,7 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
             device_key, "TxBytes", 0
         ),
         "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.MEGABYTES,
         "state_class": SensorStateClass.TOTAL_INCREASING,
         "device_class": SensorDeviceClass.DATA_SIZE,
     },
@@ -214,6 +215,7 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
             device_key, "RxBytes", 0
         ),
         "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.MEGABYTES,
         "state_class": SensorStateClass.TOTAL_INCREASING,
         "device_class": SensorDeviceClass.DATA_SIZE,
     },

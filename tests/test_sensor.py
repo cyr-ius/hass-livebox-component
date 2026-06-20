@@ -8,7 +8,7 @@ import homeassistant.helpers.entity_registry as er
 import pytest
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfDataRate
+from homeassistant.const import UnitOfDataRate, UnitOfInformation
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from pytest_homeassistant_custom_component.common import load_json_object_fixture
@@ -195,15 +195,15 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
 
     sensors = {entity.entity_description.key: entity for entity in entities}
 
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7777000
-    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8888000
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7.777
+    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8.888
     downlink_description = cast(
         SensorEntityDescription,
         sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].entity_description,
     )
     assert (
         downlink_description.native_unit_of_measurement
-        == UnitOfDataRate.BITS_PER_SECOND
+        == UnitOfDataRate.MEGABITS_PER_SECOND
     )
     assert (
         downlink_description.suggested_unit_of_measurement
@@ -211,6 +211,15 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
     )
     assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].native_value == 321
     assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].native_value == 654
+    tx_bytes_description = cast(
+        SensorEntityDescription,
+        sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].entity_description,
+    )
+    assert tx_bytes_description.native_unit_of_measurement == UnitOfInformation.BYTES
+    assert (
+        tx_bytes_description.suggested_unit_of_measurement
+        == UnitOfInformation.MEGABYTES
+    )
     assert sensors["aa_bb_cc_dd_ee_ff_signal_strength"].native_value == -41
     assert sensors["aa_bb_cc_dd_ee_ff_signal_noise_ratio"].native_value == 32
     assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].extra_state_attributes is None
