@@ -6,13 +6,19 @@ from unittest.mock import AsyncMock
 
 import homeassistant.helpers.entity_registry as er
 import pytest
+from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfDataRate
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from pytest_homeassistant_custom_component.common import load_json_object_fixture
 
 from custom_components.livebox.coordinator import LiveboxDataUpdateCoordinator
-from custom_components.livebox.sensor import LiveboxSensor, async_setup_entry
+from custom_components.livebox.sensor import (
+    SENSOR_TYPES,
+    LiveboxSensor,
+    async_setup_entry,
+)
 
 
 def _load_fixture(name: str) -> dict[str, Any]:
@@ -121,11 +127,11 @@ async def test_rate_sensors_use_megabits_per_second_math(
 
     rx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
     assert rx_state is not None
-    assert float(rx_state.state) == 0.01
+    assert float(rx_state.state) == 0.09
 
     tx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_tx")
     assert tx_state is not None
-    assert float(tx_state.state) == 5.69
+    assert float(tx_state.state) == 45.48
 
 
 async def test_device_metric_sensors_are_created_for_wifi_clients(
@@ -189,8 +195,20 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
 
     sensors = {entity.entity_description.key: entity for entity in entities}
 
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7777
-    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8888
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7777000
+    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8888000
+    downlink_description = cast(
+        SensorEntityDescription,
+        sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].entity_description,
+    )
+    assert (
+        downlink_description.native_unit_of_measurement
+        == UnitOfDataRate.BITS_PER_SECOND
+    )
+    assert (
+        downlink_description.suggested_unit_of_measurement
+        == UnitOfDataRate.MEGABITS_PER_SECOND
+    )
     assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].native_value == 321
     assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].native_value == 654
     assert sensors["aa_bb_cc_dd_ee_ff_signal_strength"].native_value == -41
@@ -200,3 +218,36 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
     assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info["identifiers"] == {
         ("livebox", "AA:BB:CC:DD:EE:FF")
     }
+
+
+def test_fiber_rate_attributes_use_gigabits_per_second() -> None:
+    """Fiber status rate attributes should match their Gbit/s labels."""
+    data = {
+        "fiber_status": {
+            "DownstreamMaxRate": 2488320,
+            "DownstreamCurrRate": 2488320,
+            "UpstreamMaxRate": 1244160,
+            "UpstreamCurrRate": 1244160,
+            "MaxBitRateSupported": 10000,
+        }
+    }
+
+    rx_description = next(
+        description
+        for description in SENSOR_TYPES
+        if description.key == "fiber_power_rx"
+    )
+    tx_description = next(
+        description
+        for description in SENSOR_TYPES
+        if description.key == "fiber_power_tx"
+    )
+
+    assert rx_description.attrs is not None
+    assert tx_description.attrs is not None
+    assert rx_description.attrs["Downstream max rate Gbps"](data) == 2.48832
+    assert rx_description.attrs["Downstream current rate Gbps"](data) == 2.48832
+    assert rx_description.attrs["Max bitrate (Gbps)"](data) == 10
+    assert tx_description.attrs["Upstream max rate (Gbps)"](data) == 1.24416
+    assert tx_description.attrs["Upstream current rate (Gbps)"](data) == 1.24416
+    assert tx_description.attrs["Max bitrate (Gbps)"](data) == 10

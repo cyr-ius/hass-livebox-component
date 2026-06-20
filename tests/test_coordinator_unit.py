@@ -215,5 +215,5 @@ async def test_async_get_results_keeps_interfaces_without_traffic() -> None:
 
     assert results["ETH0"]["rate_rx"] == 0.0
     assert results["ETH0"]["rate_tx"] == 0.0
-    assert results["ETH1"]["rate_rx"] == 0.1
-    assert results["ETH1"]["rate_tx"] == 0.2
+    assert results["ETH1"]["rate_rx"] == 0.8
+    assert results["ETH1"]["rate_tx"] == 1.6

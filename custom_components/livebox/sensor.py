@@ -88,6 +88,21 @@ def get_closure_value_fn(path: str) -> Callable[..., Any]:
     return lambda x: find_item(x, path)
 
 
+def kilobits_per_second_to_bits_per_second(value: Any) -> float:
+    """Convert a Kbit/s API value to bit/s."""
+    return value * 1000
+
+
+def kilobits_per_second_to_gigabits_per_second(value: Any) -> float:
+    """Convert a Kbit/s API value to Gbit/s."""
+    return value / 1000000
+
+
+def megabits_per_second_to_gigabits_per_second(value: Any) -> float:
+    """Convert a Mbit/s API value to Gbit/s."""
+    return value / 1000
+
+
 def _normalize_device_key(device_key: str) -> str:
     """Return a stable entity key fragment for a device key."""
     return device_key.lower().replace(":", "_")
@@ -98,6 +113,15 @@ def _get_wireless_device_value_fn(
 ) -> Callable[..., Any]:
     """Return a sensor value function for a device field."""
     return lambda data: find_item(data, f"devices.{device_key}.{path}", default)
+
+
+def _get_wireless_device_rate_value_fn(
+    device_key: str, path: str
+) -> Callable[..., Any]:
+    """Return a bit/s sensor value function for a Kbit/s device rate field."""
+    return lambda data: kilobits_per_second_to_bits_per_second(
+        find_item(data, f"devices.{device_key}.{path}", 0)
+    )
 
 
 def _get_associated_wifi_device(
@@ -150,10 +174,11 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
         "key": "downlink_rate",
         "name": "Downlink Rate",
         "icon": DOWNLOAD_ICON,
-        "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
-            device_key, "LastDataDownlinkRate", 0
+        "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
+            device_key, "LastDataDownlinkRate"
         ),
         "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "state_class": SensorStateClass.MEASUREMENT,
         "device_class": SensorDeviceClass.DATA_RATE,
     },
@@ -161,10 +186,11 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
         "key": "uplink_rate",
         "name": "Uplink Rate",
         "icon": UPLOAD_ICON,
-        "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
-            device_key, "LastDataUplinkRate", 0
+        "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
+            device_key, "LastDataUplinkRate"
         ),
         "native_unit_of_measurement": UnitOfDataRate.BITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
         "state_class": SensorStateClass.MEASUREMENT,
         "device_class": SensorDeviceClass.DATA_RATE,
     },
@@ -293,13 +319,17 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         translation_key="fiber_power_rx",
         attrs={
             "Downstream max rate Gbps": lambda x: (
-                find_item(x, "fiber_status.DownstreamMaxRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.DownstreamMaxRate", 0)
+                )
             ),
             "Downstream current rate Gbps": lambda x: (
-                find_item(x, "fiber_status.DownstreamCurrRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.DownstreamCurrRate", 0)
+                )
             ),
-            "Max bitrate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
+                find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
@@ -319,13 +349,17 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         translation_key="fiber_power_tx",
         attrs={
             "Upstream max rate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.UpstreamMaxRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.UpstreamMaxRate", 0)
+                )
             ),
             "Upstream current rate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.UpstreamCurrRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.UpstreamCurrRate", 0)
+                )
             ),
-            "Max bitrate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
+                find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
@@ -340,7 +374,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         icon=UPLOAD_ICON,
         value_fn=get_rolling_32_bit_value_fn("fiber_stats.TxBytes"),
         native_unit_of_measurement=UnitOfInformation.BYTES,
-        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_tx",
@@ -352,7 +386,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         icon=DOWNLOAD_ICON,
         value_fn=get_rolling_32_bit_value_fn("fiber_stats.RxBytes"),
         native_unit_of_measurement=UnitOfInformation.BYTES,
-        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_rx",
@@ -494,6 +528,9 @@ def async_add_new_device_entities(
                 icon=template.get("icon"),
                 value_fn=template["value_fn_factory"](device_key),
                 native_unit_of_measurement=template.get("native_unit_of_measurement"),
+                suggested_unit_of_measurement=template.get(
+                    "suggested_unit_of_measurement"
+                ),
                 state_class=template.get("state_class"),
                 device_class=template.get("device_class"),
                 entity_category=EntityCategory.DIAGNOSTIC,
