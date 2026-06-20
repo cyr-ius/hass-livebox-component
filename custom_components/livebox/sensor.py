@@ -47,6 +47,7 @@ class LiveboxDeviceSensorEntityDescription(SensorEntityDescription):
     """Represents a per-device sensor."""
 
     value_fn: Callable[..., Any]
+    attrs: dict[str, Callable[..., Any]] | None = None
 
 
 def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:

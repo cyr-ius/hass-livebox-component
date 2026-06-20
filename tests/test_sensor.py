@@ -213,6 +213,10 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
     assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].native_value == 654
     assert sensors["aa_bb_cc_dd_ee_ff_signal_strength"].native_value == -41
     assert sensors["aa_bb_cc_dd_ee_ff_signal_noise_ratio"].native_value == 32
+    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].extra_state_attributes is None
+    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].extra_state_attributes is None
+    assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].extra_state_attributes is None
+    assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].extra_state_attributes is None
     assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].name == "Downlink Rate"
     assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info is not None
     assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info["identifiers"] == {
