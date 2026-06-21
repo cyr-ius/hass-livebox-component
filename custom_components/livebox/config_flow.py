@@ -65,6 +65,57 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Get option flow."""
         return LiveboxOptionsFlowHandler()
 
+    async def _async_validate_input(
+        self, user_input: Mapping[str, Any]
+    ) -> tuple[dict[str, Any] | None, dict[str, str]]:
+        """Validate user credentials against the Livebox."""
+        errors: dict[str, str] = {}
+
+        try:
+            api: Any = AIOSysbus(
+                username=user_input[CONF_USERNAME],
+                password=user_input[CONF_PASSWORD],
+                session=async_create_clientsession(self.hass),
+                host=user_input[CONF_HOST],
+                port=user_input[CONF_PORT],
+                use_tls=user_input[CONF_USE_TLS],
+                verify_tls=user_input[CONF_VERIFY_TLS],
+            )
+            await api.async_connect()
+            await api.async_get_permissions()
+            infos = await api.deviceinfo.async_get_deviceinfo()
+        except AuthenticationFailed as err:
+            _LOGGER.warning("Fail to authenticate to the Livebox: %s", err)
+            errors["base"] = "login_incorrect"
+        except InsufficientPermissionsError as err:
+            _LOGGER.warning(
+                "Insufficient permissions error occurred connecting to the Livebox: %s",
+                err,
+            )
+            errors["base"] = "insufficient_permission"
+        except (RetrieveFailed, HttpRequestFailed) as err:
+            _LOGGER.warning("Fail to connect to the Livebox: %s", err)
+            errors["base"] = "cannot_connect"
+        except AiosysbusException:
+            _LOGGER.exception("Unknown error connecting to the Livebox")
+            errors["base"] = "unknown"
+        else:
+            if infos.get("status", {}).get("SerialNumber") is not None:
+                return infos, errors
+
+            errors["base"] = "cannot_connect"
+
+        return None, errors
+
+    def _get_data_schema(
+        self, suggested_values: Mapping[str, Any] | None = None
+    ) -> vol.Schema:
+        """Build the config form schema."""
+        schema = DATA_SCHEMA
+        if suggested_values:
+            schema = self.add_suggested_values_to_schema(schema, suggested_values)
+        return schema
+
     async def async_step_import(self, import_config) -> ConfigFlowResult:
         """Import a config entry from configuration.yaml."""
         return await self.async_step_user(import_config)
@@ -73,55 +124,23 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: Mapping[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
-        errors = {}
+        errors: dict[str, str] = {}
         if user_input:
-            try:
-                api: Any = AIOSysbus(
-                    username=user_input[CONF_USERNAME],
-                    password=user_input[CONF_PASSWORD],
-                    session=async_create_clientsession(self.hass),
-                    host=user_input[CONF_HOST],
-                    port=user_input[CONF_PORT],
-                    use_tls=user_input[CONF_USE_TLS],
-                    verify_tls=user_input[CONF_VERIFY_TLS],
+            infos, errors = await self._async_validate_input(user_input)
+            if (
+                infos
+                and (sn := infos.get("status", {}).get("SerialNumber")) is not None
+            ):
+                await self.async_set_unique_id(sn)
+                self._abort_if_unique_id_configured()
+
+                return self.async_create_entry(
+                    title=f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})",
+                    data=user_input,
                 )
-                await api.async_connect()
-                await api.async_get_permissions()
-
-                infos = await api.deviceinfo.async_get_deviceinfo()
-
-            except AuthenticationFailed as err:
-                _LOGGER.warning("Fail to authenticate to the Livebox: %s", err)
-                errors["base"] = "login_incorrect"
-            except InsufficientPermissionsError as err:
-                _LOGGER.warning(
-                    "Insufficient permissions error occurred "
-                    "connecting to the Livebox: %s",
-                    err,
-                )
-                errors["base"] = "insufficient_permission"
-            except (RetrieveFailed, HttpRequestFailed) as err:
-                _LOGGER.warning("Fail to connect to the Livebox: %s", err)
-                errors["base"] = "cannot_connect"
-            except AiosysbusException:
-                _LOGGER.exception("Unknown error connecting to the Livebox")
-                errors["base"] = "unknown"
-            else:
-                if (sn := infos.get("status", {}).get("SerialNumber")) is not None:
-                    await self.async_set_unique_id(sn)
-                    self._abort_if_unique_id_configured()
-
-                    return self.async_create_entry(
-                        title=(
-                            f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})"
-                        ),
-                        data=user_input,
-                    )
-
-                errors["base"] = "cannot_connect"
 
         return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA, errors=errors
+            step_id="user", data_schema=self._get_data_schema(), errors=errors
         )
 
     async def async_step_ssdp(
@@ -132,6 +151,32 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
         return await self.async_step_user()
+
+    async def async_step_reconfigure(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle a reconfiguration flow."""
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+
+        if user_input:
+            infos, errors = await self._async_validate_input(user_input)
+            if (
+                infos
+                and (sn := infos.get("status", {}).get("SerialNumber")) is not None
+            ):
+                await self.async_set_unique_id(sn)
+                self._abort_if_unique_id_mismatch()
+                return self.async_update_reload_and_abort(
+                    entry,
+                    data=user_input,
+                )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self._get_data_schema(entry.data),
+            errors=errors,
+        )
 
 
 class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):

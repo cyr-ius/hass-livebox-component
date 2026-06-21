@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, cast
 
-from homeassistant.components.device_tracker.config_entry import ScannerEntity
+from homeassistant.components.device_tracker import ScannerEntity
 from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
@@ -21,6 +21,67 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+# Left side = Home Assistant attribute names, right side = raw Livebox keys.
+_BASE_DEVICE_ATTRIBUTE_FIELDS: dict[str, str] = {
+    "interface_name": "InterfaceName",
+    "type": "DeviceType",
+    "vendor": "VendorClassID",
+    "manufacturer": "Manufacturer",
+    "first_seen": "FirstSeen",
+    "last_connection": "LastConnection",
+    "last_changed": "LastChanged",
+}
+
+# Left side = Home Assistant attribute names, right side = raw Livebox keys.
+_WIRELESS_DEVICE_ATTRIBUTE_FIELDS: dict[str, str] = {
+    "frequency_band": "OperatingFrequencyBand",
+}
+
+
+def _is_wireless_device(device: dict[str, Any]) -> bool:
+    """Return whether a Livebox device looks like a Wi-Fi client."""
+    interface_name = device.get("InterfaceName", "")
+    tags = device.get("Tags", "")
+    return (
+        isinstance(interface_name, str)
+        and interface_name.startswith(("vap", "wlan", "wl"))
+    ) or (isinstance(tags, str) and "wifi" in tags.split())
+
+
+def _copy_selected_fields(
+    source: dict[str, Any], fields: dict[str, str]
+) -> dict[str, Any]:
+    """Return non-empty values from a raw Livebox payload using normalized names."""
+    return {
+        attr: value
+        for attr, key in fields.items()
+        if (value := source.get(key)) is not None and value != ""
+    }
+
+
+def _get_signal_quality(signal_strength: Any) -> str:
+    """Return a human-readable signal quality from the raw signal strength."""
+    if not isinstance(signal_strength, (int, float)):
+        return "unknown"
+
+    match signal_strength * -1:
+        case x if x > 90:
+            return "very bad"
+        case x if 80 <= x < 90:
+            return "bad"
+        case x if 70 <= x < 80:
+            return "very low"
+        case x if 67 <= x < 70:
+            return "low"
+        case x if 60 <= x < 67:
+            return "good"
+        case x if 50 <= x < 60:
+            return "very good"
+        case x if 30 <= x < 50:
+            return "excellent"
+        case _:
+            return "unknown"
 
 
 async def async_setup_entry(
@@ -104,15 +165,7 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        attrs = {
-            "interface_name": self._device.get("InterfaceName"),
-            "type": self._device.get("DeviceType"),
-            "vendor": self._device.get("VendorClassID"),
-            "manufacturer": self._device.get("Manufacturer"),
-            "first_seen": self._device.get("FirstSeen"),
-            "last_connection": self._device.get("LastConnection"),
-            "last_changed": self._device.get("LastChanged"),
-        }
+        attrs = _copy_selected_fields(self._device, _BASE_DEVICE_ATTRIBUTE_FIELDS)
 
         if self._device.get("InterfaceName") in [
             "eth1",
@@ -121,39 +174,15 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
             "eth4",
             "eth5",
         ]:
-            attrs.update({"connection": "ethernet", "band": "Wired"})
+            attrs.update({"connection": "ethernet", "frequency_band": "Wired"})
 
-        if (iname := self._device.get("InterfaceName")) in [
-            "eth6",
-            "wlan0",
-            "wl0",
-            "wlguest2",
-            "wlguest5",
-        ]:
-            match self._device.get("SignalStrength", 0) * -1:
-                case x if x > 90:
-                    signal_quality = "very bad"
-                case x if 80 <= x < 90:
-                    signal_quality = "bad"
-                case x if 70 <= x < 80:
-                    signal_quality = "very low"
-                case x if 67 <= x < 70:
-                    signal_quality = "low"
-                case x if 60 <= x < 67:
-                    signal_quality = "good"
-                case x if 50 <= x < 60:
-                    signal_quality = "very good"
-                case x if 30 <= x < 50:
-                    signal_quality = "excellent"
-                case _:
-                    signal_quality = "unknown"
-
+        if _is_wireless_device(self._device):
+            iname = self._device.get("InterfaceName")
+            signal_quality = _get_signal_quality(self._device.get("SignalStrength"))
             attrs.update(
                 {
-                    "band": self._device.get("OperatingFrequencyBand"),
-                    "signal_strength": self._device.get("SignalStrength"),
+                    "frequency_band": self._device.get("OperatingFrequencyBand"),
                     "signal_quality": signal_quality,
-                    "frenquency_band": self._device.get("OperatingFrequencyBand"),
                     "connection": "wifi"
                     if iname not in ["wlguest2", "wlguest5"]
                     else "guestwifi",

@@ -19,11 +19,14 @@ from homeassistant.const import (
     UnitOfInformation,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.entity import EntityCategory, EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .const import DOWNLOAD_ICON, PHONE_ICON, UPLOAD_ICON
+from .const import DOMAIN, DOWNLOAD_ICON, PHONE_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
@@ -34,6 +37,14 @@ _LOGGER = logging.getLogger(__name__)
 @dataclass(frozen=True, kw_only=True)
 class LiveboxSensorEntityDescription(SensorEntityDescription):
     """Represents an Flow Sensor."""
+
+    value_fn: Callable[..., Any]
+    attrs: dict[str, Callable[..., Any]] | None = None
+
+
+@dataclass(frozen=True, kw_only=True)
+class LiveboxDeviceSensorEntityDescription(SensorEntityDescription):
+    """Represents a per-device sensor."""
 
     value_fn: Callable[..., Any]
     attrs: dict[str, Callable[..., Any]] | None = None
@@ -76,6 +87,158 @@ def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
     """Returns a closure function for value_fn of entities with variable name"""
     return lambda x: find_item(x, path)
+
+
+def kilobits_per_second_to_megabits_per_second(value: Any) -> float:
+    """Convert a Kbit/s API value to Mbit/s."""
+    return value / 1000
+
+
+def kilobits_per_second_to_gigabits_per_second(value: Any) -> float:
+    """Convert a Kbit/s API value to Gbit/s."""
+    return value / 1000000
+
+
+def megabits_per_second_to_gigabits_per_second(value: Any) -> float:
+    """Convert a Mbit/s API value to Gbit/s."""
+    return value / 1000
+
+
+def _normalize_device_key(device_key: str) -> str:
+    """Return a stable entity key fragment for a device key."""
+    return device_key.lower().replace(":", "_")
+
+
+def _get_wireless_device_value_fn(
+    device_key: str, path: str, default: Any = None
+) -> Callable[..., Any]:
+    """Return a sensor value function for a device field."""
+    return lambda data: find_item(data, f"devices.{device_key}.{path}", default)
+
+
+def _get_wireless_device_rate_value_fn(
+    device_key: str, path: str
+) -> Callable[..., Any]:
+    """Return a Mbit/s sensor value function for a Kbit/s device rate field."""
+    return lambda data: kilobits_per_second_to_megabits_per_second(
+        find_item(data, f"devices.{device_key}.{path}", 0)
+    )
+
+
+def _get_associated_wifi_device(
+    coordinator_data: dict[str, Any], device_key: str
+) -> dict[str, Any] | None:
+    """Return the AP-side payload for a Wi-Fi client when available."""
+    for lan_device in coordinator_data.get("lan", []):
+        if lan_device.get("type") != "Wireless":
+            continue
+        associated_devices = lan_device.get("extra_attributes", {}).get(
+            "associated_devices", {}
+        )
+        if not isinstance(associated_devices, dict):
+            continue
+        for associated_device in associated_devices.values():
+            if not isinstance(associated_device, dict):
+                continue
+            if associated_device.get("MACAddress") == device_key:
+                return associated_device
+    return None
+
+
+def _get_associated_wifi_metric_value_fn(
+    device_key: str, metric: str, default: Any = None
+) -> Callable[..., Any]:
+    """Return a sensor value function for AP-side Wi-Fi statistics."""
+
+    def value_fn(coordinator_data: dict[str, Any]) -> Any:
+        associated_device = _get_associated_wifi_device(coordinator_data, device_key)
+        if associated_device is None:
+            return default
+        value = associated_device.get(metric)
+        return default if value is None else value
+
+    return value_fn
+
+
+def _is_wireless_device(device: dict[str, Any]) -> bool:
+    """Return whether a Livebox device looks like a Wi-Fi client."""
+    interface_name = device.get("InterfaceName", "")
+    tags = device.get("Tags", "")
+    return (
+        isinstance(interface_name, str)
+        and interface_name.startswith(("vap", "wlan", "wl"))
+    ) or (isinstance(tags, str) and "wifi" in tags.split())
+
+
+DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
+    {
+        "key": "downlink_rate",
+        "name": "Downlink Rate",
+        "icon": DOWNLOAD_ICON,
+        "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
+            device_key, "LastDataDownlinkRate"
+        ),
+        "native_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "device_class": SensorDeviceClass.DATA_RATE,
+    },
+    {
+        "key": "uplink_rate",
+        "name": "Uplink Rate",
+        "icon": UPLOAD_ICON,
+        "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
+            device_key, "LastDataUplinkRate"
+        ),
+        "native_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "suggested_unit_of_measurement": UnitOfDataRate.MEGABITS_PER_SECOND,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "device_class": SensorDeviceClass.DATA_RATE,
+    },
+    {
+        "key": "tx_bytes",
+        "name": "Tx Bytes",
+        "icon": UPLOAD_ICON,
+        "value_fn_factory": lambda device_key: _get_associated_wifi_metric_value_fn(
+            device_key, "TxBytes", 0
+        ),
+        "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.MEGABYTES,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "device_class": SensorDeviceClass.DATA_SIZE,
+    },
+    {
+        "key": "rx_bytes",
+        "name": "Rx Bytes",
+        "icon": DOWNLOAD_ICON,
+        "value_fn_factory": lambda device_key: _get_associated_wifi_metric_value_fn(
+            device_key, "RxBytes", 0
+        ),
+        "native_unit_of_measurement": UnitOfInformation.BYTES,
+        "suggested_unit_of_measurement": UnitOfInformation.MEGABYTES,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "device_class": SensorDeviceClass.DATA_SIZE,
+    },
+    {
+        "key": "signal_strength",
+        "name": "Signal Strength",
+        "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
+            device_key, "SignalStrength", None
+        ),
+        "native_unit_of_measurement": SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "device_class": SensorDeviceClass.SIGNAL_STRENGTH,
+    },
+    {
+        "key": "signal_noise_ratio",
+        "name": "Signal Noise Ratio",
+        "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
+            device_key, "SignalNoiseRatio", None
+        ),
+        "native_unit_of_measurement": "dB",
+        "state_class": SensorStateClass.MEASUREMENT,
+    },
+]
 
 
 SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
@@ -159,13 +322,17 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         translation_key="fiber_power_rx",
         attrs={
             "Downstream max rate Gbps": lambda x: (
-                find_item(x, "fiber_status.DownstreamMaxRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.DownstreamMaxRate", 0)
+                )
             ),
             "Downstream current rate Gbps": lambda x: (
-                find_item(x, "fiber_status.DownstreamCurrRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.DownstreamCurrRate", 0)
+                )
             ),
-            "Max bitrate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
+                find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
@@ -185,13 +352,17 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         translation_key="fiber_power_tx",
         attrs={
             "Upstream max rate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.UpstreamMaxRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.UpstreamMaxRate", 0)
+                )
             ),
             "Upstream current rate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.UpstreamCurrRate", 0) / 1000
+                kilobits_per_second_to_gigabits_per_second(
+                    find_item(x, "fiber_status.UpstreamCurrRate", 0)
+                )
             ),
-            "Max bitrate (Gbps)": lambda x: (
-                find_item(x, "fiber_status.MaxBitRateSupported", 0) / 1000
+            "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
+                find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
@@ -206,7 +377,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         icon=UPLOAD_ICON,
         value_fn=get_rolling_32_bit_value_fn("fiber_stats.TxBytes"),
         native_unit_of_measurement=UnitOfInformation.BYTES,
-        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_tx",
@@ -218,7 +389,7 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         icon=DOWNLOAD_ICON,
         value_fn=get_rolling_32_bit_value_fn("fiber_stats.RxBytes"),
         native_unit_of_measurement=UnitOfInformation.BYTES,
-        suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DATA_SIZE,
         translation_key="fiber_rx",
@@ -282,6 +453,7 @@ async def async_setup_entry(
     """Set up the sensors."""
     coordinator = entry.runtime_data
     entities = []
+    tracked = set()
     linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").lower()
 
     sensor_stats = []
@@ -316,7 +488,69 @@ async def async_setup_entry(
             continue
         entities.append(LiveboxSensor(coordinator, description))
 
+    @callback
+    def _async_update_device_sensors() -> None:
+        """Add per-device sensors when new devices appear."""
+        async_add_new_device_entities(coordinator, async_add_entities, tracked)
+
+    entry.async_on_unload(
+        async_dispatcher_connect(
+            hass,
+            coordinator.signal_device_new,
+            _async_update_device_sensors,
+        )
+    )
+
+    _async_update_device_sensors()
     async_add_entities(entities)
+
+
+@callback
+def async_add_new_device_entities(
+    coordinator: LiveboxDataUpdateCoordinator,
+    async_add_entities: AddEntitiesCallback,
+    tracked: set[str],
+) -> None:
+    """Add per-device sensor entities from the router."""
+    new_entities = []
+
+    for device_key, device in coordinator.data.get("devices", {}).items():
+        if not _is_wireless_device(device):
+            continue
+        device_name = device.get("Name") or device_key
+        device_key_fragment = _normalize_device_key(device_key)
+
+        for template in DEVICE_SENSOR_TYPES:
+            entity_key = f"{device_key_fragment}_{template['key']}"
+            if entity_key in tracked:
+                continue
+
+            description = LiveboxDeviceSensorEntityDescription(
+                key=entity_key,
+                name=template["name"],
+                icon=template.get("icon"),
+                value_fn=template["value_fn_factory"](device_key),
+                native_unit_of_measurement=template.get("native_unit_of_measurement"),
+                suggested_unit_of_measurement=template.get(
+                    "suggested_unit_of_measurement"
+                ),
+                state_class=template.get("state_class"),
+                device_class=template.get("device_class"),
+                entity_category=EntityCategory.DIAGNOSTIC,
+                entity_registry_enabled_default=False,
+            )
+            new_entities.append(
+                LiveboxDeviceSensor(
+                    coordinator,
+                    description,
+                    device_key=device_key,
+                    device_name=device_name,
+                )
+            )
+            tracked.add(entity_key)
+
+    if new_entities:
+        async_add_entities(new_entities)
 
 
 class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsistent-inheritance]
@@ -325,7 +559,7 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsisten
     def __init__(
         self,
         coordinator: LiveboxDataUpdateCoordinator,
-        description: LiveboxSensorEntityDescription,
+        description: EntityDescription,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, description)
@@ -346,3 +580,39 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsisten
                 for key, attr in description.attrs.items()
             }
         return None
+
+
+class LiveboxDeviceSensor(
+    LiveboxSensor,
+):  # pyrefly: ignore[inconsistent-inheritance]
+    """Representation of a per-device sensor."""
+
+    def __init__(
+        self,
+        coordinator: LiveboxDataUpdateCoordinator,
+        description: LiveboxDeviceSensorEntityDescription,
+        device_key: str,
+        device_name: str,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, description)
+        self._device_key = device_key
+        self._device_name = device_name
+        self._via_device = coordinator.get_parent_device_identifier(self._device_key)
+
+    @property
+    def native_value(self) -> float | int | None:
+        """Return the native value of the device."""
+        description = cast(
+            LiveboxDeviceSensorEntityDescription,
+            self.entity_description,
+        )
+        return description.value_fn(self.coordinator.data)
+
+    @property
+    def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
+        """Return device info to link the sensor to the Livebox device."""
+        return DeviceInfo(
+            name=self._device_name,
+            identifiers={(DOMAIN, self._device_key)},
+        )

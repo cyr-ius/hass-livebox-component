@@ -173,3 +173,47 @@ async def test_async_get_topology_returns_cached_value_on_invalid_status() -> No
         {"DD:DD:DD:DD:DD:01": "CC:CC:CC:CC:CC:01"},
         {"CC:CC:CC:CC:CC:01": "Repeater-1"},
     )
+
+
+async def test_async_get_results_keeps_interfaces_without_traffic() -> None:
+    """Interfaces without traffic should still produce zeroed stats."""
+    coordinator = object.__new__(LiveboxDataUpdateCoordinator)
+    coordinator.api = SimpleNamespace(
+        homelan=SimpleNamespace(
+            async_get_interface=object(),
+            async_get_results=object(),
+        )
+    )
+
+    async def _make_request(func: Any, parameters: Any = None) -> dict[str, Any]:
+        if func is coordinator.api.homelan.async_get_interface:
+            return {
+                "status": {
+                    "eth0": {"Name": "ETH0", "FriendlyName": "eth0"},
+                    "eth1": {"Name": "ETH1", "FriendlyName": "eth1"},
+                }
+            }
+        if func is coordinator.api.homelan.async_get_results:
+            return {
+                "status": {
+                    "eth0": {"Traffic": []},
+                    "eth1": {
+                        "Traffic": [
+                            {
+                                "Rx_Counter": 3_000_000,
+                                "Tx_Counter": 6_000_000,
+                            }
+                        ]
+                    },
+                }
+            }
+        raise AssertionError("Unexpected API call")
+
+    coordinator._make_request = cast(Any, _make_request)
+
+    results = await LiveboxDataUpdateCoordinator.async_get_results(coordinator)
+
+    assert results["ETH0"]["rate_rx"] == 0.0
+    assert results["ETH0"]["rate_tx"] == 0.0
+    assert results["ETH1"]["rate_rx"] == 0.8
+    assert results["ETH1"]["rate_tx"] == 1.6

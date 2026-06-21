@@ -159,3 +159,53 @@ async def test_form_already_configured(
         # Assert the flow is aborted
         assert result2["type"] == FlowResultType.ABORT
         assert result2["reason"] == "already_configured"
+
+
+@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
+async def test_reconfigure_updates_entry(
+    hass: HomeAssistant,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """Test reconfiguring an existing entry updates its data."""
+    await setup.async_setup_component(hass, "persistent_notification", {})
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Livebox (012345678901234)",
+        unique_id="012345678901234",
+        data=MOCK_USER_INPUT,
+    )
+    entry.add_to_hass(hass)
+
+    new_input = {
+        **MOCK_USER_INPUT,
+        "password": "updated_password",
+    }
+
+    with (
+        patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox,
+        patch.object(hass.config_entries, "async_schedule_reload") as mock_reload,
+    ):
+        mock_livebox.return_value = AIOSysbus
+
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={
+                "source": config_entries.SOURCE_RECONFIGURE,
+                "entry_id": entry.entry_id,
+            },
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "reconfigure"
+        assert not result.get("errors")
+
+        result2 = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            new_input,
+        )
+        await hass.async_block_till_done()
+
+        assert result2["type"] == FlowResultType.ABORT
+        assert result2["reason"] == "reconfigure_successful"
+        assert entry.data == new_input
+        mock_reload.assert_called_once_with(entry.entry_id)

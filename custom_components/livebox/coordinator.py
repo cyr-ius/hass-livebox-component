@@ -557,20 +557,24 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         for key, item in interfaces.items():
             traffic = data.get(key, {}).get("Traffic", [])
-            if len(traffic) == 0:
-                continue
-            stats = traffic[0]
+            stats = traffic[0] if traffic else {}
 
-            # Rx_Counter and Tx_Counter are collected over a 30-second window.
+            # Rx_Counter and Tx_Counter are byte counters collected over
+            # a 30-second window.
             # Convert them to Mbit/s to match the sensor unit declaration.
+            bytes_to_mbit_per_second = 8 / 30 / 1000000
 
             results.update(
                 {
                     item["Name"]: {
                         "friendly_name": key,
                         "alias": item.get("alias"),
-                        "rate_rx": round(stats.get("Rx_Counter", 0) / 30 / 1000000, 2),
-                        "rate_tx": round(stats.get("Tx_Counter", 0) / 30 / 1000000, 2),
+                        "rate_rx": round(
+                            stats.get("Rx_Counter", 0) * bytes_to_mbit_per_second, 2
+                        ),
+                        "rate_tx": round(
+                            stats.get("Tx_Counter", 0) * bytes_to_mbit_per_second, 2
+                        ),
                     }
                 }
             )
