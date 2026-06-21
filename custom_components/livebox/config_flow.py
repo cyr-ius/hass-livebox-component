@@ -160,7 +160,7 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
                         ): int,
                         vol.Required(
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
-                        ): vol.In(["All", "Active only"]),
+                        ): vol.In(["All", "Active"]),
                     },
                 ),
                 self.config_entry.options,
