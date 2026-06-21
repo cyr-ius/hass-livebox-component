@@ -10,7 +10,7 @@ dependencies = []
 # disable automatic discovery, which makes node_modules irrelevant.
 packages = []
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "aiosysbus",
   "async-upnp-client",

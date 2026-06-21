@@ -1788,7 +1788,7 @@ name = "hass-livebox-component"
 version = "0.0.0"
 source = { virtual = "." }
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "aiosysbus" },
     { name = "async-upnp-client" },
@@ -1800,15 +1800,16 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "aiosysbus", marker = "extra == 'dev'" },
-    { name = "async-upnp-client", marker = "extra == 'dev'" },
-    { name = "prek", marker = "extra == 'dev'" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'" },
-    { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'" },
-    { name = "python-typing-update", marker = "extra == 'dev'" },
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "aiosysbus" },
+    { name = "async-upnp-client" },
+    { name = "prek" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-homeassistant-custom-component" },
+    { name = "python-typing-update" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "hass-nabucasa"
