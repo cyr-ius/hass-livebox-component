@@ -3,7 +3,7 @@ name: Stale
 # yamllint disable-line rule:truthy
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
             and will be closed if no further activity occurs within 7 days.
 
             If you are the author of this PR, please leave a comment if you want
-            to keep it open. Also, please rebase your PR onto the latest dev
+            to keep it open. Also, please rebase your PR onto the latest master
             branch to ensure that it's up to date with the latest changes.
 
             Thank you for your contribution!
