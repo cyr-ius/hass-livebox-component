@@ -5,19 +5,25 @@ description = "Development environment for the Orange Livebox Home Assistant cus
 requires-python = ">=3.13.2"
 dependencies = []
 
-[dependency-groups]
+[tool.setuptools]
+# Non-packageable project (see [tool.uv] package = false):
+# disable automatic discovery, which makes node_modules irrelevant.
+packages = []
+
+[project.optional-dependencies]
 dev = [
   "aiosysbus",
   "async-upnp-client",
   "prek",
-  "pyrefly",
-  "pylint",
   "pytest-homeassistant-custom-component",
+  "pytest-asyncio",
+  "python-typing-update",
 ]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-ra -q"
+pythonpath = ["."]
 testpaths = ["tests/"]
 python_files = ["test_*.py"]
 asyncio_mode = "auto"
@@ -33,8 +39,3 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
-[tool.pyrefly]
-project-includes = [
-    "**/*.py*",
-    "**/*.ipynb",
-]

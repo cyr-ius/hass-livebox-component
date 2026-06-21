@@ -41,6 +41,17 @@ def auto_enable_custom_integrations(enable_custom_integrations):
     yield
 
 
+@pytest.fixture(autouse=True)
+def enable_sockets(socket_enabled):
+    """Allow sockets during tests.
+
+    Setting up the integration loads its ``ssdp`` dependency, whose listener
+    binds a local multicast socket. Without this, pytest-socket blocks it and
+    the cleanup verification fails with "the test opens sockets".
+    """
+    yield
+
+
 @pytest.fixture(name="AIOSysbus")
 def mock_router(request) -> Iterator[MagicMock]:
     """Mock a successful connection."""

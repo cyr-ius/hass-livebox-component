@@ -1,0 +1,14 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-extra/features/prek:1": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/devcontainers-extra/features/prek@sha256:eb55e266252d8560cf726f27c5675e397bb833067a21428c50b273a59842f649",
+      "integrity": "sha256:eb55e266252d8560cf726f27c5675e397bb833067a21428c50b273a59842f649"
+    },
+    "ghcr.io/devcontainers-extra/features/uv:1": {
+      "version": "1.0.2",
+      "resolved": "ghcr.io/devcontainers-extra/features/uv@sha256:1ac5b9f17a9e9e745933d0ac2ecf758e06ed3da4423cd22c94cce4d482fd2dd8",
+      "integrity": "sha256:1ac5b9f17a9e9e745933d0ac2ecf758e06ed3da4423cd22c94cce4d482fd2dd8"
+    }
+  }
+}
