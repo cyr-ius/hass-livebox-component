@@ -22,7 +22,7 @@ dev = [
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q"
+addopts = "-ra --cov=custom_components --cov-report=term-missing --cov-fail-under=85"
 pythonpath = ["."]
 testpaths = ["tests/"]
 python_files = ["test_*.py"]
