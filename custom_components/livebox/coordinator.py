@@ -97,6 +97,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     self.model = 5656  # Sagemcom f@st 5656
                 case "Livebox Nautilus":
                     self.model = 7.2
+                case "Funbox6":
+                    self.model = 6.1  # SagemcomFast5670_OPL
             # Optionals
             wifi_tracking = self.config_entry.options.get(
                 CONF_WIFI_TRACKING, DEFAULT_WIFI_TRACKING
@@ -355,6 +357,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "Bias": float(optical.get("BiasCurrent", 0)),
             }
 
+        if self.model == 6.1:
+            parameters = {"mibs": "gpon"}
+            eth0 = (
+                await self._make_request(
+                    self.api.nemo.async_get_MIBs, "ETH0", parameters
+                )
+            ).get("status", {})
+            return find_item(eth0, "gpon.ETH0", {})
+
         parameters = {"mibs": "gpon"}
         veip0 = (
             await self._make_request(self.api.nemo.async_get_MIBs, "veip0", parameters)
@@ -426,6 +437,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             intf = "bridge_vmulti"
         elif self.model == 5656:
             intf = "bridge"
+        elif self.model == 6.1:
+            intf = "ETH0"
         else:
             intf = "veip0"
         return (
