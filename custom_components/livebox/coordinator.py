@@ -357,15 +357,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "Bias": float(optical.get("BiasCurrent", 0)),
             }
 
-        if self.model == 6.1:
-            parameters = {"mibs": "gpon"}
-            eth0 = (
-                await self._make_request(
-                    self.api.nemo.async_get_MIBs, "ETH0", parameters
-                )
-            ).get("status", {})
-            return find_item(eth0, "gpon.ETH0", {})
-
         parameters = {"mibs": "gpon"}
         veip0 = (
             await self._make_request(self.api.nemo.async_get_MIBs, "veip0", parameters)
