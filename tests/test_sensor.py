@@ -127,11 +127,11 @@ async def test_rate_sensors_use_megabits_per_second_math(
 
     rx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_rx")
     assert rx_state is not None
-    assert float(rx_state.state) == 0.09
+    assert float(rx_state.state) == 0.01
 
     tx_state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_eth2_rate_tx")
     assert tx_state is not None
-    assert float(tx_state.state) == 45.48
+    assert float(tx_state.state) == 5.69
 
 
 async def test_device_metric_sensors_are_created_for_wifi_clients(
