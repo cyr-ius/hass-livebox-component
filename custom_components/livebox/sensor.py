@@ -432,6 +432,29 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         entity_registry_enabled_default=False,
     ),
     LiveboxSensorEntityDescription(
+        key="last_reboot_reason",
+        name="Last reboot reason",
+        icon="mdi:restart-alert",
+        value_fn=lambda x: (
+            find_item(x, "reboot_log.shutdown_reason")
+            or find_item(x, "reboot_log.boot_reason")
+            or "unknown"
+        ),
+        translation_key="last_reboot_reason",
+        attrs={
+            "Boot date": lambda x: find_item(x, "reboot_log.boot_date"),
+            "Boot reason": lambda x: find_item(x, "reboot_log.boot_reason"),
+            "Shutdown date": lambda x: find_item(x, "reboot_log.shutdown_date"),
+            "Boot counter": lambda x: find_item(x, "reboot_log.counters.BootCounter"),
+            "Watchdog reboot counter": lambda x: find_item(
+                x, "reboot_log.counters.WatchdogRebootCounter"
+            ),
+            "Reboots since last upgrade": lambda x: find_item(
+                x, "reboot_log.counters.RebootSinceLastUpgrade"
+            ),
+        },
+    ),
+    LiveboxSensorEntityDescription(
         key="uptime",
         name="Uptime",
         icon="progress-clock",
