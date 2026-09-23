@@ -26,6 +26,7 @@ from custom_components.livebox.const import (
 )
 
 from .const import (
+    MOCK_REBOOT_LOG,
     MOCK_USER_INPUT,
 )
 
@@ -322,6 +323,13 @@ def mock_router(request) -> Iterator[MagicMock]:
         instance.nmc.async_reboot = AsyncMock()
         instance.nmc.async_set_wifi = AsyncMock()
         instance.nmc.async_guest_wifi = AsyncMock()
+
+        async def _mock_auth_post(
+            service: str, method: str, parameters: Any = None
+        ) -> dict[str, Any]:
+            return MOCK_REBOOT_LOG.get(service, {})
+
+        instance._auth.post = AsyncMock(side_effect=_mock_auth_post)
 
         instance.usermanagement.async_get_users = AsyncMock(
             return_value=api["UserManagement.async_get_users"]
