@@ -83,6 +83,27 @@ async def test_sensors_state(
     assert state is not None
 
 
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_last_reboot_reason_sensor(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+):
+    """The reason comes from the previous session, the dates from the current one."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_last_reboot_reason")
+    assert state is not None
+    assert state.state == "TR069 reboot"
+    assert state.attributes["Boot date"] == "2026-09-16T01:08:18Z"
+    assert state.attributes["Boot reason"] == "NMC"
+    assert state.attributes["Shutdown date"] == "2026-09-16T01:07:24Z"
+    assert state.attributes["Boot counter"] == 134
+    assert state.attributes["Watchdog reboot counter"] == 3
+    assert state.attributes["Reboots since last upgrade"] == 85
+
+
 async def test_rate_sensors_match_issue_258_diagnostics(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

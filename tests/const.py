@@ -29,3 +29,32 @@ MOCK_DISCOVERY_INFO = ZeroconfServiceInfo(
     },
     type="mock_type",
 )
+
+# Raw `NMC.Reboot.Reboot:get` / `NMC.Reboot:get` replies, as returned by a
+# Funbox 6. aiosysbus exposes no getter for them, so the coordinator reads them
+# through `_auth.post` and the router mock answers from here.
+MOCK_REBOOT_LOG = {
+    "NMC.Reboot.Reboot": {
+        "status": {
+            "133": {
+                "BootDate": "2026-09-06T12:50:00Z",
+                "BootReason": "NMC",
+                "ShutdownDate": "2026-09-16T01:07:24Z",
+                "ShutdownReason": "TR069 reboot",
+            },
+            "134": {
+                "BootDate": "2026-09-16T01:08:18Z",
+                "BootReason": "NMC",
+                "ShutdownDate": "0001-01-01T00:00:00Z",
+                "ShutdownReason": "",
+            },
+        }
+    },
+    "NMC.Reboot": {
+        "status": {
+            "BootCounter": 134,
+            "WatchdogRebootCounter": 3,
+            "RebootSinceLastUpgrade": 85,
+        }
+    },
+}

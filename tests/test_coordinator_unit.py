@@ -217,3 +217,84 @@ async def test_async_get_results_keeps_interfaces_without_traffic() -> None:
     assert results["ETH0"]["rate_tx"] == 0.0
     assert results["ETH1"]["rate_rx"] == 0.1
     assert results["ETH1"]["rate_tx"] == 0.2
+
+
+def _build_reboot_log_coordinator(
+    sessions: Any, counters: Any
+) -> LiveboxDataUpdateCoordinator:
+    """Return a coordinator answering the two reboot-log calls."""
+    coordinator = object.__new__(LiveboxDataUpdateCoordinator)
+    coordinator.api = SimpleNamespace(_auth=SimpleNamespace(post=object()))
+
+    async def _make_request(func: Any, *args: Any) -> dict[str, Any]:
+        if func is not coordinator.api._auth.post:
+            raise AssertionError("Unexpected API call")
+        if args[0] == "NMC.Reboot.Reboot":
+            return {"status": sessions}
+        if args[0] == "NMC.Reboot":
+            return {"status": counters}
+        raise AssertionError(f"Unexpected object: {args[0]}")
+
+    coordinator._make_request = cast(Any, _make_request)
+    return coordinator
+
+
+async def test_async_get_reboot_log_sorts_sessions_numerically() -> None:
+    """Session keys are strings, so "99" must not sort after "134"."""
+    coordinator = _build_reboot_log_coordinator(
+        {
+            "99": {
+                "BootDate": "2026-01-01T00:00:00Z",
+                "BootReason": "NMC",
+                "ShutdownDate": "2026-01-02T00:00:00Z",
+                "ShutdownReason": "POR",
+            },
+            "133": {
+                "BootDate": "2026-09-06T12:50:00Z",
+                "BootReason": "NMC",
+                "ShutdownDate": "2026-09-16T01:07:24Z",
+                "ShutdownReason": "TR069 reboot",
+            },
+            "134": {
+                "BootDate": "2026-09-16T01:08:18Z",
+                "BootReason": "NMC",
+                "ShutdownDate": "0001-01-01T00:00:00Z",
+                "ShutdownReason": "",
+            },
+        },
+        {"BootCounter": 134, "WatchdogRebootCounter": 3},
+    )
+
+    reboot_log = await LiveboxDataUpdateCoordinator.async_get_reboot_log(coordinator)
+
+    # Current session is 134; the reason it rebooted comes from session 133.
+    assert reboot_log["boot_date"] == "2026-09-16T01:08:18Z"
+    assert reboot_log["shutdown_reason"] == "TR069 reboot"
+    assert reboot_log["shutdown_date"] == "2026-09-16T01:07:24Z"
+    assert reboot_log["counters"]["BootCounter"] == 134
+
+
+async def test_async_get_reboot_log_handles_single_session() -> None:
+    """A gateway with one recorded session has no previous shutdown reason."""
+    coordinator = _build_reboot_log_coordinator(
+        {"1": {"BootDate": "2026-09-16T01:08:18Z", "BootReason": "POR"}},
+        {"BootCounter": 1},
+    )
+
+    reboot_log = await LiveboxDataUpdateCoordinator.async_get_reboot_log(coordinator)
+
+    assert reboot_log["boot_reason"] == "POR"
+    assert reboot_log["shutdown_reason"] is None
+
+
+async def test_async_get_reboot_log_survives_unexpected_payloads() -> None:
+    """Models that do not expose the log must not break the update cycle."""
+    for sessions, counters in (({}, {}), ([], None), ("", {"BootCounter": 7})):
+        coordinator = _build_reboot_log_coordinator(sessions, counters)
+
+        reboot_log = await LiveboxDataUpdateCoordinator.async_get_reboot_log(
+            coordinator
+        )
+
+        assert "boot_date" not in reboot_log
+        assert isinstance(reboot_log["counters"], dict)

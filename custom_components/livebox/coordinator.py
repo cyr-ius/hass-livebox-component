@@ -131,6 +131,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 },
                 "ddns": await self.async_get_ddns(),
                 "wifi_stats": await self.async_get_wifi_stats(),
+                "reboot_log": await self.async_get_reboot_log(),
                 "fiber_status": await self.async_get_fiber_status(),
                 "fiber_stats": await self.async_get_fiber_stats(),
                 "remote_access": await self.async_is_remote_access(),
@@ -340,6 +341,46 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             await self._make_request(self.api.nemo.async_get_MIBs, "data", parameters)
         ).get("status", {})
         return find_item(dsl0, "dsl.dsl0", {})
+
+    async def async_get_reboot_log(self) -> dict[str, Any]:
+        """Get the gateway reboot history (why it went down, how it came back).
+
+        `aiosysbus` only exposes `async_reboot` / `async_flush_reboot`, so the
+        two read-only calls are made directly: `NMC.Reboot.Reboot:get` returns
+        the numbered boot sessions and `NMC.Reboot:get` the counters.
+        """
+        sessions = (
+            await self._make_request(
+                self.api._auth.post, "NMC.Reboot.Reboot", "get", {}
+            )
+        ).get("status", {})
+        counters = (
+            await self._make_request(self.api._auth.post, "NMC.Reboot", "get", {})
+        ).get("status", {})
+        counters = counters if isinstance(counters, dict) else {}
+
+        if not isinstance(sessions, dict) or not sessions:
+            return {"counters": counters}
+
+        # Session keys are numbers as strings, so they must be sorted
+        # numerically: a lexical sort puts "99" after "134".
+        keys = sorted((k for k in sessions if str(k).isdigit()), key=int)
+        if not keys:
+            return {"counters": counters}
+
+        current = sessions.get(keys[-1]) or {}
+        # The reason lives in the ShutdownReason of the PREVIOUS session — that
+        # is why the gateway went down. BootReason of the current session only
+        # says how it came back up.
+        previous = (sessions.get(keys[-2]) or {}) if len(keys) > 1 else {}
+
+        return {
+            "boot_date": current.get("BootDate"),
+            "boot_reason": current.get("BootReason"),
+            "shutdown_reason": previous.get("ShutdownReason"),
+            "shutdown_date": previous.get("ShutdownDate"),
+            "counters": counters,
+        }
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
