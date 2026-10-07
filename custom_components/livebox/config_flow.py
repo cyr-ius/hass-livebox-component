@@ -179,7 +179,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class LiveboxOptionsFlowHandler(config_entries.OptionsFlow):
+class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
     """Handle option."""
 
     async def async_step_init(
