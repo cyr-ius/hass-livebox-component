@@ -5,6 +5,7 @@ from typing import cast
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant, State
@@ -17,6 +18,7 @@ from custom_components.livebox.const import (
     CONF_WIFI_TRACKING,
     DOMAIN,
 )
+from custom_components.livebox.coordinator import TOPOLOGY_SCAN_INTERVAL
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
@@ -164,6 +166,38 @@ async def test_device_tracker_updates_via_device_on_coordinator_refresh(
     state = hass.states.get("device_tracker.device_repeater_5g_1")
     assert state is not None
     assert state.attributes["ip"] == "192.168.1.99"
+
+
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_device_tracker_follows_client_roaming(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """A client moving from a repeater to the Livebox is re-parented (#325)."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    coordinator = config_entry.runtime_data
+
+    repeater = _device(hass, config_entry, "CC:CC:CC:CC:CC:01")
+    assert _device(hass, config_entry, "DD:DD:DD:DD:DD:01").via_device_id == repeater.id
+
+    # The client roams to the Livebox; LastUpdate is left unchanged.
+    root = AIOSysbus.topologydiagnostics.async_set_topodiags_build.return_value[
+        "status"
+    ][0]
+    lan = root["Children"][0]
+    repeater_vap = lan["Children"][1]["Children"][1]["Children"][0]
+    client = repeater_vap["Children"].pop()
+    lan["Children"][0]["Children"].append(client)
+
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+
+    livebox = _device(hass, config_entry, cast(str, coordinator.unique_id))
+    assert _device(hass, config_entry, "DD:DD:DD:DD:DD:01").via_device_id == livebox.id
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)

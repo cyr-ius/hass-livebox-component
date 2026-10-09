@@ -4,10 +4,12 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from custom_components.livebox.const import CONF_LAN_TRACKING, CONF_WIFI_TRACKING
+from custom_components.livebox.coordinator import TOPOLOGY_SCAN_INTERVAL
 
 from .helpers import load_fixture
 
@@ -159,6 +161,7 @@ async def test_topology_kept_on_invalid_status(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     AIOSysbus: AsyncMock | MagicMock,
+    freezer: FrozenDateTimeFactory,
 ) -> None:
     """Malformed topology status should fall back to the existing cache."""
     data = await _async_setup(hass, config_entry)
@@ -170,11 +173,33 @@ async def test_topology_kept_on_invalid_status(
     topology.async_get_topodiags.return_value = {"status": []}
     topology.async_set_topodiags_build.reset_mock()
     coordinator = config_entry.runtime_data
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
     await coordinator.async_refresh()
 
     assert coordinator.data["topology_via_device"] == via_device
     assert coordinator.data["topology_repeaters"] == repeaters
     topology.async_set_topodiags_build.assert_not_awaited()
+
+
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_topology_rebuilt_after_scan_interval(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Topology is cached, then rebuilt even when LastUpdate is unchanged."""
+    await _async_setup(hass, config_entry)
+    build = AIOSysbus.topologydiagnostics.async_set_topodiags_build
+    build.reset_mock()
+    coordinator = config_entry.runtime_data
+
+    await coordinator.async_refresh()
+    build.assert_not_awaited()
+
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
+    await coordinator.async_refresh()
+    build.assert_awaited_once()
 
 
 async def test_stats_keep_interfaces_without_traffic(

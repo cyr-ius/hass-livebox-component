@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Any, cast
+from typing import Any
 
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import AiosysbusException
@@ -32,7 +32,7 @@ from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
-TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=15)
+TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=5)
 TOPOLOGY_BUILD_TIMEOUT = 30
 
 
@@ -53,7 +53,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self.model: int | float | None = None
         self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
         self._topology_cache_at: datetime | None = None
-        self._topology_last_update: str | None = None
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
@@ -222,24 +221,18 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_get_topology(self) -> tuple[dict[str, str], dict[str, str]]:
         """Build a device-to-repeater map from topology diagnostics."""
         now = datetime.now(tz=UTC)
+        # LastUpdate only moves when buildTopology runs, so it cannot tell
+        # whether a client roamed: rebuild periodically instead.
+        if (
+            self._topology_cache_at is not None
+            and now - self._topology_cache_at < TOPOLOGY_SCAN_INTERVAL
+        ):
+            return self._topology_cache
+
         topo_status = (
             await self._make_request(self.api.topologydiagnostics.async_get_topodiags)
         ).get("status", {})
         if not isinstance(topo_status, dict):
-            return self._topology_cache
-
-        last_update = topo_status.get("LastUpdate")
-        if (
-            isinstance(last_update, str)
-            and self._topology_last_update is not None
-            and last_update == self._topology_last_update
-        ):
-            return self._topology_cache
-        if (
-            self._topology_cache_at is not None
-            and now - self._topology_cache_at < TOPOLOGY_SCAN_INTERVAL
-            and not isinstance(last_update, str)
-        ):
             return self._topology_cache
 
         data = (
@@ -279,9 +272,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         _walk(data[0])
         self._topology_cache = (topology_via_device, topology_repeaters)
         self._topology_cache_at = now
-        self._topology_last_update = cast(str | None, data[0].get("LastUpdate")) or (
-            last_update if isinstance(last_update, str) else None
-        )
         return self._topology_cache
 
     def get_parent_device_identifier(self, device_key: str | None) -> tuple[str, str]:
