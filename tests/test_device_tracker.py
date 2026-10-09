@@ -9,8 +9,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import (
+    CONF_DISPLAY_DEVICES,
+    CONF_LAN_TRACKING,
+    CONF_WIFI_TRACKING,
+    DOMAIN,
+)
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
@@ -208,3 +214,75 @@ async def test_device_tracker_adds_associated_wifi_stats(
     assert "last_data_downlink_rate" not in attrs
     assert "last_data_uplink_rate" not in attrs
     assert "signal_strength" not in attrs
+
+
+ISSUE_350 = "issue_350_apple_private_address_sanitized.json"
+# Apple devices using a "Private Wi-Fi Address" are tagged wifi_bridge
+# without edev (issue #350). The Watch is even typed "WiFi Bridge".
+APPLE_IPHONE = "AA:AA:AA:AA:AA:01"
+APPLE_IPAD = "AA:AA:AA:AA:AA:02"
+APPLE_WATCH = "AA:AA:AA:AA:AA:03"  # inactive
+WINDOWS_PC = "BB:BB:BB:BB:BB:01"  # wifi_bridge too, e.g. virtual switch
+WIRED_BRIDGES = {"CC:CC:CC:CC:CC:01", "CC:CC:CC:CC:CC:02"}
+ORANGE_REPEATER = "DD:DD:DD:DD:DD:01"  # hnid + ssw, not wifi_bridge
+REGULAR_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
+
+
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("AIOSysbus", ["7.1"], indirect=True)
+@pytest.mark.parametrize("api_overlay", [ISSUE_350], indirect=True)
+@pytest.mark.parametrize(
+    ("display_devices", "expected"),
+    [
+        (
+            "All",
+            {
+                APPLE_IPHONE,
+                APPLE_IPAD,
+                APPLE_WATCH,
+                WINDOWS_PC,
+                ORANGE_REPEATER,
+                REGULAR_CLIENT,
+            },
+        ),
+        (
+            "Active",
+            {APPLE_IPHONE, APPLE_IPAD, WINDOWS_PC, ORANGE_REPEATER, REGULAR_CLIENT},
+        ),
+    ],
+)
+async def test_device_tracker_tracks_wifi_bridge_clients(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    display_devices: str,
+    expected: set[str],
+) -> None:
+    """Wi-Fi clients tagged wifi_bridge are tracked, wired Wi-Fi bridges are not."""
+    # Configuration reported in the issue: wired and wireless tracking enabled.
+    hass.config_entries.async_update_entry(
+        config_entry,
+        options={
+            **config_entry.options,
+            CONF_DISPLAY_DEVICES: display_devices,
+            CONF_LAN_TRACKING: True,
+            CONF_WIFI_TRACKING: True,
+        },
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    data = config_entry.runtime_data.data
+    assert set(data["devices"]) == expected
+    assert data["count_wired_devices"] == 0
+
+    entity_registry = er.async_get(hass)
+    for key in expected:
+        assert entity_registry.async_get_entity_id("device_tracker", DOMAIN, key), key
+    for key in WIRED_BRIDGES:
+        assert not entity_registry.async_get_entity_id("device_tracker", DOMAIN, key)
+
+    state = hass.states.get("device_tracker.iphone")
+    assert state is not None
+    assert state.state == STATE_HOME
+    assert state.attributes["ip"] == "192.168.1.11"
