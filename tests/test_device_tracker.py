@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
@@ -286,3 +286,58 @@ async def test_device_tracker_tracks_wifi_bridge_clients(
     assert state is not None
     assert state.state == STATE_HOME
     assert state.attributes["ip"] == "192.168.1.11"
+
+
+def _tracker_state(hass: HomeAssistant, key: str) -> State:
+    """Return the state of the device tracker of a Livebox device key."""
+    entity_id = er.async_get(hass).async_get_entity_id("device_tracker", DOMAIN, key)
+    assert entity_id is not None, key
+    state = hass.states.get(entity_id)
+    assert state is not None, entity_id
+    return state
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_device_tracker_reports_ethernet_on_uppercase_interface(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Wired clients on ETH* interfaces (Livebox 6/7) are reported as ethernet."""
+    # Fixture keys are redacted, give the PS4 (ETH3) its own key.
+    ps4 = AIOSysbus.__devices["status"][67]
+    assert ps4["InterfaceName"] == "ETH3"
+    ps4["Key"] = "AA:BB:CC:DD:00:67"
+    hass.config_entries.async_update_entry(
+        config_entry, options={**config_entry.options, CONF_LAN_TRACKING: True}
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    attrs = _tracker_state(hass, "AA:BB:CC:DD:00:67").attributes
+    assert attrs["connection"] == "ethernet"
+    assert attrs["frequency_band"] == "Wired"
+
+
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_device_tracker_keeps_wifi_for_repeater_clients_on_eth(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """Wi-Fi clients of a wired repeater stay wifi despite their ETH0 interface."""
+    hass.config_entries.async_update_entry(
+        config_entry, options={**config_entry.options, CONF_LAN_TRACKING: True}
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    wired = _tracker_state(hass, "BB:BB:BB:BB:BB:01").attributes
+    assert wired["connection"] == "ethernet"
+    assert wired["frequency_band"] == "Wired"
+
+    repeater_client = _tracker_state(hass, "DD:DD:DD:DD:DD:01").attributes
+    assert repeater_client["connection"] == "wifi"
+    assert repeater_client["frequency_band"] == "5GHz"
