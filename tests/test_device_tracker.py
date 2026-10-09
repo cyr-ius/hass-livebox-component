@@ -1,27 +1,16 @@
 """The tests for the bbox component."""
 
 from datetime import datetime
-from types import SimpleNamespace
-from typing import Any, cast
+from typing import cast
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_HOME, STATE_NOT_HOME
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityDescription
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers import device_registry as dr
 
-from custom_components.livebox.const import (
-    CONF_TRACKING_TIMEOUT,
-    DEFAULT_TRACKING_TIMEOUT,
-    DOMAIN,
-)
-from custom_components.livebox.coordinator import LiveboxDataUpdateCoordinator
-from custom_components.livebox.device_tracker import (
-    LiveboxDeviceScannerEntity,
-    async_add_new_tracked_entities,
-)
+from custom_components.livebox.const import DOMAIN
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
@@ -31,6 +20,8 @@ async def test_device_tracker(
     AIOSysbus: AsyncMock | MagicMock,
 ) -> None:
     """Test the device tracker platform."""
+    # Fixture keys are redacted, give PC-408 its own key so it is not merged.
+    AIOSysbus.__devices["status"][69]["Key"] = "AA:BB:CC:DD:04:08"
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
@@ -103,128 +94,112 @@ async def test_device_tracker_new_device(
     assert state is not None
 
 
-async def test_device_tracker_adds_repeaters_before_clients() -> None:
-    """Create repeater entities before their children and set via_device."""
+ISSUE_191 = "issue_191_repeater_topology_sanitized.json"
 
-    def _get_parent_device_identifier(device_key: str | None) -> tuple[str, str]:
-        if device_key == "DD:DD:DD:DD:DD:01":
-            return (DOMAIN, "CC:CC:CC:CC:CC:01")
-        return (DOMAIN, "LIVEBOX-1")
 
-    coordinator = cast(
-        LiveboxDataUpdateCoordinator,
-        SimpleNamespace(
-            unique_id="LIVEBOX-1",
-            config_entry=SimpleNamespace(
-                data={"host": "192.168.1.1", "port": 80},
-                options={},
-            ),
-            get_parent_device_identifier=_get_parent_device_identifier,
-            data={
-                "infos": {"ProductClass": "Livebox 7"},
-                "devices": {
-                    "DD:DD:DD:DD:DD:01": {
-                        "Key": "DD:DD:DD:DD:DD:01",
-                        "Name": "Device-Repeater-5g-1",
-                        "IPAddress": "192.168.1.21",
-                    },
-                    "CC:CC:CC:CC:CC:01": {
-                        "Key": "CC:CC:CC:CC:CC:01",
-                        "Name": "Repeater-1",
-                        "IPAddress": "192.168.1.39",
-                        "DeviceType": "repeteurwifi6",
-                    },
-                    "AA:AA:AA:AA:AA:01": {
-                        "Key": "AA:AA:AA:AA:AA:01",
-                        "Name": "Device-Direct-5g-1",
-                        "IPAddress": "192.168.1.14",
-                    },
-                },
-                "topology_repeaters": {"CC:CC:CC:CC:CC:01": "Repeater-1"},
-                "topology_via_device": {"DD:DD:DD:DD:DD:01": "CC:CC:CC:CC:CC:01"},
-            },
-        ),
+def _device(hass: HomeAssistant, entry: ConfigEntry, key: str) -> dr.DeviceEntry:
+    """Return the registry device of a Livebox device key."""
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, key), entry.entry_id
     )
+    assert device is not None, key
+    return device
 
-    created = []
 
-    def _add_entities(new_entities: Any) -> None:
-        entities = cast(list[Any], new_entities)
-        created.extend(entities)
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_device_tracker_links_clients_to_repeaters(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """Repeaters are registered before their clients so via_device resolves."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
-    async_add_new_tracked_entities(
-        coordinator,
-        cast(AddEntitiesCallback, _add_entities),
-        set(),
+    coordinator = config_entry.runtime_data
+    livebox = _device(hass, config_entry, cast(str, coordinator.unique_id))
+    repeater = _device(hass, config_entry, "CC:CC:CC:CC:CC:01")
+
+    assert repeater.via_device_id == livebox.id
+    assert _device(hass, config_entry, "DD:DD:DD:DD:DD:01").via_device_id == repeater.id
+    assert _device(hass, config_entry, "AA:AA:AA:AA:AA:01").via_device_id == livebox.id
+
+
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_device_tracker_updates_via_device_on_coordinator_refresh(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Re-parent an existing tracker when topology appears on a later refresh."""
+    topology = AIOSysbus.topologydiagnostics.async_set_topodiags_build
+    topology_response = topology.return_value
+    topology.return_value = {"status": []}
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    coordinator = config_entry.runtime_data
+
+    livebox = _device(hass, config_entry, cast(str, coordinator.unique_id))
+    assert _device(hass, config_entry, "DD:DD:DD:DD:DD:01").via_device_id == livebox.id
+
+    topology.return_value = topology_response
+    client = next(
+        device
+        for device in AIOSysbus.__devices["status"]
+        if device["Key"] == "DD:DD:DD:DD:DD:01"
     )
+    client["IPAddress"] = "192.168.1.99"
+    await coordinator.async_request_refresh()
+    await hass.async_block_till_done()
 
-    assert [entity._device["Key"] for entity in created] == [
-        "CC:CC:CC:CC:CC:01",
-        "DD:DD:DD:DD:DD:01",
-        "AA:AA:AA:AA:AA:01",
-    ]
-    assert created[0].device_info is not None
-    assert created[0].device_info["via_device"] == (DOMAIN, "LIVEBOX-1")
-    assert created[1].device_info is not None
-    assert created[1].device_info["via_device"] == (DOMAIN, "CC:CC:CC:CC:CC:01")
+    repeater = _device(hass, config_entry, "CC:CC:CC:CC:CC:01")
+    assert _device(hass, config_entry, "DD:DD:DD:DD:DD:01").via_device_id == repeater.id
+    state = hass.states.get("device_tracker.device_repeater_5g_1")
+    assert state is not None
+    assert state.attributes["ip"] == "192.168.1.99"
 
 
-def test_device_tracker_adds_associated_wifi_stats() -> None:
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_device_tracker_adds_associated_wifi_stats(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
     """Wi-Fi device trackers should keep only contextual attributes."""
-
-    coordinator = cast(
-        LiveboxDataUpdateCoordinator,
-        SimpleNamespace(
-            data={
-                "lan": [
-                    {
-                        "type": "Wireless",
-                        "name": "5GHz (home)",
-                        "extra_attributes": {
-                            "associated_devices": {
-                                "1": {
-                                    "MACAddress": "AA:BB:CC:DD:EE:FF",
-                                    "TxBytes": 321,
-                                    "RxBytes": 654,
-                                    "LastDataDownlinkRate": 1234,
-                                    "LastDataUplinkRate": 5678,
-                                }
-                            }
-                        },
-                    }
-                ]
-            },
-            config_entry=SimpleNamespace(
-                data={"host": "192.168.1.1", "port": 80},
-                options={CONF_TRACKING_TIMEOUT: DEFAULT_TRACKING_TIMEOUT},
-            ),
-            get_parent_device_identifier=lambda _device_key: (DOMAIN, "LIVEBOX"),
-            unique_id="LIVEBOX",
-        ),
+    AIOSysbus.__devices["status"].append(
+        {
+            "Key": "AA:BB:CC:DD:EE:FF",
+            "Name": "Test device",
+            "PhysAddress": "AA:BB:CC:DD:EE:FF",
+            "InterfaceName": "vap5g0priv0",
+            "DeviceType": "Mobile",
+            "Active": True,
+            "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp events",
+            "IPAddress": "10.0.0.10",
+            "OperatingFrequencyBand": "5GHz",
+            "SignalStrength": -41,
+            "SignalNoiseRatio": 32,
+            "AvgSignalStrengthByChain": -42,
+            "LastDataDownlinkRate": 7777,
+            "LastDataUplinkRate": 8888,
+        }
     )
-    device = {
-        "Key": "AA:BB:CC:DD:EE:FF",
-        "Name": "Test device",
-        "InterfaceName": "vap5g0priv",
-        "DeviceType": "Mobile",
-        "Active": True,
-        "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp events",
-        "IPAddress": "10.0.0.10",
-        "OperatingFrequencyBand": "5GHz",
-        "SignalStrength": -41,
-        "SignalNoiseRatio": 32,
-        "AvgSignalStrengthByChain": -42,
-        "LastDataDownlinkRate": 7777,
-        "LastDataUplinkRate": 8888,
+    wlanvap = AIOSysbus.api_raw["NeMo.async_get_MIBs::lan"]["status"]["wlanvap"]
+    wlanvap["vap5g0priv0"]["AssociatedDevice"]["AA:BB:CC:DD:EE:FF"] = {
+        "MACAddress": "AA:BB:CC:DD:EE:FF",
+        "TxBytes": 321,
+        "RxBytes": 654,
+        "LastDataDownlinkRate": 1234,
+        "LastDataUplinkRate": 5678,
     }
-    entity = LiveboxDeviceScannerEntity(
-        coordinator,
-        EntityDescription(key="test_device_tracker", name="Test device"),
-        device,
-    )
 
-    attrs = cast(dict[str, Any], entity.extra_state_attributes)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
+    state = hass.states.get("device_tracker.test_device")
+    assert state is not None
+    attrs = state.attributes
     assert attrs["connection"] == "wifi"
     assert attrs["frequency_band"] == "5GHz"
     assert attrs["signal_quality"] == "excellent"

@@ -1,29 +1,18 @@
 """Tests for the Bbox sensor platform."""
 
-from types import SimpleNamespace
-from typing import Any, cast
 from unittest.mock import AsyncMock
 
+import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import pytest
-from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfDataRate, UnitOfInformation
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from pytest_homeassistant_custom_component.common import load_json_object_fixture
+from homeassistant.core import HomeAssistant, State
 
-from custom_components.livebox.coordinator import LiveboxDataUpdateCoordinator
-from custom_components.livebox.sensor import (
-    SENSOR_TYPES,
-    LiveboxSensor,
-    async_setup_entry,
-)
+from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.sensor import SENSOR_TYPES
 
-
-def _load_fixture(name: str) -> dict[str, Any]:
-    """Load a typed test fixture."""
-    return cast(dict[str, Any], load_json_object_fixture(name))
+from .helpers import load_fixture
 
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
@@ -104,36 +93,56 @@ async def test_last_reboot_reason_sensor(
     assert state.attributes["Reboots since last upgrade"] == 85
 
 
+@pytest.mark.parametrize("AIOSysbus", ["7", "7.1", "7.2"], indirect=True)
 async def test_rate_sensors_match_issue_258_diagnostics(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
 ) -> None:
     """Test dynamic rate sensors keep distinct values from issue #258."""
-    fixture = _load_fixture("issue_258_livebox_nautilus_diagnostics_sanitized.json")
+    fixture = load_fixture("issue_258_livebox_nautilus_diagnostics_sanitized.json")
+    stats = fixture["data"]["data"]["stats"]
+    # The issue only provides the computed rates: rebuild the HomeLan
+    # counters (bits over 30 seconds) the coordinator derives them from.
+    AIOSysbus.homelan.async_get_interface.return_value = {
+        "status": {
+            item["friendly_name"]: {"Name": name, "FriendlyName": item["friendly_name"]}
+            for name, item in stats.items()
+        }
+    }
+    AIOSysbus.homelan.async_get_results.return_value = {
+        "status": {
+            item["friendly_name"]: {
+                "Traffic": [
+                    {
+                        "Rx_Counter": item["rate_rx"] * 30_000_000,
+                        "Tx_Counter": item["rate_tx"] * 30_000_000,
+                    }
+                ]
+            }
+            for item in stats.values()
+        }
+    }
 
-    coordinator = LiveboxDataUpdateCoordinator(hass, config_entry)
-    coordinator.unique_id = "issue258"
-    coordinator.data = fixture["data"]["data"]
-    config_entry.runtime_data = coordinator
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
-    entities: list[LiveboxSensor] = []
+    entity_registry = er.async_get(hass)
+    unique_id = config_entry.runtime_data.unique_id
 
-    def _add_entities(
-        new_entities: list[LiveboxSensor], update_before_add: bool = False
-    ) -> None:
-        del update_before_add
-        entities.extend(new_entities)
+    def _value(key: str) -> float:
+        entity_id = entity_registry.async_get_entity_id(
+            "sensor", DOMAIN, f"{unique_id}_{key}"
+        )
+        assert entity_id is not None, key
+        state = hass.states.get(entity_id)
+        assert state is not None, key
+        return float(state.state)
 
-    await async_setup_entry(
-        hass, config_entry, cast(AddEntitiesCallback, _add_entities)
-    )
-
-    sensors = {entity.entity_description.key: entity for entity in entities}
-
-    assert sensors["vap5g0priv_rate_rx"].native_value == 0.01
-    assert sensors["vap5g0priv_rate_tx"].native_value == 0.06
-    assert sensors["ETH0_rate_rx"].native_value == 0.01
-    assert sensors["ETH0_rate_tx"].native_value == 0.0
+    assert _value("vap5g0priv_rate_rx") == 0.01
+    assert _value("vap5g0priv_rate_tx") == 0.06
+    assert _value("ETH0_rate_rx") == 0.01
+    assert _value("ETH0_rate_tx") == 0.0
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7.1"], indirect=True)
@@ -155,103 +164,69 @@ async def test_rate_sensors_use_megabits_per_second_math(
     assert float(tx_state.state) == 5.69
 
 
+@pytest.mark.usefixtures("entity_registry_enabled_by_default")
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_device_metric_sensors_are_created_for_wifi_clients(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
 ) -> None:
     """Test per-device Wi-Fi sensors expose the expected metrics."""
-    coordinator = cast(
-        LiveboxDataUpdateCoordinator,
-        SimpleNamespace(
-            unique_id="LIVEBOX",
-            config_entry=SimpleNamespace(
-                data={"host": "192.168.1.1", "port": 80},
-                options={},
-            ),
-            signal_device_new="livebox-LIVEBOX-device-new",
-            get_parent_device_identifier=lambda _device_key: ("livebox", "LIVEBOX"),
-            data={
-                "devices": {
-                    "AA:BB:CC:DD:EE:FF": {
-                        "Key": "AA:BB:CC:DD:EE:FF",
-                        "Name": "Test device",
-                        "InterfaceName": "vap5g0priv",
-                        "SignalStrength": -41,
-                        "SignalNoiseRatio": 32,
-                        "LastDataDownlinkRate": 7777,
-                        "LastDataUplinkRate": 8888,
-                    }
-                },
-                "lan": [
-                    {
-                        "type": "Wireless",
-                        "name": "5GHz (home)",
-                        "extra_attributes": {
-                            "associated_devices": {
-                                "1": {
-                                    "MACAddress": "AA:BB:CC:DD:EE:FF",
-                                    "TxBytes": 321,
-                                    "RxBytes": 654,
-                                }
-                            }
-                        },
-                    }
-                ],
-            },
-        ),
+    AIOSysbus.__devices["status"].append(
+        {
+            "Key": "AA:BB:CC:DD:EE:FF",
+            "Name": "Test device",
+            "PhysAddress": "AA:BB:CC:DD:EE:FF",
+            "Active": True,
+            "Tags": "lan edev mac physical wifi ipv4 ipv6 dhcp events",
+            "InterfaceName": "vap5g0priv0",
+            "SignalStrength": -41,
+            "SignalNoiseRatio": 32,
+            "LastDataDownlinkRate": 7777,
+            "LastDataUplinkRate": 8888,
+        }
     )
-    config_entry.runtime_data = coordinator
-
-    entities: list[LiveboxSensor] = []
-
-    def _add_entities(
-        new_entities: list[LiveboxSensor], update_before_add: bool = False
-    ) -> None:
-        del update_before_add
-        entities.extend(new_entities)
-
-    await async_setup_entry(
-        hass, config_entry, cast(AddEntitiesCallback, _add_entities)
-    )
-
-    sensors = {entity.entity_description.key: entity for entity in entities}
-
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].native_value == 7.777
-    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].native_value == 8.888
-    downlink_description = cast(
-        SensorEntityDescription,
-        sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].entity_description,
-    )
-    assert (
-        downlink_description.native_unit_of_measurement
-        == UnitOfDataRate.MEGABITS_PER_SECOND
-    )
-    assert (
-        downlink_description.suggested_unit_of_measurement
-        == UnitOfDataRate.MEGABITS_PER_SECOND
-    )
-    assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].native_value == 321
-    assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].native_value == 654
-    tx_bytes_description = cast(
-        SensorEntityDescription,
-        sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].entity_description,
-    )
-    assert tx_bytes_description.native_unit_of_measurement == UnitOfInformation.BYTES
-    assert (
-        tx_bytes_description.suggested_unit_of_measurement
-        == UnitOfInformation.MEGABYTES
-    )
-    assert sensors["aa_bb_cc_dd_ee_ff_signal_strength"].native_value == -41
-    assert sensors["aa_bb_cc_dd_ee_ff_signal_noise_ratio"].native_value == 32
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].extra_state_attributes is None
-    assert sensors["aa_bb_cc_dd_ee_ff_uplink_rate"].extra_state_attributes is None
-    assert sensors["aa_bb_cc_dd_ee_ff_tx_bytes"].extra_state_attributes is None
-    assert sensors["aa_bb_cc_dd_ee_ff_rx_bytes"].extra_state_attributes is None
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].name == "Downlink Rate"
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info is not None
-    assert sensors["aa_bb_cc_dd_ee_ff_downlink_rate"].device_info["identifiers"] == {
-        ("livebox", "AA:BB:CC:DD:EE:FF")
+    wlanvap = AIOSysbus.api_raw["NeMo.async_get_MIBs::lan"]["status"]["wlanvap"]
+    wlanvap["vap5g0priv0"]["AssociatedDevice"]["AA:BB:CC:DD:EE:FF"] = {
+        "MACAddress": "AA:BB:CC:DD:EE:FF",
+        "TxBytes": 321,
+        "RxBytes": 654,
     }
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    entity_registry = er.async_get(hass)
+    device_registry = dr.async_get(hass)
+
+    def _state(key: str) -> State:
+        entity_id = entity_registry.async_get_entity_id(
+            "sensor", DOMAIN, f"{config_entry.runtime_data.unique_id}_{key}"
+        )
+        assert entity_id is not None, key
+        state = hass.states.get(entity_id)
+        assert state is not None, key
+        return state
+
+    downlink = _state("aa_bb_cc_dd_ee_ff_downlink_rate")
+    assert float(downlink.state) == 7.777
+    assert downlink.attributes["unit_of_measurement"] == (
+        UnitOfDataRate.MEGABITS_PER_SECOND
+    )
+    assert float(_state("aa_bb_cc_dd_ee_ff_uplink_rate").state) == 8.888
+    tx_bytes = _state("aa_bb_cc_dd_ee_ff_tx_bytes")
+    assert float(tx_bytes.state) == 0.000321
+    assert tx_bytes.attributes["unit_of_measurement"] == UnitOfInformation.MEGABYTES
+    assert float(_state("aa_bb_cc_dd_ee_ff_rx_bytes").state) == 0.000654
+    assert float(_state("aa_bb_cc_dd_ee_ff_signal_strength").state) == -41
+    assert float(_state("aa_bb_cc_dd_ee_ff_signal_noise_ratio").state) == 32
+    assert downlink.attributes["friendly_name"] == "Test device Downlink Rate"
+
+    entry = entity_registry.async_get(downlink.entity_id)
+    assert entry is not None and entry.device_id is not None
+    device = device_registry.async_get(entry.device_id)
+    assert device is not None
+    assert device.identifiers == {(DOMAIN, "AA:BB:CC:DD:EE:FF")}
 
 
 def test_fiber_rate_attributes_use_gigabits_per_second() -> None:
