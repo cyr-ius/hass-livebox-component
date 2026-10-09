@@ -1,6 +1,6 @@
 {
   "name": "Orange Livebox routeur",
   "country": "FR",
-  "homeassistant": "2025.5.0",
+  "homeassistant": "2025.8.0",
   "render_readme": true
 }
