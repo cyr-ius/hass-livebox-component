@@ -7,7 +7,7 @@ Home Assistant custom integration for Orange Livebox routers
 
 ```bash
 python -m pytest tests -q        # coverage must stay >= 85 %
-pre-commit run --all-files       # ruff check/format, codespell, yamllint
+prek run --all-files             # or pre-commit; ruff, codespell, yamllint
 ```
 
 ## Writing tests
