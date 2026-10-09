@@ -166,7 +166,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         if mode == "All":
             parameters = {
                 "expression": {
-                    "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
+                    "wifi": (
+                        'wifi && (edev || hnid || wifi_bridge) and .PhysAddress!=""'
+                    ),
                     "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
                 }
             }
@@ -174,7 +176,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             parameters = {
                 "expression": {
                     "wifi": (
-                        '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""'
+                        ".Active==true && wifi && (edev || hnid || wifi_bridge)"
+                        ' and .PhysAddress!=""'
                     ),
                     "eth": (
                         '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
