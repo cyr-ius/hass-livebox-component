@@ -1,0 +1,108 @@
+{
+  "api_raw": {
+    "Devices.async_get_devices": {
+      "status": [
+        {
+          "Key": "AA:AA:AA:AA:AA:01",
+          "Name": "iPhone",
+          "DeviceType": "Mobile",
+          "Tags": "lan mac physical flowstats ipv4 ipv6 dhcp apple ssw_sta vowifi wifi_bridge events wifi",
+          "Active": true,
+          "PhysAddress": "AA:AA:AA:AA:AA:01",
+          "IPAddress": "192.168.1.11",
+          "InterfaceName": "vap5g0priv",
+          "Layer2Interface": "wl0"
+        },
+        {
+          "Key": "AA:AA:AA:AA:AA:02",
+          "Name": "iPad-1",
+          "DeviceType": "Tablet",
+          "Tags": "lan mac physical flowstats ipv4 ipv6 dhcp apple ssw_sta wifi_bridge wifi events",
+          "Active": true,
+          "PhysAddress": "AA:AA:AA:AA:AA:02",
+          "IPAddress": "192.168.1.12",
+          "InterfaceName": "vap5g0priv",
+          "Layer2Interface": "wl0"
+        },
+        {
+          "Key": "AA:AA:AA:AA:AA:03",
+          "Name": "Watch",
+          "DeviceType": "WiFi Bridge",
+          "Tags": "lan mac physical flowstats ipv4 ipv6 ssw_sta dhcp wifi_bridge events wifi",
+          "Active": false,
+          "PhysAddress": "AA:AA:AA:AA:AA:03",
+          "IPAddress": "",
+          "InterfaceName": "vap5g0priv",
+          "Layer2Interface": "wl0"
+        },
+        {
+          "Key": "BB:BB:BB:BB:BB:01",
+          "Name": "PC1",
+          "DeviceType": "Desktop Windows",
+          "Tags": "lan mac physical wifi flowstats ipv4 ipv6 dhcp ssw_sta microsoft wifi_bridge lltd events",
+          "Active": true,
+          "PhysAddress": "BB:BB:BB:BB:BB:01",
+          "IPAddress": "192.168.1.21",
+          "InterfaceName": "vap5g0priv",
+          "Layer2Interface": "wl1"
+        },
+        {
+          "Key": "CC:CC:CC:CC:CC:01",
+          "Name": "Amsterdam",
+          "DeviceType": "WiFi Bridge",
+          "Tags": "lan mac physical ipv4 ipv6 dhcp flowstats wifi_bridge ssw_sta eth events",
+          "Active": true,
+          "PhysAddress": "CC:CC:CC:CC:CC:01",
+          "IPAddress": "192.168.1.31",
+          "InterfaceName": "ETH2",
+          "Layer2Interface": "eth1"
+        },
+        {
+          "Key": "CC:CC:CC:CC:CC:02",
+          "Name": "Skopje",
+          "DeviceType": "WiFi Bridge",
+          "Tags": "lan mac physical flowstats ipv4 ipv6 wifi_bridge dhcp ssw_sta events eth",
+          "Active": true,
+          "PhysAddress": "CC:CC:CC:CC:CC:02",
+          "IPAddress": "192.168.1.32",
+          "InterfaceName": "ETH2",
+          "Layer2Interface": "eth1"
+        },
+        {
+          "Key": "DD:DD:DD:DD:DD:01",
+          "Name": "Repeteur WiFi - Bureau",
+          "DeviceType": "SAH AP",
+          "Tags": "lan mac physical ssw hnid wifi flowstats orange information ipv4 ipv6 dhcp manageable ssw_sta events",
+          "Active": true,
+          "PhysAddress": "DD:DD:DD:DD:DD:01",
+          "IPAddress": "192.168.1.41",
+          "InterfaceName": "vap5g0priv0",
+          "Layer2Interface": "wl1"
+        },
+        {
+          "Key": "EE:EE:EE:EE:EE:01",
+          "Name": "Client-1",
+          "DeviceType": "Computer",
+          "Tags": "lan edev mac physical flowstats ipv4 ipv6 dhcp ssw_sta wifi events",
+          "Active": true,
+          "PhysAddress": "EE:EE:EE:EE:EE:01",
+          "IPAddress": "192.168.1.51",
+          "InterfaceName": "vap5g0priv",
+          "Layer2Interface": "wl0"
+        },
+        {
+          "Key": "vap5g0priv",
+          "Name": "vap5g0priv",
+          "Tags": "self lan vap wifi nemo interface events",
+          "Active": true
+        },
+        {
+          "Key": "ETH2",
+          "Name": "ETH2",
+          "Tags": "self lan eth nemo interface events",
+          "Active": true
+        }
+      ]
+    }
+  }
+}

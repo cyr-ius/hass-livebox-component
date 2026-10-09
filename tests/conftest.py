@@ -1,17 +1,15 @@
 """The tests for the component."""
 
 from collections.abc import Iterator
-from typing import Any, cast
+from copy import deepcopy
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
 from homeassistant.config_entries import SOURCE_USER, ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.util import slugify
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    load_json_object_fixture,
-)
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
@@ -29,11 +27,7 @@ from .const import (
     MOCK_REBOOT_LOG,
     MOCK_USER_INPUT,
 )
-
-
-def _load_api_fixture(name: str) -> dict[str, Any]:
-    """Load a typed API fixture payload."""
-    return cast(dict[str, Any], load_json_object_fixture(name))["api_raw"]
+from .helpers import devices_response, load_api_fixture
 
 
 @pytest.fixture(autouse=True)
@@ -53,8 +47,38 @@ def enable_sockets(socket_enabled):
     yield
 
 
+@pytest.fixture
+def entity_registry_enabled_by_default() -> Iterator[None]:
+    """Enable the entities that are disabled by default."""
+    with patch(
+        "homeassistant.helpers.entity.Entity.entity_registry_enabled_default",
+        new_callable=PropertyMock,
+        return_value=True,
+    ):
+        yield
+
+
+@pytest.fixture(name="reboot_log")
+def mock_reboot_log() -> dict[str, Any]:
+    """Return the `_auth.post` responses, editable per test."""
+    return deepcopy(MOCK_REBOOT_LOG)
+
+
+@pytest.fixture(name="api_overlay")
+def mock_api_overlay(request) -> dict[str, Any]:
+    """Return API responses that replace the model ones.
+
+    Parametrize indirectly with a fixture file name holding a partial
+    ``api_raw`` (e.g. a sanitized issue capture).
+    """
+    name = getattr(request, "param", None)
+    return load_api_fixture(name) if name else {}
+
+
 @pytest.fixture(name="AIOSysbus")
-def mock_router(request) -> Iterator[MagicMock]:
+def mock_router(
+    request, reboot_log: dict[str, Any], api_overlay: dict[str, Any]
+) -> Iterator[MagicMock]:
     """Mock a successful connection."""
     model = getattr(request, "param", "7")  # valeur par défaut
     api: Any
@@ -69,17 +93,18 @@ def mock_router(request) -> Iterator[MagicMock]:
     # "Livebox S": "Livebox S", 7.2
 
     if model == "3":
-        api = _load_api_fixture("Livebox 3.json")
+        api = load_api_fixture("Livebox 3.json")
     elif model == "5":
-        api = _load_api_fixture("Livebox Fibre.json")
+        api = load_api_fixture("Livebox Fibre.json")
     elif model == "7":
-        api = _load_api_fixture("Livebox 7.json")
+        api = load_api_fixture("Livebox 7.json")
     elif model == "7.1":
-        api = _load_api_fixture("Livebox W7.json")
+        api = load_api_fixture("Livebox W7.json")
     elif model == "7.2":
-        api = _load_api_fixture("Livebox Nautilus.json")
+        api = load_api_fixture("Livebox Nautilus.json")
     else:
         raise ValueError(f"Unknown model: {model}")
+    api = {**api, **api_overlay}
 
     with patch("custom_components.livebox.coordinator.AIOSysbus") as mock:
         instance = mock.return_value
@@ -91,54 +116,11 @@ def mock_router(request) -> Iterator[MagicMock]:
             return_value=api["DeviceInfo.async_get_deviceinfo"]
         )
 
-        def _mock_get_devices(*args, **kwargs):
-            """Return different values based on the first arg."""
-
-            def _filtered_devices():
-                filtered_devices = {"status": {"eth": [], "wifi": []}}
-                for device in api["Devices.async_get_devices"]["status"]:
-                    if (
-                        ("edev" in device["Tags"] or "hnid" in device["Tags"])
-                        and "wifi" in device["Tags"]
-                        and device["PhysAddress"] is not None
-                    ):
-                        filtered_devices["status"]["wifi"].append(device)
-                return filtered_devices
-
-            def _filtered_interfaces():
-                filtered_interfaces = {"status": {"eth": [], "wifi": []}}
-                for device in api["Devices.async_get_devices"]["status"]:
-                    if "self" in device["Tags"] and "vap" in device["Tags"]:
-                        filtered_interfaces["status"]["wifi"].append(device)
-                    if "self" in device["Tags"] and "eth" in device["Tags"]:
-                        filtered_interfaces["status"]["eth"].append(device)
-                return filtered_interfaces
-
-            if len(args) == 0:
-                return api["Devices.async_get_devices"]
-            if args[0] == {"expression": {"wifi": "vap && lan", "eth": "eth && lan"}}:
-                return _filtered_interfaces()
-            if args[0] == {
-                "expression": {
-                    "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
-                    "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
-                }
-            }:
-                return _filtered_devices()
-
-            if args[0] == {
-                "expression": {
-                    "wifi": (
-                        '.Active==true && wifi && (edev || hnid) and .PhysAddress!=""'
-                    ),
-                    "eth": (
-                        '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
-                    ),
-                }
-            }:
-                return _filtered_devices()
-
-            return {}
+        def _mock_get_devices(parameters: Any = None) -> dict[str, Any]:
+            """Filter the fixture devices with the expression sent by the code."""
+            return devices_response(
+                api["Devices.async_get_devices"]["status"], parameters
+            )
 
         instance.devices.async_get_devices = AsyncMock(side_effect=_mock_get_devices)
 
@@ -238,12 +220,6 @@ def mock_router(request) -> Iterator[MagicMock]:
             return_value=api.get("HomeLan.async_get_interface", {})
         )
 
-        def _mock_get_results(*args, **kwargs):
-            """Return different values based on the first arg."""
-            return api.get("HomeLan.async_get_results", {})
-
-        instance.homelan.async_get_results = AsyncMock(side_effect=_mock_get_results)
-
         instance.homelan.async_get_results = AsyncMock(
             return_value=api.get("HomeLan.async_get_results", {})
         )
@@ -327,7 +303,7 @@ def mock_router(request) -> Iterator[MagicMock]:
         async def _mock_auth_post(
             service: str, method: str, parameters: Any = None
         ) -> dict[str, Any]:
-            return MOCK_REBOOT_LOG.get(service, {})
+            return reboot_log.get(service, {})
 
         instance._auth.post = AsyncMock(side_effect=_mock_auth_post)
 
@@ -362,6 +338,9 @@ def mock_router(request) -> Iterator[MagicMock]:
         )
 
         instance.close = AsyncMock()
+
+        # Raw responses, to edit in place before setting up the integration.
+        instance.api_raw = api
 
         type(instance).__devices = PropertyMock(
             return_value=api["Devices.async_get_devices"]

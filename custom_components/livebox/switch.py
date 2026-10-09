@@ -157,11 +157,10 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
         self._device_key = device.get("Key", self.name)
         self._device = device
         self._attr_unique_id = f"{coordinator.unique_id or DOMAIN}_{description.key}"
-        unique_id = coordinator.unique_id or DOMAIN
         self._attr_device_info = DeviceInfo(
             name=self._device.get("Name"),
             identifiers={(DOMAIN, self._device_key)},
-            via_device=(DOMAIN, unique_id),
+            via_device=coordinator.get_parent_device_identifier(self._device_key),
         )
 
     def _get_device_schedule(self) -> dict[str, Any]:
