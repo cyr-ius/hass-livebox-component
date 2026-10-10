@@ -1,7 +1,5 @@
 """Parent Entity."""
 
-from __future__ import annotations
-
 from homeassistant.core import callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import EntityDescription

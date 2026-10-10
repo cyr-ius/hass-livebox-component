@@ -1,7 +1,5 @@
 """Call log calendar for Livebox SIP gateway."""
 
-from __future__ import annotations
-
 import datetime
 import logging
 from typing import Any, cast
