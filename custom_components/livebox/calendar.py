@@ -81,17 +81,24 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
 
         max_call_id_in_batch = 0
         for call in self.coordinator.data["callers"]:
-            call_id = int(call["id"])
+            try:
+                call_id = int(call["id"])
+            except TypeError, ValueError:
+                continue
             max_call_id_in_batch = max(max_call_id_in_batch, call_id)
 
             if call_id > self._max_call_id:
+                try:
+                    duration = int(call["duration"] or 0)
+                except TypeError, ValueError:
+                    duration = 0
                 call_time = parser.parse(call["date"])
                 call_type = "Call" if call["status"] == "succeeded" else "Missed "
                 call_direction = "to" if call["origin"] == "local" else "from"
 
                 self._calls[call_id] = CalendarEvent(
                     start=call_time,
-                    end=call_time + +datetime.timedelta(seconds=call["duration"]),
+                    end=call_time + datetime.timedelta(seconds=duration),
                     summary="{} {} {}".format(
                         call_type,
                         call_direction,
@@ -101,10 +108,8 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
 
         self._max_call_id = max(max_call_id_in_batch, self._max_call_id)
 
-        return cast(
-            list[CalendarEvent],
-            filter(
-                lambda ev: ev.start > start_date and ev.end < end_date,
-                self._calls.values(),
-            ),
-        )
+        return [
+            event
+            for event in self._calls.values()
+            if event.start < end_date and event.end > start_date
+        ]
