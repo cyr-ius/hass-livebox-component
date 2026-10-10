@@ -143,7 +143,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> 
 
 
 async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+    hass: HomeAssistant, config_entry: LiveboxConfigEntry, device_entry: dr.DeviceEntry
 ) -> bool:
-    """Remove config entry from a device."""
-    return True
+    """Remove config entry from a device, except the Livebox itself."""
+    gateway = config_entry.runtime_data.get_parent_device_identifier(None)
+    return gateway not in device_entry.identifiers
