@@ -148,8 +148,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "topology_repeaters": topology_repeaters,
                 "lan": await self.async_get_lan(devices),
                 "upnp": await self.async_get_port_forwarding(),
-                "dhcp_leases": await self.async_get_dhcp_leases(),
-                "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
+                **await self.async_get_dhcp_leases(),
                 "stats": await self.async_get_results(),
             }
         except AiosysbusException as error:
@@ -585,17 +584,24 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return ports
 
-    async def async_get_dhcp_leases(
-        self, domain: str = "default"
-    ) -> list[dict[str, Any]]:
-        """Get dhcp leases."""
+    async def async_get_dhcp_leases(self) -> dict[str, list[dict[str, Any]]]:
+        """Get dhcp leases of the default and guest pools."""
         if self.model == 5656:
-            return []
+            return {"dhcp_leases": [], "guest_dhcp_leases": []}
 
-        data = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get(
+        pools = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get(
             "status", {}
         )
-        if data.get(domain, {}).get("Enable", False) is False:
+        return {
+            "dhcp_leases": await self._async_get_pool_leases(pools, "default"),
+            "guest_dhcp_leases": await self._async_get_pool_leases(pools, "guest"),
+        }
+
+    async def _async_get_pool_leases(
+        self, pools: dict[str, Any], domain: str
+    ) -> list[dict[str, Any]]:
+        """Get the leases of an enabled dhcp pool."""
+        if pools.get(domain, {}).get("Enable", False) is False:
             return []
 
         data = (
