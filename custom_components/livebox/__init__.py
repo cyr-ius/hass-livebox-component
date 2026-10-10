@@ -102,6 +102,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, async_logout_on_stop)
     )
 
+    # Register the Livebox first so per-device entities can use it as via_device_id.
+    dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id, **coordinator.device_info
+    )
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_remove_cmissed(call) -> None:

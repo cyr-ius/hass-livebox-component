@@ -621,7 +621,6 @@ class LiveboxDeviceSensor(
         super().__init__(coordinator, description)
         self._device_key = device_key
         self._device_name = device_name
-        self._via_device = coordinator.get_parent_device_identifier(self._device_key)
 
     @property
     def native_value(self) -> float | int | None:

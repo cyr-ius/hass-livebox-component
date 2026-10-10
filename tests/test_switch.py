@@ -1,12 +1,18 @@
 import copy
-from unittest.mock import AsyncMock
+from typing import cast
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID, STATE_OFF, STATE_ON, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from sqlalchemy import false
+
+from custom_components.livebox.const import DOMAIN
+
+ISSUE_191 = "issue_191_repeater_topology_sanitized.json"
 
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
@@ -219,3 +225,35 @@ async def test_wan_access_switch_unique_id_migration(
 
     # No duplicate entry should exist under the old unique_id
     assert entity_registry.async_get_entity_id("switch", "livebox", legacy_uid) is None
+
+
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("api_overlay", [ISSUE_191], indirect=True)
+async def test_wan_access_switch_links_device_to_repeater(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """A device created by its WAN access switch ends up linked to its repeater."""
+    with patch("custom_components.livebox.PLATFORMS", [Platform.SWITCH]):
+        await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+    coordinator = config_entry.runtime_data
+
+    await coordinator.async_refresh()
+    await hass.async_block_till_done()
+
+    device_registry = dr.async_get(hass)
+    livebox = device_registry.async_get_device_by_identifier(
+        (DOMAIN, cast(str, coordinator.unique_id)), config_entry.entry_id
+    )
+    repeater = device_registry.async_get_device_by_identifier(
+        (DOMAIN, "CC:CC:CC:CC:CC:01"), config_entry.entry_id
+    )
+    client = device_registry.async_get_device_by_identifier(
+        (DOMAIN, "DD:DD:DD:DD:DD:01"), config_entry.entry_id
+    )
+    assert livebox is not None
+    assert repeater is not None
+    assert client is not None
+    assert repeater.via_device_id == livebox.id
+    assert client.via_device_id == repeater.id

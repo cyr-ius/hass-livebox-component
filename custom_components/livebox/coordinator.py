@@ -13,7 +13,9 @@ from aiosysbus.exceptions import AiosysbusException
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
@@ -284,6 +286,21 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self._topology_cache_at = now
         return self._topology_cache
 
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return the device info of the Livebox itself."""
+        infos = (self.data or {}).get("infos", {})
+        entry_data = self.config_entry.data
+        scheme = "https" if entry_data.get(CONF_USE_TLS) else "http"
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.unique_id or DOMAIN)},
+            manufacturer=infos.get("Manufacturer"),
+            model=infos.get("ModelName"),
+            name=infos.get("ProductClass", DOMAIN.capitalize()),
+            sw_version=infos.get("SoftwareVersion"),
+            configuration_url=f"{scheme}://{entry_data.get(CONF_HOST)}:{entry_data.get(CONF_PORT)}",
+        )
+
     def get_parent_device_identifier(self, device_key: str | None) -> tuple[str, str]:
         """Return the parent device identifier for a tracked device."""
         unique_id = self.unique_id or DOMAIN
@@ -293,6 +310,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             if isinstance(parent_key, str):
                 return (DOMAIN, parent_key)
         return (DOMAIN, unique_id)
+
+    def get_parent_device_id(self, device_key: str | None) -> str | None:
+        """Return the registry id of the parent device of a tracked device."""
+        parent = dr.async_get(self.hass).async_get_device_by_identifier(
+            self.get_parent_device_identifier(device_key), self.config_entry.entry_id
+        )
+        return parent.id if parent is not None else None
 
     def get_repeater_name(self, device_key: str | None) -> str | None:
         """Return the repeater name for a tracked device, if any."""
