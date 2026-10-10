@@ -548,7 +548,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_detect_new_dvices(self, devices) -> None:
         """New devices detected."""
-        if self.data and self.data.get("devices"):
+        # On the first refresh, platforms create entities from the returned data.
+        if self.data is not None:
             for key in devices:
                 if key not in self.data.get("devices", {}):
                     self.data["devices"] = devices

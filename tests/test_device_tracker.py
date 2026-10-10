@@ -375,3 +375,27 @@ async def test_device_tracker_keeps_wifi_for_repeater_clients_on_eth(
     repeater_client = _tracker_state(hass, "DD:DD:DD:DD:DD:01").attributes
     assert repeater_client["connection"] == "wifi"
     assert repeater_client["frequency_band"] == "5GHz"
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_device_tracker_new_device_after_empty_start(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Devices are discovered even when the first refresh found none."""
+    devices = AIOSysbus.__devices["status"]
+    saved = list(devices)
+    devices.clear()
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert config_entry.runtime_data.data["devices"] == {}
+
+    devices.extend(saved)
+    await config_entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+
+    state = hass.states.get("device_tracker.pc_408")
+    assert state is not None
+    assert hass.states.get("switch.pc_408_wan_access") is not None
