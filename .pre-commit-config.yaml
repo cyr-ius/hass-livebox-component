@@ -9,8 +9,6 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
-        exclude: ^uv\.lock$
-        exclude_types: [csv, json]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -27,17 +25,3 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-  - repo: https://github.com/cdce8p/python-typing-update
-    rev: v0.8.1
-    hooks:
-      # Run `python-typing-update` hook manually from time to time
-      # to update python typing syntax.
-      # Will require manual work, before submitting changes!
-      # pre-commit run --hook-stage manual python-typing-update --all-files
-      - id: python-typing-update
-        stages: [manual]
-        args:
-          - --py314-plus
-          - --force
-          - --keep-updates
-        files: ^custom_components/.+\.py$
