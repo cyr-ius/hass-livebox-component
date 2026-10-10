@@ -4,17 +4,11 @@ repos:
     rev: v0.16.2
     hooks:
       - id: ruff-check
-        args:
-          - --fix
       - id: ruff-format
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
       - id: codespell
-        args:
-          - --ignore-words-list=hass
-          - --skip="./.*,*.csv,*.json"
-          - --quiet-level=2
         exclude: ^uv\.lock$
         exclude_types: [csv, json]
   - repo: https://github.com/pre-commit/pre-commit-hooks
