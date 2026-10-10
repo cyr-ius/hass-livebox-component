@@ -32,6 +32,33 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True
 
 
+async def _async_logout_orphaned_session(
+    hass: HomeAssistant, entry: LiveboxConfigEntry
+) -> None:
+    """Logout a session that was left open from a previous HA run."""
+    from .session import LiveboxSessionStore, async_logout_session
+
+    store = LiveboxSessionStore(hass, entry.entry_id)
+    await store.async_load()
+    if store.has_session:
+        _LOGGER.info("Found orphaned Livebox session from previous run, logging out")
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+        success = await async_logout_session(
+            async_get_clientsession(hass),
+            store.base_url or "",
+            store.cookies,
+            verify_tls=store.verify_tls,
+        )
+        if success:
+            _LOGGER.info("Orphaned session logged out successfully")
+        else:
+            _LOGGER.warning(
+                "Failed to logout orphaned session (Livebox may be unreachable)"
+            )
+        await store.async_clear()
+
+
 def _migrate_wan_access_unique_ids(
     hass: HomeAssistant,
     entry: LiveboxConfigEntry,
@@ -74,6 +101,8 @@ def _migrate_wan_access_unique_ids(
 
 async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Set up Livebox as config entry."""
+    await _async_logout_orphaned_session(hass, entry)
+
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
 
@@ -104,7 +133,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    coordinator: LiveboxDataUpdateCoordinator | None = getattr(
+        entry, "runtime_data", None
+    )
+    if coordinator is not None:
+        await coordinator.async_logout()
+    return unload_ok
 
 
 async def async_remove_config_entry_device(

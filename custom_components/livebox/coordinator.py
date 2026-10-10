@@ -8,11 +8,14 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from aiosysbus import AIOSysbus
-from aiosysbus.exceptions import AiosysbusException
+from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.aiohttp_client import (
+    async_create_clientsession,
+    async_get_clientsession,
+)
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
@@ -66,6 +69,52 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
 
+    async def async_persist_session(self) -> None:
+        """Save current session credentials to storage for logout on restart."""
+        from .session import LiveboxSessionStore
+
+        try:
+            auth = self.api._auth
+            token = auth.session_token
+            cookies = auth._cookies
+            if isinstance(token, str) and isinstance(cookies, dict) and cookies:
+                store = LiveboxSessionStore(self.hass, self.config_entry.entry_id)
+                await store.async_save(
+                    cookies={str(key): str(value) for key, value in cookies.items()},
+                    context_id=token,
+                    base_url=str(auth.base_url),
+                    verify_tls=bool(getattr(auth, "verify_tls", True)),
+                )
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Failed to persist session", exc_info=True)
+
+    async def async_logout(self) -> None:
+        """Logout from the Livebox to release the API session slot."""
+        from .session import LiveboxSessionStore, async_logout_session
+
+        try:
+            auth = self.api._auth
+            cookies = auth._cookies
+            if isinstance(cookies, dict) and cookies:
+                success = await async_logout_session(
+                    async_get_clientsession(self.hass),
+                    str(auth.base_url),
+                    {str(key): str(value) for key, value in cookies.items()},
+                    verify_tls=bool(getattr(auth, "verify_tls", True)),
+                )
+                if success:
+                    auth.session_token = None
+                    auth._cookies = {}
+                    _LOGGER.info("Logged out from Livebox")
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Logout failed", exc_info=True)
+
+        try:
+            store = LiveboxSessionStore(self.hass, self.config_entry.entry_id)
+            await store.async_clear()
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Failed to clear session store", exc_info=True)
+
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
         try:
@@ -113,6 +162,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
             await self.async_detect_new_dvices(devices)
 
+            await self.async_persist_session()
+
             return {
                 "cmissed": cmissed,
                 "callers": callers,
@@ -143,6 +194,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "stats": await self.async_get_results(),
             }
         except AiosysbusException as error:
+            if isinstance(error, HttpRequestFailed):
+                self.api._auth.session_token = None
+                _LOGGER.debug(
+                    "Cleared session token after communication failure, "
+                    "will re-authenticate on next update"
+                )
             _LOGGER.error("Error while fetch data information: %s", error)
             raise UpdateFailed(error) from error
 
