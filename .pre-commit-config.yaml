@@ -37,7 +37,7 @@ repos:
       - id: python-typing-update
         stages: [manual]
         args:
-          - --py311-plus
+          - --py314-plus
           - --force
           - --keep-updates
         files: ^custom_components/.+\.py$
