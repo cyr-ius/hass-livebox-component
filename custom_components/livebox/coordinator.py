@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
@@ -32,6 +33,7 @@ from .helpers import find_item
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
+LOGOUT_TIMEOUT = 10
 TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=5)
 TOPOLOGY_BUILD_TIMEOUT = 30
 
@@ -65,6 +67,14 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             use_tls=self.config_entry.data.get(CONF_USE_TLS, False),
             verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
+
+    async def async_logout(self) -> None:
+        """Release the session, the Livebox accepts a limited number of them."""
+        try:
+            async with asyncio.timeout(LOGOUT_TIMEOUT):
+                await self.api.async_logout()
+        except (AiosysbusException, TimeoutError) as error:
+            _LOGGER.debug("Failed to release the Livebox session: %s", error)
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""

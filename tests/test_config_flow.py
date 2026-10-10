@@ -58,6 +58,9 @@ async def test_form_success(
         assert result2["data"] == MOCK_USER_INPUT
         assert result2["result"].unique_id == "012345678901234"  # From INFO fixture
 
+    # The validation session is released, the integration opens its own one.
+    AIOSysbus.async_logout.assert_awaited_once()
+
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
 async def test_form_cannot_connect(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
@@ -209,3 +212,19 @@ async def test_reconfigure_updates_entry(
         assert result2["reason"] == "reconfigure_successful"
         assert entry.data == new_input
         mock_reload.assert_called_once_with(entry.entry_id)
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_form_logout_error(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
+    """A failed release of the validation session does not fail the flow."""
+    AIOSysbus.async_logout.side_effect = HttpRequestFailed("Connection failed")
+
+    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
+        mock_livebox.return_value = AIOSysbus
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_USER},
+            data=MOCK_USER_INPUT,
+        )
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY

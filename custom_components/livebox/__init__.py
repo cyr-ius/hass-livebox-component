@@ -5,7 +5,9 @@ import re
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import Event, HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -75,7 +77,12 @@ def _migrate_wan_access_unique_ids(
 async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Set up Livebox as config entry."""
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except ConfigEntryNotReady:
+        # The next attempt opens a new session, release this one.
+        await coordinator.async_logout()
+        raise
 
     # If unique_id was cleared (migration) or missing, set it from SerialNumber
     if entry.unique_id is None and coordinator.unique_id:
@@ -86,6 +93,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
         _migrate_wan_access_unique_ids(hass, entry, coordinator.unique_id)
 
     entry.runtime_data = coordinator
+
+    # Entries are not unloaded when Home Assistant stops.
+    async def async_logout_on_stop(event: Event) -> None:
+        await coordinator.async_logout()
+
+    entry.async_on_unload(
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, async_logout_on_stop)
+    )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -104,7 +119,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        await entry.runtime_data.async_logout()
+    return unload_ok
 
 
 async def async_remove_config_entry_device(
