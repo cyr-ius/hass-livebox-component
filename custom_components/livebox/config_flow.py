@@ -208,9 +208,17 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                         ): int,
                         vol.Required(
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
-                        ): vol.In(["All", "Active only"]),
+                        ): vol.In(["All", DEFAULT_DISPLAY_DEVICES]),
                     },
                 ),
-                self.config_entry.options,
+                {
+                    **self.config_entry.options,
+                    # Legacy default, still handled as "Active only".
+                    CONF_DISPLAY_DEVICES: (
+                        "All"
+                        if self.config_entry.options.get(CONF_DISPLAY_DEVICES) == "All"
+                        else DEFAULT_DISPLAY_DEVICES
+                    ),
+                },
             ),
         )

@@ -13,7 +13,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import (
+    CONF_DISPLAY_DEVICES,
+    DEFAULT_DISPLAY_DEVICES,
+    DOMAIN,
+)
 
 from .const import MOCK_USER_INPUT
 
@@ -228,3 +232,20 @@ async def test_form_logout_error(hass: HomeAssistant, AIOSysbus: AsyncMock) -> N
         )
 
     assert result["type"] == FlowResultType.CREATE_ENTRY
+
+
+@pytest.mark.parametrize("stored", [None, "Active"])
+async def test_options_flow_defaults_are_valid(
+    hass: HomeAssistant, stored: str | None
+) -> None:
+    """The options form accepts its defaults, including the legacy value."""
+    options = {} if stored is None else {CONF_DISPLAY_DEVICES: stored}
+    entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT, options=options)
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] == FlowResultType.FORM
+
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_DISPLAY_DEVICES] == DEFAULT_DISPLAY_DEVICES
