@@ -260,3 +260,26 @@ def test_fiber_rate_attributes_use_gigabits_per_second() -> None:
     assert tx_description.attrs["Upstream max rate (Gbps)"](data) == 1.24416
     assert tx_description.attrs["Upstream current rate (Gbps)"](data) == 1.24416
     assert tx_description.attrs["Max bitrate (Gbps)"](data) == 10
+
+
+@pytest.mark.usefixtures("entity_registry_enabled_by_default")
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_rolling_counter_state_not_shared_across_setups(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """A reloaded entry starts its 32-bit counters from scratch."""
+    wifi_stats = AIOSysbus.api_raw["Nmc.async_get_wifi_stats"]["data"]
+    entity_id = f"sensor.{AIOSysbus.__unique_name}_wifi_rx"
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id) is not None
+
+    wifi_stats["RxBytes"] = 1_000_000
+    assert await hass.config_entries.async_reload(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    # 1 MB, not 4 GiB + 1 MB from a rollover against the previous entry.
+    assert float(hass.states.get(entity_id).state) == 1
