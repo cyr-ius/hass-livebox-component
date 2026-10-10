@@ -32,6 +32,7 @@ from .const import (
     DOMAIN,
 )
 from .helpers import find_item
+from .session import LiveboxSessionStore, async_logout_session
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
@@ -51,6 +52,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
         self.config_entry: Any = config_entry
         self.api: Any
+        self._persisted_session: tuple[str, dict[str, str], str, bool] | None = None
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
@@ -71,26 +73,34 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_persist_session(self) -> None:
         """Save current session credentials to storage for logout on restart."""
-        from .session import LiveboxSessionStore
-
         try:
             auth = self.api._auth
             token = auth.session_token
             cookies = auth._cookies
             if isinstance(token, str) and isinstance(cookies, dict) and cookies:
+                session = (
+                    token,
+                    {str(key): str(value) for key, value in cookies.items()},
+                    str(auth.base_url),
+                    bool(getattr(auth, "verify_tls", True)),
+                )
+                if session == self._persisted_session:
+                    return
+
                 store = LiveboxSessionStore(self.hass, self.config_entry.entry_id)
                 await store.async_save(
-                    cookies={str(key): str(value) for key, value in cookies.items()},
-                    context_id=token,
-                    base_url=str(auth.base_url),
-                    verify_tls=bool(getattr(auth, "verify_tls", True)),
+                    cookies=session[1],
+                    context_id=session[0],
+                    base_url=session[2],
+                    verify_tls=session[3],
                 )
+                self._persisted_session = session
         except Exception:  # noqa: BLE001
             _LOGGER.debug("Failed to persist session", exc_info=True)
 
     async def async_logout(self) -> None:
         """Logout from the Livebox to release the API session slot."""
-        from .session import LiveboxSessionStore, async_logout_session
+        self._persisted_session = None
 
         try:
             auth = self.api._auth

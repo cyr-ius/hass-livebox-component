@@ -20,7 +20,7 @@ class _FakeResponse:
     def __init__(self, status: int) -> None:
         self.status = status
 
-    async def __aenter__(self) -> _FakeResponse:
+    async def __aenter__(self) -> "_FakeResponse":
         return self
 
     async def __aexit__(self, *args: object) -> None:
@@ -173,6 +173,39 @@ async def test_coordinator_persists_session(
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_coordinator_persists_only_changed_session(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Repeated updates save stable credentials once and save changed ones again."""
+    _set_mock_session(AIOSysbus)
+
+    with patch.object(
+        LiveboxSessionStore, "async_save", new_callable=AsyncMock
+    ) as mock_save:
+        await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+        coordinator = config_entry.runtime_data
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+        mock_save.assert_awaited_once()
+
+        AIOSysbus._auth.session_token = "updated-session-context"
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+        assert mock_save.await_count == 2
+        assert mock_save.await_args_list[-1].kwargs["context_id"] == (
+            "updated-session-context"
+        )
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_unload_logs_out_persisted_session(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -184,7 +217,7 @@ async def test_unload_logs_out_persisted_session(
     await hass.async_block_till_done()
 
     with patch(
-        "custom_components.livebox.session.async_logout_session",
+        "custom_components.livebox.coordinator.async_logout_session",
         new_callable=AsyncMock,
         return_value=True,
     ) as mock_logout:
