@@ -227,3 +227,28 @@ async def test_stats_keep_interfaces_without_traffic(
     assert stats["ETH0"]["rate_tx"] == 0.0
     assert stats["ETH1"]["rate_rx"] == 0.1
     assert stats["ETH1"]["rate_tx"] == 0.2
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_fiber_status_5656_with_empty_optical_values(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Empty optical values on a Sagemcom 5656 do not fail the update."""
+    AIOSysbus.api_raw["DeviceInfo.async_get_deviceinfo"]["status"]["ProductClass"] = (
+        "SMBSLBFIBRA"
+    )
+    AIOSysbus.sgcomci.async_get_optical.return_value = {
+        "status": {"PowerTx": "", "PowerRx": None, "Temperature": "45.5"}
+    }
+
+    fiber_status = (await _async_setup(hass, config_entry))["fiber_status"]
+
+    assert fiber_status == {
+        "SignalTxPower": 0.0,
+        "SignalRxPower": 0.0,
+        "Temperature": 45.5,
+        "Voltage": 0.0,
+        "Bias": 0.0,
+    }

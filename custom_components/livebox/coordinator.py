@@ -415,12 +415,20 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             optical = (
                 await self._make_request(self.api.sgcomci.async_get_optical)
             ).get("status", {})
+
+            def _float(key: str) -> float:
+                # Empty or null while the fiber link is down.
+                try:
+                    return float(optical.get(key) or 0)
+                except TypeError, ValueError:
+                    return 0.0
+
             return {
-                "SignalTxPower": float(optical.get("PowerTx", 0)) * 1000,
-                "SignalRxPower": float(optical.get("PowerRx", 0)) * 1000,
-                "Temperature": float(optical.get("Temperature", 0)),
-                "Voltage": float(optical.get("Vcc", 0)),
-                "Bias": float(optical.get("BiasCurrent", 0)),
+                "SignalTxPower": _float("PowerTx") * 1000,
+                "SignalRxPower": _float("PowerRx") * 1000,
+                "Temperature": _float("Temperature"),
+                "Voltage": _float("Vcc"),
+                "Bias": _float("BiasCurrent"),
             }
 
         parameters = {"mibs": "gpon"}
