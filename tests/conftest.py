@@ -109,6 +109,7 @@ def mock_router(
     with patch("custom_components.livebox.coordinator.AIOSysbus") as mock:
         instance = mock.return_value
         instance.async_connect = AsyncMock(return_value=True)
+        instance.async_logout = AsyncMock(return_value=True)
         instance.async_get_permissions = AsyncMock(
             return_value=api["AIOSysbus.async_get_permissions"]
         )

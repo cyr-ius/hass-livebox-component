@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
+from contextlib import suppress
 from typing import Any
 
 import voluptuous as vol
@@ -70,17 +71,17 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> tuple[dict[str, Any] | None, dict[str, str]]:
         """Validate user credentials against the Livebox."""
         errors: dict[str, str] = {}
+        api: Any = AIOSysbus(
+            username=user_input[CONF_USERNAME],
+            password=user_input[CONF_PASSWORD],
+            session=async_create_clientsession(self.hass),
+            host=user_input[CONF_HOST],
+            port=user_input[CONF_PORT],
+            use_tls=user_input[CONF_USE_TLS],
+            verify_tls=user_input[CONF_VERIFY_TLS],
+        )
 
         try:
-            api: Any = AIOSysbus(
-                username=user_input[CONF_USERNAME],
-                password=user_input[CONF_PASSWORD],
-                session=async_create_clientsession(self.hass),
-                host=user_input[CONF_HOST],
-                port=user_input[CONF_PORT],
-                use_tls=user_input[CONF_USE_TLS],
-                verify_tls=user_input[CONF_VERIFY_TLS],
-            )
             await api.async_connect()
             await api.async_get_permissions()
             infos = await api.deviceinfo.async_get_deviceinfo()
@@ -104,6 +105,10 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 return infos, errors
 
             errors["base"] = "cannot_connect"
+        finally:
+            # The integration opens its own session once set up.
+            with suppress(AiosysbusException):
+                await api.async_logout()
 
         return None, errors
 
