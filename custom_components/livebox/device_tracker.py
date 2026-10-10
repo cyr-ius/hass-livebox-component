@@ -10,7 +10,6 @@ from typing import Any, cast
 from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.components.device_tracker.entity import ScannerEntity
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityDescription
@@ -169,7 +168,6 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         super().__init__(coordinator, description)
         self._device = device
         self._device_key = cast(str | None, device.get("Key"))
-        self._via_device = coordinator.get_parent_device_identifier(self._device_key)
         self._old_status = datetime.today()
         self._attr_is_connected = device.get("Active", False)
         self._attr_source_type = SourceType.ROUTER
@@ -258,7 +256,7 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         return DeviceInfo(
             name=self._device.get("Name"),
             identifiers={(DOMAIN, device_identifier)},
-            via_device=self._via_device,
+            via_device_id=self.coordinator.get_parent_device_id(self._device_key),
         )
 
     @callback
@@ -268,15 +266,5 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
             self._device_key, {}
         )
         self._attr_ip_address = self._device.get("IPAddress")
-        via_device = self.coordinator.get_parent_device_identifier(self._device_key)
-        if via_device != self._via_device and self.device_entry is not None:
-            # Re-link the existing device when topology becomes available later.
-            self._via_device = via_device
-            self.device_entry = dr.async_get(self.hass).async_get_or_create(
-                config_entry_id=self.coordinator.config_entry.entry_id,
-                **cast(DeviceInfo, self.device_info),
-            )
-        else:
-            self._via_device = via_device
-
+        self._async_update_via_device(self._device_key)
         self.async_write_ha_state()

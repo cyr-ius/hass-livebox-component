@@ -157,11 +157,21 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
         self._device_key = device.get("Key", self.name)
         self._device = device
         self._attr_unique_id = f"{coordinator.unique_id or DOMAIN}_{description.key}"
-        self._attr_device_info = DeviceInfo(
+
+    @property
+    def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
+        """Return device info to link the switch to the tracked device."""
+        return DeviceInfo(
             name=self._device.get("Name"),
             identifiers={(DOMAIN, self._device_key)},
-            via_device=coordinator.get_parent_device_identifier(self._device_key),
+            via_device_id=self.coordinator.get_parent_device_id(self._device_key),
         )
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Respond to a DataUpdateCoordinator update."""
+        self._async_update_via_device(self._device_key)
+        super()._handle_coordinator_update()
 
     def _get_device_schedule(self) -> dict[str, Any]:
         """Get device schedule."""
