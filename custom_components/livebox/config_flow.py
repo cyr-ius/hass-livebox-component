@@ -137,8 +137,11 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
 
+                product_class = infos["status"].get("ProductClass") or (
+                    DOMAIN.capitalize()
+                )
                 return self.async_create_entry(
-                    title=f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})",
+                    title=f"{product_class} ({sn})",
                     data=user_input,
                 )
 
