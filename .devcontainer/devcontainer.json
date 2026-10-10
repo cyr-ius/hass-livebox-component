@@ -6,7 +6,9 @@
   "image": "mcr.microsoft.com/devcontainers/python:3-3.14-trixie",
   "features": {
     "ghcr.io/devcontainers-extra/features/prek:1": {},
-    "ghcr.io/devcontainers-extra/features/uv:1": {}
+    "ghcr.io/devcontainers-extra/features/uv:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
   "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && prek install --overwrite && uv sync --group dev --link-mode=copy",
   "customizations": {
