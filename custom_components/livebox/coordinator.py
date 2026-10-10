@@ -1,7 +1,5 @@
 """Coordinator for Livebox."""
 
-from __future__ import annotations
-
 import asyncio
 import logging
 from collections.abc import Callable
@@ -150,8 +148,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "topology_repeaters": topology_repeaters,
                 "lan": await self.async_get_lan(devices),
                 "upnp": await self.async_get_port_forwarding(),
-                "dhcp_leases": await self.async_get_dhcp_leases(),
-                "guest_dhcp_leases": await self.async_get_dhcp_leases("guest"),
+                **await self.async_get_dhcp_leases(),
                 "stats": await self.async_get_results(),
             }
         except AiosysbusException as error:
@@ -343,7 +340,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 continue
             try:
                 utc_dt = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 _LOGGER.debug("Skipping call with unparsable startTime: %s", start_time)
                 continue
             local_dt = utc_dt.replace(tzinfo=UTC).astimezone(tz=DEFAULT_TIME_ZONE)
@@ -417,12 +414,20 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             optical = (
                 await self._make_request(self.api.sgcomci.async_get_optical)
             ).get("status", {})
+
+            def _float(key: str) -> float:
+                # Empty or null while the fiber link is down.
+                try:
+                    return float(optical.get(key) or 0)
+                except TypeError, ValueError:
+                    return 0.0
+
             return {
-                "SignalTxPower": float(optical.get("PowerTx", 0)) * 1000,
-                "SignalRxPower": float(optical.get("PowerRx", 0)) * 1000,
-                "Temperature": float(optical.get("Temperature", 0)),
-                "Voltage": float(optical.get("Vcc", 0)),
-                "Bias": float(optical.get("BiasCurrent", 0)),
+                "SignalTxPower": _float("PowerTx") * 1000,
+                "SignalRxPower": _float("PowerRx") * 1000,
+                "Temperature": _float("Temperature"),
+                "Voltage": _float("Vcc"),
+                "Bias": _float("BiasCurrent"),
             }
 
         parameters = {"mibs": "gpon"}
@@ -550,7 +555,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_detect_new_dvices(self, devices) -> None:
         """New devices detected."""
-        if self.data and self.data.get("devices"):
+        # On the first refresh, platforms create entities from the returned data.
+        if self.data is not None:
             for key in devices:
                 if key not in self.data.get("devices", {}):
                     self.data["devices"] = devices
@@ -578,17 +584,24 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return ports
 
-    async def async_get_dhcp_leases(
-        self, domain: str = "default"
-    ) -> list[dict[str, Any]]:
-        """Get dhcp leases."""
+    async def async_get_dhcp_leases(self) -> dict[str, list[dict[str, Any]]]:
+        """Get dhcp leases of the default and guest pools."""
         if self.model == 5656:
-            return []
+            return {"dhcp_leases": [], "guest_dhcp_leases": []}
 
-        data = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get(
+        pools = (await self._make_request(self.api.dhcp.async_get_dhcp_pool)).get(
             "status", {}
         )
-        if data.get(domain, {}).get("Enable", False) is False:
+        return {
+            "dhcp_leases": await self._async_get_pool_leases(pools, "default"),
+            "guest_dhcp_leases": await self._async_get_pool_leases(pools, "guest"),
+        }
+
+    async def _async_get_pool_leases(
+        self, pools: dict[str, Any], domain: str
+    ) -> list[dict[str, Any]]:
+        """Get the leases of an enabled dhcp pool."""
+        if pools.get(domain, {}).get("Enable", False) is False:
             return []
 
         data = (

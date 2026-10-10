@@ -21,15 +21,14 @@ def find_item(data: dict[str, Any], key_chain: str, default: Any = None) -> Any:
         "default"
     """
     current: Any = data
-    if (keys := key_chain.split(".")) and isinstance(keys, list):
-        for key in keys:
-            if isinstance(current, dict):
-                current = current.get(key)
-            elif (
-                isinstance(current, list)
-                and len(current) > 0
-                and key.isdigit()
-                and int(key) < len(current)
-            ):
-                current = current[int(key)]
+    for key in key_chain.split("."):
+        if isinstance(current, dict):
+            current = current.get(key)
+        elif isinstance(current, list) and key.isdigit() and int(key) < len(current):
+            current = current[int(key)]
+        else:
+            # Missing list index or scalar on the path: the key does not exist.
+            current = None
+        if current is None:
+            break
     return default if current is None and default is not None else current

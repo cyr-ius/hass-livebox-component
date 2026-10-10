@@ -5,9 +5,9 @@ import re
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import Event, HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.const import ATTR_CONFIG_ENTRY_ID, EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import Event, HomeAssistant, ServiceCall
+from homeassistant.exceptions import ConfigEntryNotReady, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -17,7 +17,9 @@ from .coordinator import LiveboxDataUpdateCoordinator
 
 type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
 
-CALLMISSED_SCHEMA = vol.Schema({vol.Optional(CALLID): str})
+CALLMISSED_SCHEMA = vol.Schema(
+    {vol.Optional(CALLID): str, vol.Optional(ATTR_CONFIG_ENTRY_ID): str}
+)
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,6 +33,27 @@ _LEGACY_WAN_ACCESS_RE = re.compile(
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Livebox integration."""
+
+    async def async_remove_cmissed(call: ServiceCall) -> None:
+        """Clear the call list of one Livebox, or of all of them."""
+        entry_id = call.data.get(ATTR_CONFIG_ENTRY_ID)
+        entries: list[LiveboxConfigEntry] = [
+            entry
+            for entry in hass.config_entries.async_loaded_entries(DOMAIN)
+            if entry_id is None or entry.entry_id == entry_id
+        ]
+        if entry_id is not None and not entries:
+            raise ServiceValidationError(f"Livebox entry {entry_id} is not loaded")
+        for entry in entries:
+            coordinator = entry.runtime_data
+            await coordinator.api.voiceservice.async_clear_calllist(
+                {CALLID: call.data.get(CALLID)}
+            )
+            await coordinator.async_refresh()
+
+    hass.services.async_register(
+        DOMAIN, "remove_call_missed", async_remove_cmissed, schema=CALLMISSED_SCHEMA
+    )
     return True
 
 
@@ -109,16 +132,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    async def async_remove_cmissed(call) -> None:
-        await coordinator.api.voiceservice.async_clear_calllist(
-            {CALLID: call.data.get(CALLID)}
-        )
-        await coordinator.async_refresh()
-
-    hass.services.async_register(
-        DOMAIN, "remove_call_missed", async_remove_cmissed, schema=CALLMISSED_SCHEMA
-    )
-
     return True
 
 
@@ -130,7 +143,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> 
 
 
 async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: dr.DeviceEntry
+    hass: HomeAssistant, config_entry: LiveboxConfigEntry, device_entry: dr.DeviceEntry
 ) -> bool:
-    """Remove config entry from a device."""
-    return True
+    """Remove config entry from a device, except the Livebox itself."""
+    gateway = config_entry.runtime_data.get_parent_device_identifier(None)
+    return gateway not in device_entry.identifiers

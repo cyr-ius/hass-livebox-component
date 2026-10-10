@@ -11,3 +11,9 @@ remove_call_missed:
         sensor). Value to put in quotation marks. If you omit so that it
         deletes all calls.
       example: '"666"'
+    config_entry_id:
+      name: Livebox
+      description: Livebox whose call list is cleared. All of them if omitted.
+      selector:
+        config_entry:
+          integration: livebox

@@ -1,7 +1,5 @@
 """Config flow to configure Livebox."""
 
-from __future__ import annotations
-
 import logging
 from collections.abc import Mapping
 from contextlib import suppress
@@ -139,8 +137,11 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(sn)
                 self._abort_if_unique_id_configured()
 
+                product_class = infos["status"].get("ProductClass") or (
+                    DOMAIN.capitalize()
+                )
                 return self.async_create_entry(
-                    title=f"{infos.get('ProductClass', DOMAIN.capitalize())} ({sn})",
+                    title=f"{product_class} ({sn})",
                     data=user_input,
                 )
 
@@ -210,9 +211,17 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                         ): int,
                         vol.Required(
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
-                        ): vol.In(["All", "Active only"]),
+                        ): vol.In(["All", DEFAULT_DISPLAY_DEVICES]),
                     },
                 ),
-                self.config_entry.options,
+                {
+                    **self.config_entry.options,
+                    # Legacy default, still handled as "Active only".
+                    CONF_DISPLAY_DEVICES: (
+                        "All"
+                        if self.config_entry.options.get(CONF_DISPLAY_DEVICES) == "All"
+                        else DEFAULT_DISPLAY_DEVICES
+                    ),
+                },
             ),
         )

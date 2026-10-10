@@ -1,10 +1,8 @@
 """Sensor for Livebox router."""
 
-from __future__ import annotations
-
 import logging
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Final, cast
 
 from homeassistant.components.sensor import (
@@ -40,6 +38,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
 
     value_fn: Callable[..., Any]
     attrs: dict[str, Callable[..., Any]] | None = None
+    rolling_32_bit: bool = False
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -50,11 +49,14 @@ class LiveboxDeviceSensorEntityDescription(SensorEntityDescription):
     attrs: dict[str, Callable[..., Any]] | None = None
 
 
-def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
+def get_rolling_32_bit_value_fn(
+    read_fn: Callable[..., Any],
+) -> Callable[..., Any]:
     """Returns a closure function, that extracts a rolling 32-bit value from"""
     """the coordinator data structure, and tweaks its result so that HASS"""
     """properly accumulates the total rolling value."""
     """Meant for monotonically increasing counters: fiber/DSL Tx/Rx, and WiFi Tx/Rx"""
+    """Holds per-entity state: build one closure for each entity."""
 
     previous_reading: int = 0
     previous_uptime: int = 0
@@ -65,7 +67,7 @@ def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
         nonlocal previous_uptime
         nonlocal rolls
         current_uptime = coordinator_data.get("infos", {}).get("UpTime") or 0
-        current_reading = find_item(coordinator_data, path, 0)
+        current_reading = read_fn(coordinator_data)
 
         if current_uptime < previous_uptime:
             # The router has reset, so clear up previous counter value
@@ -73,7 +75,7 @@ def get_rolling_32_bit_value_fn(path: str) -> Callable[..., Any]:
             rolls = 0
 
         if current_reading < previous_reading:
-            _LOGGER.debug("Rolling over 32-bit integer counter: %s", path)
+            _LOGGER.debug("Rolling over 32-bit integer counter")
             rolls += 1
 
         previous_reading = current_reading
@@ -290,7 +292,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="wifi_rx",
         name="Wifi Rx",
         icon="mdi:wifi-arrow-down",
-        value_fn=get_rolling_32_bit_value_fn("wifi_stats.RxBytes"),
+        value_fn=lambda x: find_item(x, "wifi_stats.RxBytes", 0),
+        rolling_32_bit=True,
         native_unit_of_measurement=UnitOfInformation.BYTES,
         suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -302,7 +305,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="wifi_tx",
         name="Wifi Tx",
         icon="mdi:wifi-arrow-up",
-        value_fn=get_rolling_32_bit_value_fn("wifi_stats.TxBytes"),
+        value_fn=lambda x: find_item(x, "wifi_stats.TxBytes", 0),
+        rolling_32_bit=True,
         native_unit_of_measurement=UnitOfInformation.BYTES,
         suggested_unit_of_measurement=UnitOfInformation.MEGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -375,7 +379,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="fiber_tx",
         name="Fiber Tx",
         icon=UPLOAD_ICON,
-        value_fn=get_rolling_32_bit_value_fn("fiber_stats.TxBytes"),
+        value_fn=lambda x: find_item(x, "fiber_stats.TxBytes", 0),
+        rolling_32_bit=True,
         native_unit_of_measurement=UnitOfInformation.BYTES,
         suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -387,7 +392,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         key="fiber_rx",
         name="Fiber Rx",
         icon=DOWNLOAD_ICON,
-        value_fn=get_rolling_32_bit_value_fn("fiber_stats.RxBytes"),
+        value_fn=lambda x: find_item(x, "fiber_stats.RxBytes", 0),
+        rolling_32_bit=True,
         native_unit_of_measurement=UnitOfInformation.BYTES,
         suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -509,6 +515,11 @@ async def async_setup_entry(
     for description in SENSOR_TYPES + sensor_stats:
         if description.key in ["up", "down"] and linktype in ["gpon", "sfp"]:
             continue
+        if description.rolling_32_bit:
+            description = replace(
+                description,
+                value_fn=get_rolling_32_bit_value_fn(description.value_fn),
+            )
         entities.append(LiveboxSensor(coordinator, description))
 
     @callback
