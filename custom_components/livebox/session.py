@@ -8,7 +8,6 @@ from typing import Any
 from aiohttp import ClientSession, ClientTimeout
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
-from yarl import URL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,30 +81,46 @@ class LiveboxSessionStore:
 async def async_logout_session(
     http_session: ClientSession,
     base_url: str,
+    context_id: str | None,
     cookies: dict[str, str],
     *,
     verify_tls: bool = True,
 ) -> bool:
-    """Logout from the Livebox by calling /logout.cmd with the session cookie."""
+    """Release the Livebox session using the web UI's releaseContext request.
+
+    Returns True only when the Livebox confirms the context was released.
+    """
+    if not context_id:
+        _LOGGER.debug("Skipped Livebox logout without a context ID")
+        return False
+
     try:
-        url = URL(base_url).parent / "logout.cmd"
         headers = {
-            "Cookie": ";".join(f"{key}={value}" for key, value in cookies.items())
+            "Authorization": f"X-Sah-Logout {context_id}",
+            "Content-Type": "application/x-sah-ws-1-call+json",
+            "Cookie": ";".join(f"{key}={value}" for key, value in cookies.items()),
         }
-        async with http_session.get(
-            str(url),
+        async with http_session.post(
+            base_url,
             headers=headers,
-            allow_redirects=False,
+            json={
+                "service": "sah.Device.Information",
+                "method": "releaseContext",
+                "parameters": {"applicationName": "so_sdkut"},
+            },
             timeout=ClientTimeout(total=10),
             ssl=verify_tls,
         ) as response:
-            if response.status in (200, 301, 302, 307):
-                _LOGGER.debug(
-                    "Successfully logged out from Livebox (status %s)",
-                    response.status,
-                )
+            if response.status != 200:
+                _LOGGER.debug("Logout returned unexpected status %s", response.status)
+                return False
+
+            response_data = await response.json(content_type=None)
+            if isinstance(response_data, dict) and response_data.get("status") == 0:
+                _LOGGER.debug("Successfully released Livebox session context")
                 return True
-            _LOGGER.debug("Logout returned unexpected status %s", response.status)
+
+            _LOGGER.debug("Livebox logout response did not confirm context release")
     except Exception as err:  # noqa: BLE001
         _LOGGER.debug("Logout failed: %s", err)
     return False

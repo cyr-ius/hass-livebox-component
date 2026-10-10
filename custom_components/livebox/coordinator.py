@@ -104,11 +104,18 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         try:
             auth = self.api._auth
+            token = auth.session_token
             cookies = auth._cookies
-            if isinstance(cookies, dict) and cookies:
+            if (
+                isinstance(token, str)
+                and token
+                and isinstance(cookies, dict)
+                and cookies
+            ):
                 success = await async_logout_session(
                     async_get_clientsession(self.hass),
                     str(auth.base_url),
+                    token,
                     {str(key): str(value) for key, value in cookies.items()},
                     verify_tls=bool(getattr(auth, "verify_tls", True)),
                 )

@@ -17,14 +17,28 @@ from custom_components.livebox.session import (
 class _FakeResponse:
     """Minimal async context manager mimicking an aiohttp response."""
 
-    def __init__(self, status: int) -> None:
+    def __init__(
+        self,
+        status: int,
+        payload: object | None = None,
+        json_error: Exception | None = None,
+    ) -> None:
         self.status = status
+        self.payload = payload
+        self.json_error = json_error
+        self.json_content_type: str | None = "not called"
 
     async def __aenter__(self) -> "_FakeResponse":
         return self
 
     async def __aexit__(self, *args: object) -> None:
         return None
+
+    async def json(self, content_type: str | None = None) -> object | None:
+        self.json_content_type = content_type
+        if self.json_error is not None:
+            raise self.json_error
+        return self.payload
 
 
 def _set_mock_session(AIOSysbus: AsyncMock | MagicMock) -> None:
@@ -35,86 +49,116 @@ def _set_mock_session(AIOSysbus: AsyncMock | MagicMock) -> None:
     AIOSysbus._auth.verify_tls = False
 
 
-@pytest.mark.parametrize("status", [200, 301, 302, 307])
-async def test_logout_session_success_statuses(status: int) -> None:
-    """Logout succeeds for successful responses and redirects."""
+@pytest.mark.parametrize("verify_tls", [True, False])
+async def test_logout_session_success(verify_tls: bool) -> None:
+    """Logout releases the session using the web UI request."""
     http_session = MagicMock(spec=ClientSession)
-    http_session.get.return_value = _FakeResponse(status)
+    response = _FakeResponse(200, {"status": 0})
+    http_session.post.return_value = response
+    base_url = "http://192.168.1.1/ws"
+    cookies = {"SESSIONID": "session-cookie", "token": "second-cookie"}
+
+    result = await async_logout_session(
+        http_session,
+        base_url,
+        "session-context",
+        cookies,
+        verify_tls=verify_tls,
+    )
+
+    assert result is True
+    call_args = http_session.post.call_args
+    assert call_args.args == (base_url,)
+    assert call_args.kwargs["headers"] == {
+        "Authorization": "X-Sah-Logout session-context",
+        "Content-Type": "application/x-sah-ws-1-call+json",
+        "Cookie": "SESSIONID=session-cookie;token=second-cookie",
+    }
+    assert call_args.kwargs["json"] == {
+        "service": "sah.Device.Information",
+        "method": "releaseContext",
+        "parameters": {"applicationName": "so_sdkut"},
+    }
+    assert call_args.kwargs["ssl"] is verify_tls
+    assert call_args.kwargs["timeout"].total == 10
+    assert response.json_content_type is None
+
+
+async def test_logout_session_failure_payload() -> None:
+    """A successful HTTP response with errors does not release the context."""
+    http_session = MagicMock(spec=ClientSession)
+    http_session.post.return_value = _FakeResponse(
+        200,
+        {"result": {"errors": [{"error": 196618}]}},
+    )
 
     result = await async_logout_session(
         http_session,
         "http://192.168.1.1/ws",
+        "session-context",
         {"SESSIONID": "session-cookie"},
     )
-
-    assert result is True
-    http_session.get.assert_called_once()
-    assert http_session.get.call_args.args[0] == "http://192.168.1.1/logout.cmd"
-    assert http_session.get.call_args.kwargs["headers"]["Cookie"] == (
-        "SESSIONID=session-cookie"
-    )
-
-
-async def test_logout_session_verify_tls_false() -> None:
-    """Logout passes the configured TLS verification setting to aiohttp."""
-    http_session = MagicMock(spec=ClientSession)
-    http_session.get.return_value = _FakeResponse(307)
-
-    result = await async_logout_session(
-        http_session,
-        "https://192.168.1.1/ws",
-        {"SESSIONID": "session-cookie"},
-        verify_tls=False,
-    )
-
-    assert result is True
-    assert http_session.get.call_args.kwargs["ssl"] is False
+    assert result is False
 
 
 async def test_logout_session_failure_status() -> None:
     """Logout fails for unexpected HTTP statuses."""
     http_session = MagicMock(spec=ClientSession)
-    http_session.get.return_value = _FakeResponse(404)
+    http_session.post.return_value = _FakeResponse(500, {"status": 0})
 
-    assert (
-        await async_logout_session(
-            http_session,
-            "http://192.168.1.1/ws",
-            {"SESSIONID": "session-cookie"},
-        )
-        is False
+    result = await async_logout_session(
+        http_session,
+        "http://192.168.1.1/ws",
+        "session-context",
+        {"SESSIONID": "session-cookie"},
     )
+    assert result is False
 
 
 async def test_logout_session_exception() -> None:
     """Logout returns False when the HTTP request raises."""
     http_session = MagicMock(spec=ClientSession)
-    http_session.get.side_effect = OSError("Connection refused")
+    http_session.post.side_effect = OSError("Connection refused")
 
-    assert (
-        await async_logout_session(
-            http_session,
-            "http://192.168.1.1/ws",
-            {"SESSIONID": "session-cookie"},
-        )
-        is False
-    )
-
-
-async def test_logout_session_multiple_cookies() -> None:
-    """Logout joins all session cookies in its request header."""
-    http_session = MagicMock(spec=ClientSession)
-    http_session.get.return_value = _FakeResponse(307)
-
-    await async_logout_session(
+    result = await async_logout_session(
         http_session,
         "http://192.168.1.1/ws",
-        {"SESSIONID": "first", "token": "second"},
+        "session-context",
+        {"SESSIONID": "session-cookie"},
+    )
+    assert result is False
+
+
+async def test_logout_session_non_json() -> None:
+    """Logout returns False when the response is not valid JSON."""
+    http_session = MagicMock(spec=ClientSession)
+    http_session.post.return_value = _FakeResponse(
+        200,
+        json_error=ValueError("Invalid JSON"),
     )
 
-    cookie_header = http_session.get.call_args.kwargs["headers"]["Cookie"]
-    assert "SESSIONID=first" in cookie_header
-    assert "token=second" in cookie_header
+    result = await async_logout_session(
+        http_session,
+        "http://192.168.1.1/ws",
+        "session-context",
+        {"SESSIONID": "session-cookie"},
+    )
+    assert result is False
+
+
+@pytest.mark.parametrize("context_id", [None, ""])
+async def test_logout_session_missing_context_id(context_id: str | None) -> None:
+    """Logout does not make a request without a context ID."""
+    http_session = MagicMock(spec=ClientSession)
+
+    result = await async_logout_session(
+        http_session,
+        "http://192.168.1.1/ws",
+        context_id,
+        {"SESSIONID": "session-cookie"},
+    )
+    assert result is False
+    http_session.post.assert_not_called()
 
 
 async def test_store_save_load_roundtrip(hass: HomeAssistant) -> None:
@@ -205,17 +249,30 @@ async def test_coordinator_persists_only_changed_session(
         )
 
 
+@pytest.mark.parametrize(
+    ("session_token", "cookies", "should_logout"),
+    [
+        (None, {"SESSIONID": "session-cookie"}, False),
+        ("session-context", {}, False),
+        ("session-context", {"SESSIONID": "session-cookie"}, True),
+    ],
+)
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
-async def test_unload_logs_out_persisted_session(
+async def test_unload_logout_uses_credentials_only(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     AIOSysbus: AsyncMock | MagicMock,
+    session_token: str | None,
+    cookies: dict[str, str],
+    should_logout: bool,
 ) -> None:
-    """Unloading the real config entry logs out its active router session."""
+    """Logout requires both context and cookies and passes the context ID."""
     _set_mock_session(AIOSysbus)
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
+    AIOSysbus._auth.session_token = session_token
+    AIOSysbus._auth._cookies = cookies
     with patch(
         "custom_components.livebox.coordinator.async_logout_session",
         new_callable=AsyncMock,
@@ -224,12 +281,16 @@ async def test_unload_logs_out_persisted_session(
         assert await hass.config_entries.async_unload(config_entry.entry_id) is True
         await hass.async_block_till_done()
 
-    mock_logout.assert_awaited_once()
-    assert mock_logout.call_args.args[1:] == (
-        "http://192.168.1.1/ws",
-        {"SESSIONID": "session-cookie"},
-    )
-    assert mock_logout.call_args.kwargs["verify_tls"] is False
+    if should_logout:
+        mock_logout.assert_awaited_once()
+        assert mock_logout.call_args.args[1:] == (
+            "http://192.168.1.1/ws",
+            "session-context",
+            {"SESSIONID": "session-cookie"},
+        )
+        assert mock_logout.call_args.kwargs["verify_tls"] is False
+    else:
+        mock_logout.assert_not_awaited()
 
     store = LiveboxSessionStore(hass, config_entry.entry_id)
     await store.async_load()
@@ -262,6 +323,7 @@ async def test_setup_logs_out_orphaned_session(
     mock_logout.assert_awaited_once()
     assert mock_logout.call_args.args[1:] == (
         "http://192.168.1.1/ws",
+        "orphan-context",
         {"SESSIONID": "orphan-cookie"},
     )
     assert mock_logout.call_args.kwargs["verify_tls"] is False
