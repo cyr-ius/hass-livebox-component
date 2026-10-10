@@ -11,13 +11,13 @@ dependencies = []
 packages = []
 
 [dependency-groups]
+lint = ["prek"]
 dev = [
   "aiosysbus",
   "async-upnp-client",
-  "prek",
+  {include-group = "lint"},
   "pytest-homeassistant-custom-component",
   "pytest-asyncio",
-  "python-typing-update",
 ]
 
 [tool.pytest.ini_options]
@@ -42,5 +42,5 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
 [tool.codespell]
 ignore-words-list = "hass"
-skip = "./.*,*.csv,*.json"
+skip = "./.*,*.csv,*.json,uv.lock"
 quiet-level = 2

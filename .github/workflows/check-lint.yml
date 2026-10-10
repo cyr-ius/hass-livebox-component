@@ -24,8 +24,5 @@ jobs:
         with:
           enable-cache: true
 
-      - name: 📦 Sync development environment
-        run: uv sync --group dev
-
       - name: Run prek
-        run: uv run prek run --all-files
+        run: uv run --only-group lint prek run --all-files
