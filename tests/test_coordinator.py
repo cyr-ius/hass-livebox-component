@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -252,3 +253,61 @@ async def test_fiber_status_5656_with_empty_optical_values(
         "Voltage": 0.0,
         "Bias": 0.0,
     }
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_transport_failure_clears_token_and_next_refresh_reauthenticates(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """A top-level HttpRequestFailed clears the token and the next refresh logs in."""
+    AIOSysbus._auth.session_token = "session-1"
+    await _async_setup(hass, config_entry)
+    coordinator = config_entry.runtime_data
+
+    AIOSysbus.deviceinfo.async_get_deviceinfo.side_effect = HttpRequestFailed(
+        "Connection reset by peer"
+    )
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success is False
+    assert AIOSysbus._auth.session_token is None
+
+    logins: list[str] = []
+    base = AIOSysbus.api_raw["DeviceInfo.async_get_deviceinfo"]
+
+    async def _get_deviceinfo() -> dict[str, Any]:
+        # Mimic the real aiosysbus lazy login: with the token cleared, the next
+        # request authenticates again before fetching.
+        if AIOSysbus._auth.session_token is None:
+            AIOSysbus._auth.session_token = "session-2"
+            logins.append("re-authenticated")
+        return base
+
+    AIOSysbus.deviceinfo.async_get_deviceinfo.side_effect = _get_deviceinfo
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success is True
+    assert logins == ["re-authenticated"]
+    assert config_entry.runtime_data.data["devices"]
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_non_transport_error_leaves_session_token(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """A non-transport error at the top level leaves the session token alone."""
+    AIOSysbus._auth.session_token = "session-1"
+    await _async_setup(hass, config_entry)
+    coordinator = config_entry.runtime_data
+
+    AIOSysbus.deviceinfo.async_get_deviceinfo.side_effect = AiosysbusException(
+        "service error"
+    )
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success is False
+    assert AIOSysbus._auth.session_token == "session-1"

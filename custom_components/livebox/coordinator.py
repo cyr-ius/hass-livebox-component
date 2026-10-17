@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from aiosysbus import AIOSysbus
-from aiosysbus.exceptions import AiosysbusException
+from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -152,6 +152,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 "stats": await self.async_get_results(),
             }
         except AiosysbusException as error:
+            # If the Livebox API is unreachable (empty reply, connection reset),
+            # invalidate the session token so aiosysbus will re-authenticate
+            # on the next polling cycle instead of reusing a stale token.
+            if isinstance(error, HttpRequestFailed):
+                self.api._auth.session_token = None
+                _LOGGER.debug(
+                    "Cleared session token after communication failure, "
+                    "will re-authenticate on next update"
+                )
             _LOGGER.error("Error while fetch data information: %s", error)
             raise UpdateFailed(error) from error
 
