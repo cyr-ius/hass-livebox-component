@@ -97,8 +97,47 @@ def _migrate_wan_access_unique_ids(
         )
 
 
+async def _async_logout_orphaned_session(
+    hass: HomeAssistant, entry: LiveboxConfigEntry
+) -> None:
+    """Logout a session that was left open from a previous HA run.
+
+    On HA restart, the in-memory session (cookie + contextID) is lost.
+    If we persisted it before shutdown, we can still send the logout
+    request to free the session slot on the Livebox.
+    """
+    from .session import LiveboxSessionStore, async_logout_session
+
+    store = LiveboxSessionStore(hass, entry.entry_id)
+    await store.async_load()
+    if store.has_session:
+        _LOGGER.info("Found orphaned Livebox session from previous run, logging out")
+        from homeassistant.helpers.aiohttp_client import (
+            async_get_clientsession,
+        )
+
+        session = async_get_clientsession(hass)
+        success = await async_logout_session(
+            session,
+            store.base_url or "",
+            store.context_id,
+            store.cookies,
+            verify_tls=store.verify_tls,
+        )
+        if success:
+            _LOGGER.info("Orphaned session logged out successfully")
+        else:
+            _LOGGER.warning(
+                "Failed to logout orphaned session (Livebox may be unreachable)"
+            )
+        await store.async_clear()
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Set up Livebox as config entry."""
+    # Logout any orphaned session from a previous run (prevents exhaustion)
+    await _async_logout_orphaned_session(hass, entry)
+
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
     try:
         await coordinator.async_config_entry_first_refresh()

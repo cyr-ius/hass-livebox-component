@@ -30,6 +30,7 @@ from .const import (
     DOMAIN,
 )
 from .helpers import find_item
+from .session import LiveboxSessionStore
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=1)
@@ -50,6 +51,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
         self.config_entry: Any = config_entry
         self.api: Any
+        self._persisted_session: tuple[str, dict[str, str], str, bool] | None = None
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
@@ -68,6 +70,34 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
 
+    async def async_persist_session(self) -> None:
+        """Save current session credentials to storage for logout on restart."""
+        try:
+            auth = self.api._auth
+            token = auth.session_token
+            cookies = auth._cookies
+            # Only persist if we have real string values (not mocks)
+            if isinstance(token, str) and isinstance(cookies, dict) and cookies:
+                session = (
+                    token,
+                    {str(key): str(value) for key, value in cookies.items()},
+                    str(auth.base_url),
+                    bool(getattr(auth, "verify_tls", True)),
+                )
+                if session == self._persisted_session:
+                    return
+
+                store = LiveboxSessionStore(self.hass, self.config_entry.entry_id)
+                await store.async_save(
+                    cookies=session[1],
+                    context_id=session[0],
+                    base_url=session[2],
+                    verify_tls=session[3],
+                )
+                self._persisted_session = session
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Failed to persist session", exc_info=True)
+
     async def async_logout(self) -> None:
         """Release the session, the Livebox accepts a limited number of them."""
         try:
@@ -75,6 +105,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.api.async_logout()
         except (AiosysbusException, TimeoutError) as error:
             _LOGGER.debug("Failed to release the Livebox session: %s", error)
+        finally:
+            self._persisted_session = None
+            try:
+                store = LiveboxSessionStore(self.hass, self.config_entry.entry_id)
+                await store.async_clear()
+            except Exception:  # noqa: BLE001
+                _LOGGER.debug("Failed to clear session store", exc_info=True)
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -122,6 +159,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             callers, cmissed = await self.async_get_callers()
 
             await self.async_detect_new_dvices(devices)
+
+            # Persist session for clean logout on restart
+            await self.async_persist_session()
 
             return {
                 "cmissed": cmissed,
