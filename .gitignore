@@ -124,7 +124,7 @@ dmypy.json
 
 ### Python Patch ###
 .venv/
-
+.mcp.json
 fakedevices.py
 
 # End of https://www.gitignore.io/api/python
