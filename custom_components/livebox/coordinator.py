@@ -299,7 +299,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         _walk(data[0])
         self._topology_cache = (topology_via_device, topology_repeaters)
-        self._topology_cache_at = now
         return self._topology_cache
 
     @property
