@@ -1,0 +1,64 @@
+{
+  "api_raw": {
+    "Devices.async_get_devices": {
+      "status": [
+        {
+          "Key": "AA:AA:AA:AA:AA:01",
+          "Name": "iMac 10G",
+          "DeviceType": "Desktop",
+          "Tags": "lan mac physical eth flowstats ipv4 ipv6 dhcp lltd wifi_bridge events",
+          "Active": true,
+          "PhysAddress": "AA:AA:AA:AA:AA:01",
+          "IPAddress": "192.168.1.11",
+          "InterfaceName": "ETH0",
+          "Layer2Interface": "eth4"
+        },
+        {
+          "Key": "AA:AA:AA:AA:AA:02",
+          "Name": "iMac off",
+          "DeviceType": "Desktop",
+          "Tags": "lan mac physical eth flowstats ipv4 ipv6 dhcp lltd wifi_bridge events",
+          "Active": false,
+          "PhysAddress": "AA:AA:AA:AA:AA:02",
+          "IPAddress": "",
+          "InterfaceName": "ETH0",
+          "Layer2Interface": "eth4"
+        },
+        {
+          "Key": "CC:CC:CC:CC:CC:01",
+          "Name": "Amsterdam",
+          "DeviceType": "WiFi Bridge",
+          "Tags": "lan mac physical ipv4 ipv6 dhcp flowstats wifi_bridge ssw_sta eth events",
+          "Active": true,
+          "PhysAddress": "CC:CC:CC:CC:CC:01",
+          "IPAddress": "192.168.1.31",
+          "InterfaceName": "ETH2",
+          "Layer2Interface": "eth1"
+        },
+        {
+          "Key": "EE:EE:EE:EE:EE:01",
+          "Name": "NAS",
+          "DeviceType": "NAS",
+          "Tags": "lan edev mac physical eth flowstats ipv4 ipv6 dhcp events",
+          "Active": true,
+          "PhysAddress": "EE:EE:EE:EE:EE:01",
+          "IPAddress": "192.168.1.51",
+          "InterfaceName": "ETH2",
+          "Layer2Interface": "eth1"
+        },
+        {
+          "Key": "ETH0",
+          "Name": "ETH0",
+          "Tags": "self lan eth nemo interface events",
+          "Active": true
+        },
+        {
+          "Key": "ETH2",
+          "Name": "ETH2",
+          "Tags": "self lan eth nemo interface events",
+          "Active": true
+        }
+      ]
+    }
+  }
+}

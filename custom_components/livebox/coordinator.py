@@ -53,6 +53,16 @@ def _is_object_not_found(error: AiosysbusException) -> bool:
     )
 
 
+def _is_wired_wifi_bridge(device: dict[str, Any]) -> bool:
+    """Return True for a genuine Wi-Fi bridge seen on an Ethernet port.
+
+    Such a device is matched by the eth query only through its wifi_bridge
+    tag; a client tagged wifi_bridge keeps its own type (Desktop, ...).
+    """
+    tags = set(str(device.get("Tags", "")).split())
+    return not tags & {"edev", "hnid"} and device.get("DeviceType") == "WiFi Bridge"
+
+
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     """Define an object to fetch data."""
 
@@ -203,7 +213,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "wifi": (
                         'wifi && (edev || hnid || wifi_bridge) and .PhysAddress!=""'
                     ),
-                    "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+                    "eth": (
+                        'eth && (edev || hnid || wifi_bridge) and .PhysAddress!=""'
+                    ),
                 }
             }
         else:
@@ -214,7 +226,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                         ' and .PhysAddress!=""'
                     ),
                     "eth": (
-                        '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
+                        ".Active==true && eth && (edev || hnid || wifi_bridge)"
+                        ' and .PhysAddress!=""'
                     ),
                 }
             }
@@ -222,6 +235,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             await self._make_request(self.api.devices.async_get_devices, parameters)
         ).get("status", {})
         _LOGGER.debug("Fetch Devices: %s", devices)
+        if isinstance(devices, dict) and isinstance(devices.get("eth"), list):
+            # Wired clients may be tagged wifi_bridge without edev (issue #364),
+            # but genuine wired Wi-Fi bridges must stay untracked.
+            devices["eth"] = [
+                device for device in devices["eth"] if not _is_wired_wifi_bridge(device)
+            ]
         if wifi_tracking:
             device_counters["wireless"] = len(devices.get("wifi", {}))
             for device in devices.get("wifi", {}):

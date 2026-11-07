@@ -327,6 +327,57 @@ async def test_device_tracker_tracks_wifi_bridge_clients(
     assert state.attributes["ip"] == "192.168.1.11"
 
 
+ISSUE_364 = "issue_364_wired_wifi_bridge_sanitized.json"
+# A wired iMac on the W7 10G port is tagged wifi_bridge without edev (issue #364).
+WIRED_IMAC = "AA:AA:AA:AA:AA:01"
+WIRED_IMAC_OFF = "AA:AA:AA:AA:AA:02"  # inactive
+WIRED_BRIDGE = "CC:CC:CC:CC:CC:01"  # DeviceType "WiFi Bridge"
+WIRED_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
+
+
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("AIOSysbus", ["7.1"], indirect=True)
+@pytest.mark.parametrize("api_overlay", [ISSUE_364], indirect=True)
+@pytest.mark.parametrize(
+    ("display_devices", "expected"),
+    [
+        ("All", {WIRED_IMAC, WIRED_IMAC_OFF, WIRED_CLIENT}),
+        ("Active", {WIRED_IMAC, WIRED_CLIENT}),
+    ],
+)
+async def test_device_tracker_tracks_wired_wifi_bridge_clients(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    display_devices: str,
+    expected: set[str],
+) -> None:
+    """Wired clients tagged wifi_bridge are tracked, wired Wi-Fi bridges are not."""
+    hass.config_entries.async_update_entry(
+        config_entry,
+        options={
+            **config_entry.options,
+            CONF_DISPLAY_DEVICES: display_devices,
+            CONF_LAN_TRACKING: True,
+            CONF_WIFI_TRACKING: True,
+        },
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    data = config_entry.runtime_data.data
+    assert set(data["devices"]) == expected
+    assert data["count_wired_devices"] == len(expected)
+
+    entity_registry = er.async_get(hass)
+    assert not entity_registry.async_get_entity_id(
+        "device_tracker", DOMAIN, WIRED_BRIDGE
+    )
+    state = _tracker_state(hass, WIRED_IMAC)
+    assert state.state == STATE_HOME
+    assert state.attributes["connection"] == "ethernet"
+
+
 def _tracker_state(hass: HomeAssistant, key: str) -> State:
     """Return the state of the device tracker of a Livebox device key."""
     entity_id = er.async_get(hass).async_get_entity_id("device_tracker", DOMAIN, key)
