@@ -1,5 +1,6 @@
 """Tests for the Bbox sensor platform."""
 
+from typing import Any
 from unittest.mock import AsyncMock
 
 import homeassistant.helpers.device_registry as dr
@@ -12,7 +13,7 @@ from homeassistant.core import HomeAssistant, State
 from custom_components.livebox.const import DOMAIN
 from custom_components.livebox.sensor import SENSOR_TYPES
 
-from .helpers import load_fixture
+from .helpers import load_fixture, object_not_found
 
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
@@ -26,10 +27,12 @@ async def test_sensors_state(
     await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
 
+    # The Livebox 3 optical termination is an external box: nothing to read.
+    has_ont = AIOSysbus.__model != "3"
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_tx")
-    assert state is not None
+    assert (state is not None) is has_ont
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_rx")
-    assert state is not None
+    assert (state is not None) is has_ont
 
     state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_tx")
     assert state is not None
@@ -91,6 +94,52 @@ async def test_last_reboot_reason_sensor(
     assert state.attributes["Boot counter"] == 134
     assert state.attributes["Watchdog reboot counter"] == 3
     assert state.attributes["Reboots since last upgrade"] == 85
+
+
+@pytest.mark.parametrize("AIOSysbus", ["3"], indirect=True)
+async def test_last_reboot_reason_sensor_absent_without_reboot_log(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+    reboot_log: dict[str, Any],
+) -> None:
+    """A gateway without `NMC.Reboot` gets no permanently unknown sensor (#361)."""
+    reboot_log["NMC.Reboot.Reboot"] = object_not_found("NMC.Reboot.Reboot")
+    reboot_log["NMC.Reboot"] = object_not_found("NMC.Reboot")
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert (
+        hass.states.get(f"sensor.{AIOSysbus.__unique_name}_last_reboot_reason") is None
+    )
+    assert hass.states.get(f"sensor.{AIOSysbus.__unique_name}_callers") is not None
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_fiber_power_unknown_without_reading(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """A missing optical reading is unknown, not a misleading 0 dBm (#362)."""
+    get_mibs = AIOSysbus.nemo.async_get_MIBs.side_effect
+
+    def _get_mibs(intf: str, *args: Any) -> dict[str, Any]:
+        # Fiber link down: the gpon MIB comes back without any reading.
+        if intf == "veip0":
+            return {"status": {"gpon": {"veip0": {"ONUState": "O1"}}}}
+        return get_mibs(intf, *args)
+
+    AIOSysbus.nemo.async_get_MIBs.side_effect = _get_mibs
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    for key in ("fiber_power_rx", "fiber_power_tx"):
+        state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_{key}")
+        assert state is not None
+        assert state.state == "unknown"
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7", "7.1", "7.2"], indirect=True)

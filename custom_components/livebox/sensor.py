@@ -39,6 +39,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
     value_fn: Callable[..., Any]
     attrs: dict[str, Callable[..., Any]] | None = None
     rolling_32_bit: bool = False
+    exists_fn: Callable[[LiveboxDataUpdateCoordinator], bool] = lambda _: True
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -84,6 +85,14 @@ def get_rolling_32_bit_value_fn(
         return (rolls << 32) + current_reading
 
     return value_fn
+
+
+def _fiber_power_dbm(coordinator_data: dict[str, Any], key: str) -> float | None:
+    """Return an optical power in dBm, None when the router gave no reading."""
+    value = find_item(coordinator_data, f"fiber_status.{key}")
+    if value is None:
+        return None
+    return round(value / 1000, 2)
 
 
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
@@ -317,9 +326,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="fiber_power_rx",
         name="Fiber Power Rx",
-        value_fn=lambda x: round(
-            find_item(x, "fiber_status.SignalRxPower", 0) / 1000, 2
-        ),
+        value_fn=lambda x: _fiber_power_dbm(x, "SignalRxPower"),
+        exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
@@ -347,9 +355,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="fiber_power_tx",
         name="Fiber Power Tx",
-        value_fn=lambda x: round(
-            find_item(x, "fiber_status.SignalTxPower", 0) / 1000, 2
-        ),
+        value_fn=lambda x: _fiber_power_dbm(x, "SignalTxPower"),
+        exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
@@ -446,6 +453,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
             or find_item(x, "reboot_log.boot_reason")
             or "unknown"
         ),
+        # Empty when the gateway has no `NMC.Reboot` object (Livebox 3, ...).
+        exists_fn=lambda coordinator: bool(coordinator.data.get("reboot_log")),
         translation_key="last_reboot_reason",
         attrs={
             "Boot date": lambda x: find_item(x, "reboot_log.boot_date"),
@@ -514,6 +523,8 @@ async def async_setup_entry(
 
     for description in SENSOR_TYPES + sensor_stats:
         if description.key in ["up", "down"] and linktype in ["gpon", "sfp"]:
+            continue
+        if not description.exists_fn(coordinator):
             continue
         if description.rolling_32_bit:
             description = replace(

@@ -37,6 +37,20 @@ LOGOUT_TIMEOUT = 10
 TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=5)
 TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS = timedelta(hours=24)
 TOPOLOGY_BUILD_TIMEOUT = 30
+# Sysbus error code returned when the requested object does not exist.
+OBJECT_NOT_FOUND = 196618
+# Models whose optical termination (ONT) is an external box: the gateway
+# exposes no optical measurement (no `veip0`, no `gpon` MIB).
+MODELS_WITHOUT_ONT = (3, 4)
+
+
+def _is_object_not_found(error: AiosysbusException) -> bool:
+    """Return True when the router answered that the object does not exist."""
+    details = error.args[0] if error.args else None
+    return isinstance(details, list) and any(
+        isinstance(item, dict) and item.get("error") == OBJECT_NOT_FOUND
+        for item in details
+    )
 
 
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
@@ -54,6 +68,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
+        self._reboot_log_supported = True
         self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
         self._topology_cache_at: datetime | None = None
         self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL
@@ -390,14 +405,16 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         two read-only calls are made directly: `NMC.Reboot.Reboot:get` returns
         the numbered boot sessions and `NMC.Reboot:get` the counters.
         """
-        sessions = (
-            await self._make_request(
-                self.api._auth.post, "NMC.Reboot.Reboot", "get", {}
-            )
-        ).get("status", {})
-        counters = (
-            await self._make_request(self.api._auth.post, "NMC.Reboot", "get", {})
-        ).get("status", {})
+        if not self._reboot_log_supported:
+            return {}
+        sessions = await self._async_get_optional("NMC.Reboot.Reboot")
+        counters = await self._async_get_optional("NMC.Reboot")
+        if sessions is None and counters is None:
+            # Some gateways (Livebox 3, ...) have no `NMC.Reboot` object: stop
+            # asking instead of logging two errors on every refresh.
+            _LOGGER.debug("Reboot log is not supported by this Livebox")
+            self._reboot_log_supported = False
+            return {}
         counters = counters if isinstance(counters, dict) else {}
 
         if not isinstance(sessions, dict) or not sessions:
@@ -425,7 +442,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
-        if self.model in [4, 3]:
+        if not self.has_ont:
             return {}
         if self.model == 5656:
             optical = (
@@ -681,6 +698,26 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 }
             )
         return results
+
+    @property
+    def has_ont(self) -> bool:
+        """Return True when the gateway embeds the optical termination."""
+        return self.model not in MODELS_WITHOUT_ONT
+
+    async def _async_get_optional(self, service: str) -> Any:
+        """Return the status of `service:get`, None if the object is missing.
+
+        A missing object is a capability of the model, not a failure, so it is
+        only logged at debug level.
+        """
+        try:
+            return (await self.api._auth.post(service, "get", {})).get("status", {})
+        except AiosysbusException as error:
+            if _is_object_not_found(error):
+                _LOGGER.debug("%s is not available: %s", service, error)
+                return None
+            _LOGGER.error("Error while execute: %s (%s)", service, error)
+        return {}
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any

@@ -304,7 +304,10 @@ def mock_router(
         async def _mock_auth_post(
             service: str, method: str, parameters: Any = None
         ) -> dict[str, Any]:
-            return reboot_log.get(service, {})
+            response = reboot_log.get(service, {})
+            if isinstance(response, Exception):
+                raise response
+            return response
 
         instance._auth.post = AsyncMock(side_effect=_mock_auth_post)
 
