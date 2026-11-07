@@ -15,6 +15,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
@@ -37,6 +38,7 @@ LOGOUT_TIMEOUT = 10
 TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=5)
 TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS = timedelta(hours=24)
 TOPOLOGY_BUILD_TIMEOUT = 30
+SESSION_STORE_VERSION = 1
 # Sysbus error code returned when the requested object does not exist.
 OBJECT_NOT_FOUND = 196618
 # Models whose optical termination (ONT) is an external box: the gateway
@@ -82,6 +84,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
         self._topology_cache_at: datetime | None = None
         self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL
+        # Session saved so that a later run can release it after a crash.
+        self._session_store: Store[dict[str, Any]] = Store(
+            hass, SESSION_STORE_VERSION, f"{DOMAIN}_session.{config_entry.entry_id}"
+        )
+        self._saved_session: dict[str, Any] | None = None
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
@@ -94,6 +101,36 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             use_tls=self.config_entry.data.get(CONF_USE_TLS, False),
             verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
+        await self._async_release_orphaned_session()
+
+    async def _async_release_orphaned_session(self) -> None:
+        """Release a session left open by a crash or a power loss.
+
+        A clean stop releases the session and clears the store, so a saved
+        session means the previous run never reached async_logout.
+        """
+        if not (saved := await self._session_store.async_load()):
+            return
+        try:
+            async with asyncio.timeout(LOGOUT_TIMEOUT):
+                released = await self.api.async_release_session(saved)
+        except (AiosysbusException, TimeoutError) as error:
+            released = False
+            _LOGGER.debug("Failed to release the orphaned session: %s", error)
+        _LOGGER.debug("Orphaned Livebox session released: %s", released)
+        # The context expires on its own anyway, do not retry on every start.
+        await self._session_store.async_remove()
+
+    async def _async_save_session(self) -> None:
+        """Save the open session, only when it changed."""
+        session = self.api.session_state
+        if session == self._saved_session:
+            return
+        if session is None:
+            await self._session_store.async_remove()
+        else:
+            await self._session_store.async_save(session)
+        self._saved_session = session
 
     async def async_logout(self) -> None:
         """Release the session, the Livebox accepts a limited number of them."""
@@ -102,6 +139,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.api.async_logout()
         except (AiosysbusException, TimeoutError) as error:
             _LOGGER.debug("Failed to release the Livebox session: %s", error)
+        self._saved_session = None
+        await self._session_store.async_remove()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -150,7 +189,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
             await self.async_detect_new_dvices(devices)
 
-            return {
+            data = {
                 "cmissed": cmissed,
                 "callers": callers,
                 "devices": devices,
@@ -178,6 +217,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 **await self.async_get_dhcp_leases(),
                 "stats": await self.async_get_results(),
             }
+            await self._async_save_session()
+            return data
         except AiosysbusException as error:
             # If the Livebox API is unreachable (empty reply, connection reset),
             # invalidate the session token so aiosysbus will re-authenticate

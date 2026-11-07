@@ -227,15 +227,15 @@ wheels = [
 
 [[package]]
 name = "aiosysbus"
-version = "1.2.6"
+version = "1.2.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/81/6a/52dd41af028ebb8856d13a622bb21cd6b3899ec150e7e40cc89490574300/aiosysbus-1.2.6.tar.gz", hash = "sha256:1e6afcff8be6f1fd79f4974b64d022c4c3f36ba4cb37dd804ab64a15e6ea0c1f", size = 46116, upload-time = "2026-10-10T11:55:38.537Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/33/eb291cdac9e6f848b82c93358e4a02164ff65b8e51085e9f5c70161e6cb6/aiosysbus-1.2.7.tar.gz", hash = "sha256:e07315dc8fbeeeccd4a78bf75f4799dc2e72e56b4e2467e97b82d1bd8fa56727", size = 46848, upload-time = "2026-11-07T18:23:55.477Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/09/c0/d720e13e3997ed59a6bb3b792089067a07c7247436c0e1f59a20587bed1c/aiosysbus-1.2.6-py3-none-any.whl", hash = "sha256:f7ccde4020a72a8a58e94eb58eedf7cf83c1d80abcf7ecbf819f48eca1ed5377", size = 45204, upload-time = "2026-10-10T11:55:36.858Z" },
+    { url = "https://files.pythonhosted.org/packages/56/0d/ce170ada04ea5f310d78a0a144b96d77a21fab6bffc3d0940f7787e45b15/aiosysbus-1.2.7-py3-none-any.whl", hash = "sha256:bcc832ba6e929dff658199f2ed5cbcbfe9f14c421affc56ff4d8e56fcfd569ea", size = 46151, upload-time = "2026-11-07T18:23:53.789Z" },
 ]
 
 [[package]]
