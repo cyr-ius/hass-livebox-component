@@ -56,6 +56,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         self.model: int | float | None = None
         self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
         self._topology_cache_at: datetime | None = None
+        self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
@@ -237,14 +238,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         return devices_tracker, device_counters
 
-    def _topology_scan_interval(self) -> timedelta:
-        """Rebuild often only when the mesh has repeaters to roam between."""
-        return (
-            TOPOLOGY_SCAN_INTERVAL
-            if self._topology_cache[1]
-            else TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS
-        )
-
     async def async_get_topology(self) -> tuple[dict[str, str], dict[str, str]]:
         """Build a device-to-repeater map from topology diagnostics."""
         now = datetime.now(tz=UTC)
@@ -252,10 +245,13 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         # whether a client roamed: rebuild periodically instead.
         if (
             self._topology_cache_at is not None
-            and now - self._topology_cache_at < self._topology_scan_interval()
+            and now - self._topology_cache_at < self._topology_scan_interval
         ):
             return self._topology_cache
+        # A failed build is retried at the regular interval: a mesh must not
+        # lose its via_device links for a day because one build timed out.
         self._topology_cache_at = now
+        self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL
 
         topo_status = (
             await self._make_request(self.api.topologydiagnostics.async_get_topodiags)
@@ -299,6 +295,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         _walk(data[0])
         self._topology_cache = (topology_via_device, topology_repeaters)
+        if not topology_repeaters:
+            # Without repeaters clients cannot roam: rebuild once a day only.
+            self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS
         return self._topology_cache
 
     @property

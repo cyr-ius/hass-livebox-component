@@ -248,13 +248,13 @@ async def test_topology_rebuilt_daily_without_repeaters(
 
 
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
-async def test_topology_failed_build_not_retried_every_cycle(
+async def test_topology_failed_build_retried_at_regular_interval(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     AIOSysbus: AsyncMock | MagicMock,
     freezer: FrozenDateTimeFactory,
 ) -> None:
-    """Failed topology builds are rate-limited using the no-repeater interval."""
+    """A failed build is retried after five minutes, not every cycle nor daily."""
     topology = AIOSysbus.topologydiagnostics
     topology.async_set_topodiags_build.return_value = {"status": []}
 
@@ -265,11 +265,9 @@ async def test_topology_failed_build_not_retried_every_cycle(
 
     freezer.tick(SCAN_INTERVAL)
     await coordinator.async_refresh()
-    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
-    await coordinator.async_refresh()
     build.assert_awaited_once()
 
-    freezer.tick(TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS)
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
     await coordinator.async_refresh()
     assert build.await_count == 2
 
