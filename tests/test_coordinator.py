@@ -4,7 +4,11 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
+from aiosysbus.exceptions import (
+    AiosysbusException,
+    HttpRequestFailed,
+    RetrieveFailed,
+)
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -16,7 +20,7 @@ from custom_components.livebox.coordinator import (
     TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS,
 )
 
-from .helpers import load_fixture
+from .helpers import load_fixture, object_not_found
 
 ISSUE_191 = "issue_191_repeater_topology_sanitized.json"
 
@@ -121,6 +125,82 @@ async def test_reboot_log_survives_unexpected_payloads(
 
     assert "boot_date" not in result
     assert isinstance(result["counters"], dict)
+
+
+@pytest.mark.parametrize("AIOSysbus", ["3"], indirect=True)
+async def test_reboot_log_not_polled_when_unsupported(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    reboot_log: dict[str, Any],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A gateway without `NMC.Reboot` is probed once, without errors (#361)."""
+    reboot_log["NMC.Reboot.Reboot"] = object_not_found("NMC.Reboot.Reboot")
+    reboot_log["NMC.Reboot"] = object_not_found("NMC.Reboot")
+
+    assert (await _async_setup(hass, config_entry))["reboot_log"] == {}
+    calls = AIOSysbus._auth.post.call_count
+
+    coordinator = config_entry.runtime_data
+    await coordinator.async_refresh()
+
+    assert coordinator.data["reboot_log"] == {}
+    assert AIOSysbus._auth.post.call_count == calls
+    assert "NMC.Reboot" not in "".join(
+        record.getMessage() for record in caplog.records if record.levelname == "ERROR"
+    )
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reboot_log_keeps_counters_without_sessions(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    reboot_log: dict[str, Any],
+) -> None:
+    """Only the sessions object missing still reports the counters."""
+    reboot_log["NMC.Reboot.Reboot"] = object_not_found("NMC.Reboot.Reboot")
+
+    result = (await _async_setup(hass, config_entry))["reboot_log"]
+
+    assert result == {"counters": reboot_log["NMC.Reboot"]["status"]}
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reboot_log_retried_after_transient_error(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    reboot_log: dict[str, Any],
+) -> None:
+    """Any other error is logged and the log is read again on the next update."""
+    log = dict(reboot_log)
+    reboot_log["NMC.Reboot.Reboot"] = RetrieveFailed([{"error": 13}])
+    reboot_log["NMC.Reboot"] = RetrieveFailed([{"error": 13}])
+
+    assert (await _async_setup(hass, config_entry))["reboot_log"] == {"counters": {}}
+
+    reboot_log.update(log)
+    coordinator = config_entry.runtime_data
+    await coordinator.async_refresh()
+
+    assert coordinator.data["reboot_log"]["shutdown_reason"] == "TR069 reboot"
+
+
+@pytest.mark.parametrize("AIOSysbus", ["3"], indirect=True)
+async def test_fiber_status_not_read_without_ont(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """The Livebox 3 has an external ONT: no optical reading is attempted."""
+    data = await _async_setup(hass, config_entry)
+
+    assert data["fiber_status"] == {}
+    assert all(
+        call.args[0] != "veip0" for call in AIOSysbus.nemo.async_get_MIBs.call_args_list
+    )
 
 
 @pytest.mark.usefixtures("AIOSysbus")

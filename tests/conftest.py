@@ -110,6 +110,8 @@ def mock_router(
         instance = mock.return_value
         instance.async_connect = AsyncMock(return_value=True)
         instance.async_logout = AsyncMock(return_value=True)
+        instance.async_release_session = AsyncMock(return_value=True)
+        instance.session_state = None
         instance.async_get_permissions = AsyncMock(
             return_value=api["AIOSysbus.async_get_permissions"]
         )
@@ -154,11 +156,7 @@ def mock_router(
 
         def _mock_get_net_dev_stats(*args, **kwargs):
             """Return different values based on the first arg."""
-            if args[0] == "eth0":
-                return api["NeMo.async_get_net_dev_stats::eth0"]
-            if args[0] == "veip0":
-                return api["NeMo.async_get_net_dev_stats::veip0"]
-            return {}
+            return api.get(f"NeMo.async_get_net_dev_stats::{args[0]}", {})
 
         instance.nemo.async_get_net_dev_stats = AsyncMock(
             side_effect=_mock_get_net_dev_stats
@@ -304,7 +302,10 @@ def mock_router(
         async def _mock_auth_post(
             service: str, method: str, parameters: Any = None
         ) -> dict[str, Any]:
-            return reboot_log.get(service, {})
+            response = reboot_log.get(service, {})
+            if isinstance(response, Exception):
+                raise response
+            return response
 
         instance._auth.post = AsyncMock(side_effect=_mock_auth_post)
 

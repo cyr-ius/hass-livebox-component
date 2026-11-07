@@ -72,8 +72,7 @@ async def test_livebox_device_cannot_be_removed(
     async def _remove(device_id: str) -> bool:
         await client.send_json_auto_id(
             {
-                "type": "config/device_registry/remove_config_entry",
-                "config_entry_id": config_entry.entry_id,
+                "type": "config/device_registry/remove",
                 "device_id": device_id,
             }
         )

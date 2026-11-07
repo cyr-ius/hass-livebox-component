@@ -27,7 +27,7 @@ from . import LiveboxConfigEntry
 from .const import DOMAIN, DOWNLOAD_ICON, PHONE_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
-from .helpers import find_item
+from .helpers import find_item, is_wireless_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ class LiveboxSensorEntityDescription(SensorEntityDescription):
     value_fn: Callable[..., Any]
     attrs: dict[str, Callable[..., Any]] | None = None
     rolling_32_bit: bool = False
+    exists_fn: Callable[[LiveboxDataUpdateCoordinator], bool] = lambda _: True
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -84,6 +85,37 @@ def get_rolling_32_bit_value_fn(
         return (rolls << 32) + current_reading
 
     return value_fn
+
+
+def _fiber_power_dbm(coordinator_data: dict[str, Any], key: str) -> float | None:
+    """Return an optical power in dBm, None when the router gave no reading."""
+    value = find_item(coordinator_data, f"fiber_status.{key}")
+    # 0 dBm is not a plausible GPON reading: some gateways (Funbox 6) report 0
+    # for the measurements they do not support.
+    if not value:
+        return None
+    return round(value / 1000, 2)
+
+
+def _fiber_reading(
+    key: str, convert: Callable[[Any], Any] | None = None
+) -> Callable[[dict[str, Any]], Any]:
+    """Return a fiber_status attribute getter, None when not reported (0)."""
+
+    def _get(coordinator_data: dict[str, Any]) -> Any:
+        value = find_item(coordinator_data, f"fiber_status.{key}")
+        if not value:
+            return None
+        return convert(value) if convert else value
+
+    return _get
+
+
+def _onu_state(coordinator_data: dict[str, Any]) -> str | None:
+    """Return the ONU state, whose key casing differs between firmwares."""
+    return find_item(coordinator_data, "fiber_status.ONUState") or find_item(
+        coordinator_data, "fiber_status.OnuState"
+    )
 
 
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
@@ -160,16 +192,6 @@ def _get_associated_wifi_metric_value_fn(
         return default if value is None else value
 
     return value_fn
-
-
-def _is_wireless_device(device: dict[str, Any]) -> bool:
-    """Return whether a Livebox device looks like a Wi-Fi client."""
-    interface_name = device.get("InterfaceName", "")
-    tags = device.get("Tags", "")
-    return (
-        isinstance(interface_name, str)
-        and interface_name.startswith(("vap", "wlan", "wl"))
-    ) or (isinstance(tags, str) and "wifi" in tags.split())
 
 
 DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
@@ -317,53 +339,43 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="fiber_power_rx",
         name="Fiber Power Rx",
-        value_fn=lambda x: round(
-            find_item(x, "fiber_status.SignalRxPower", 0) / 1000, 2
-        ),
+        value_fn=lambda x: _fiber_power_dbm(x, "SignalRxPower"),
+        exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_rx",
         attrs={
-            "Downstream max rate Gbps": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.DownstreamMaxRate", 0)
-                )
+            "Downstream max rate Gbps": _fiber_reading(
+                "DownstreamMaxRate", kilobits_per_second_to_gigabits_per_second
             ),
-            "Downstream current rate Gbps": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.DownstreamCurrRate", 0)
-                )
+            "Downstream current rate Gbps": _fiber_reading(
+                "DownstreamCurrRate", kilobits_per_second_to_gigabits_per_second
             ),
             "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
                 find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
-            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
-            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
+            "Bias (mA)": _fiber_reading("Bias"),
+            "ONU State": _onu_state,
         },
     ),
     LiveboxSensorEntityDescription(
         key="fiber_power_tx",
         name="Fiber Power Tx",
-        value_fn=lambda x: round(
-            find_item(x, "fiber_status.SignalTxPower", 0) / 1000, 2
-        ),
+        value_fn=lambda x: _fiber_power_dbm(x, "SignalTxPower"),
+        exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_tx",
         attrs={
-            "Upstream max rate (Gbps)": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.UpstreamMaxRate", 0)
-                )
+            "Upstream max rate (Gbps)": _fiber_reading(
+                "UpstreamMaxRate", kilobits_per_second_to_gigabits_per_second
             ),
-            "Upstream current rate (Gbps)": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.UpstreamCurrRate", 0)
-                )
+            "Upstream current rate (Gbps)": _fiber_reading(
+                "UpstreamCurrRate", kilobits_per_second_to_gigabits_per_second
             ),
             "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
                 find_item(x, "fiber_status.MaxBitRateSupported", 0)
@@ -371,8 +383,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
             "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
-            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
-            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
+            "Bias (mA)": _fiber_reading("Bias"),
+            "ONU State": _onu_state,
         },
     ),
     LiveboxSensorEntityDescription(
@@ -446,6 +458,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
             or find_item(x, "reboot_log.boot_reason")
             or "unknown"
         ),
+        # Empty when the gateway has no `NMC.Reboot` object (Livebox 3, ...).
+        exists_fn=lambda coordinator: bool(coordinator.data.get("reboot_log")),
         translation_key="last_reboot_reason",
         attrs={
             "Boot date": lambda x: find_item(x, "reboot_log.boot_date"),
@@ -515,6 +529,8 @@ async def async_setup_entry(
     for description in SENSOR_TYPES + sensor_stats:
         if description.key in ["up", "down"] and linktype in ["gpon", "sfp"]:
             continue
+        if not description.exists_fn(coordinator):
+            continue
         if description.rolling_32_bit:
             description = replace(
                 description,
@@ -549,7 +565,7 @@ def async_add_new_device_entities(
     new_entities = []
 
     for device_key, device in coordinator.data.get("devices", {}).items():
-        if not _is_wireless_device(device):
+        if not is_wireless_device(device):
             continue
         device_name = device.get("Name") or device_key
         device_key_fragment = _normalize_device_key(device_key)

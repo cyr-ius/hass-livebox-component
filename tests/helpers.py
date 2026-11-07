@@ -3,6 +3,7 @@
 import re
 from typing import Any, cast
 
+from aiosysbus.exceptions import RetrieveFailed
 from pytest_homeassistant_custom_component.common import load_json_object_fixture
 
 _TOKEN_RE = re.compile(
@@ -19,6 +20,19 @@ def load_fixture(name: str) -> dict[str, Any]:
 def load_api_fixture(name: str) -> dict[str, Any]:
     """Load the raw API payload of a test fixture."""
     return cast(dict[str, Any], load_fixture(name)["api_raw"])
+
+
+def object_not_found(info: str) -> RetrieveFailed:
+    """Return the error raised by aiosysbus for an object the router lacks."""
+    return RetrieveFailed(
+        [
+            {
+                "error": 196618,
+                "description": "Object or parameter not found",
+                "info": info,
+            }
+        ]
+    )
 
 
 def _field_matches(device: dict[str, Any], token: str) -> bool:

@@ -15,6 +15,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import DEFAULT_TIME_ZONE, UTC
 
@@ -37,6 +38,31 @@ LOGOUT_TIMEOUT = 10
 TOPOLOGY_SCAN_INTERVAL = timedelta(minutes=5)
 TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS = timedelta(hours=24)
 TOPOLOGY_BUILD_TIMEOUT = 30
+SESSION_STORE_VERSION = 1
+# Sysbus error code returned when the requested object does not exist.
+OBJECT_NOT_FOUND = 196618
+# Models whose optical termination (ONT) is an external box: the gateway
+# exposes no optical measurement (no `veip0`, no `gpon` MIB).
+MODELS_WITHOUT_ONT = (3, 4)
+
+
+def _is_object_not_found(error: AiosysbusException) -> bool:
+    """Return True when the router answered that the object does not exist."""
+    details = error.args[0] if error.args else None
+    return isinstance(details, list) and any(
+        isinstance(item, dict) and item.get("error") == OBJECT_NOT_FOUND
+        for item in details
+    )
+
+
+def _is_wired_wifi_bridge(device: dict[str, Any]) -> bool:
+    """Return True for a genuine Wi-Fi bridge seen on an Ethernet port.
+
+    Such a device is matched by the eth query only through its wifi_bridge
+    tag; a client tagged wifi_bridge keeps its own type (Desktop, ...).
+    """
+    tags = set(str(device.get("Tags", "")).split())
+    return not tags & {"edev", "hnid"} and device.get("DeviceType") == "WiFi Bridge"
 
 
 class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
@@ -54,9 +80,15 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
         self.unique_id: str | None = None
         self.model: int | float | None = None
+        self._reboot_log_supported = True
         self._topology_cache: tuple[dict[str, str], dict[str, str]] = ({}, {})
         self._topology_cache_at: datetime | None = None
         self._topology_scan_interval = TOPOLOGY_SCAN_INTERVAL
+        # Session saved so that a later run can release it after a crash.
+        self._session_store: Store[dict[str, Any]] = Store(
+            hass, SESSION_STORE_VERSION, f"{DOMAIN}_session.{config_entry.entry_id}"
+        )
+        self._saved_session: dict[str, Any] | None = None
 
     async def _async_setup(self) -> None:
         """Coordinator setup."""
@@ -69,6 +101,36 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             use_tls=self.config_entry.data.get(CONF_USE_TLS, False),
             verify_tls=self.config_entry.data.get(CONF_VERIFY_TLS, True),
         )
+        await self._async_release_orphaned_session()
+
+    async def _async_release_orphaned_session(self) -> None:
+        """Release a session left open by a crash or a power loss.
+
+        A clean stop releases the session and clears the store, so a saved
+        session means the previous run never reached async_logout.
+        """
+        if not (saved := await self._session_store.async_load()):
+            return
+        try:
+            async with asyncio.timeout(LOGOUT_TIMEOUT):
+                released = await self.api.async_release_session(saved)
+        except (AiosysbusException, TimeoutError) as error:
+            released = False
+            _LOGGER.debug("Failed to release the orphaned session: %s", error)
+        _LOGGER.debug("Orphaned Livebox session released: %s", released)
+        # The context expires on its own anyway, do not retry on every start.
+        await self._session_store.async_remove()
+
+    async def _async_save_session(self) -> None:
+        """Save the open session, only when it changed."""
+        session = self.api.session_state
+        if session == self._saved_session:
+            return
+        if session is None:
+            await self._session_store.async_remove()
+        else:
+            await self._session_store.async_save(session)
+        self._saved_session = session
 
     async def async_logout(self) -> None:
         """Release the session, the Livebox accepts a limited number of them."""
@@ -77,6 +139,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 await self.api.async_logout()
         except (AiosysbusException, TimeoutError) as error:
             _LOGGER.debug("Failed to release the Livebox session: %s", error)
+        self._saved_session = None
+        await self._session_store.async_remove()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data."""
@@ -125,7 +189,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
             await self.async_detect_new_dvices(devices)
 
-            return {
+            data = {
                 "cmissed": cmissed,
                 "callers": callers,
                 "devices": devices,
@@ -153,6 +217,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 **await self.async_get_dhcp_leases(),
                 "stats": await self.async_get_results(),
             }
+            await self._async_save_session()
+            return data
         except AiosysbusException as error:
             # If the Livebox API is unreachable (empty reply, connection reset),
             # invalidate the session token so aiosysbus will re-authenticate
@@ -188,7 +254,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "wifi": (
                         'wifi && (edev || hnid || wifi_bridge) and .PhysAddress!=""'
                     ),
-                    "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
+                    "eth": (
+                        'eth && (edev || hnid || wifi_bridge) and .PhysAddress!=""'
+                    ),
                 }
             }
         else:
@@ -199,7 +267,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                         ' and .PhysAddress!=""'
                     ),
                     "eth": (
-                        '.Active==true && eth && (edev || hnid) and .PhysAddress!=""'
+                        ".Active==true && eth && (edev || hnid || wifi_bridge)"
+                        ' and .PhysAddress!=""'
                     ),
                 }
             }
@@ -207,6 +276,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             await self._make_request(self.api.devices.async_get_devices, parameters)
         ).get("status", {})
         _LOGGER.debug("Fetch Devices: %s", devices)
+        if isinstance(devices, dict) and isinstance(devices.get("eth"), list):
+            # Wired clients may be tagged wifi_bridge without edev (issue #364),
+            # but genuine wired Wi-Fi bridges must stay untracked.
+            devices["eth"] = [
+                device for device in devices["eth"] if not _is_wired_wifi_bridge(device)
+            ]
         if wifi_tracking:
             device_counters["wireless"] = len(devices.get("wifi", {}))
             for device in devices.get("wifi", {}):
@@ -390,14 +465,16 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         two read-only calls are made directly: `NMC.Reboot.Reboot:get` returns
         the numbered boot sessions and `NMC.Reboot:get` the counters.
         """
-        sessions = (
-            await self._make_request(
-                self.api._auth.post, "NMC.Reboot.Reboot", "get", {}
-            )
-        ).get("status", {})
-        counters = (
-            await self._make_request(self.api._auth.post, "NMC.Reboot", "get", {})
-        ).get("status", {})
+        if not self._reboot_log_supported:
+            return {}
+        sessions = await self._async_get_optional("NMC.Reboot.Reboot")
+        counters = await self._async_get_optional("NMC.Reboot")
+        if sessions is None and counters is None:
+            # Some gateways (Livebox 3, ...) have no `NMC.Reboot` object: stop
+            # asking instead of logging two errors on every refresh.
+            _LOGGER.debug("Reboot log is not supported by this Livebox")
+            self._reboot_log_supported = False
+            return {}
         counters = counters if isinstance(counters, dict) else {}
 
         if not isinstance(sessions, dict) or not sessions:
@@ -425,7 +502,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_get_fiber_status(self):
         """Get fiber status."""
-        if self.model in [4, 3]:
+        if not self.has_ont:
             return {}
         if self.model == 5656:
             optical = (
@@ -451,7 +528,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         veip0 = (
             await self._make_request(self.api.nemo.async_get_MIBs, "veip0", parameters)
         ).get("status", {})
-        return find_item(veip0, "gpon.veip0", {})
+        fiber_status = dict(find_item(veip0, "gpon.veip0", {}))
+        # The gpon MIB gives the supply voltage in units of 100 uV (SFF-8472).
+        if isinstance(voltage := fiber_status.get("Voltage"), int | float):
+            fiber_status["Voltage"] = round(voltage / 10000, 4)
+        return fiber_status
 
     async def async_get_lan(self, lan_devices):
         """Get lan status."""
@@ -681,6 +762,26 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                 }
             )
         return results
+
+    @property
+    def has_ont(self) -> bool:
+        """Return True when the gateway embeds the optical termination."""
+        return self.model not in MODELS_WITHOUT_ONT
+
+    async def _async_get_optional(self, service: str) -> Any:
+        """Return the status of `service:get`, None if the object is missing.
+
+        A missing object is a capability of the model, not a failure, so it is
+        only logged at debug level.
+        """
+        try:
+            return (await self.api._auth.post(service, "get", {})).get("status", {})
+        except AiosysbusException as error:
+            if _is_object_not_found(error):
+                _LOGGER.debug("%s is not available: %s", service, error)
+                return None
+            _LOGGER.error("Error while execute: %s (%s)", service, error)
+        return {}
 
     async def _make_request(
         self, func: Callable[..., Any], *args: Any
