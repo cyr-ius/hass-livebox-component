@@ -1,7 +1,6 @@
 """Support for the Livebox platform."""
 
 import logging
-import re
 from datetime import datetime, timedelta
 from typing import Any, cast
 
@@ -17,6 +16,7 @@ from . import LiveboxConfigEntry
 from .const import CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT, DOMAIN
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
+from .helpers import is_wired_device, is_wireless_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,29 +35,6 @@ _BASE_DEVICE_ATTRIBUTE_FIELDS: dict[str, str] = {
 _WIRELESS_DEVICE_ATTRIBUTE_FIELDS: dict[str, str] = {
     "frequency_band": "OperatingFrequencyBand",
 }
-
-
-_WIRED_INTERFACE_RE = re.compile(r"eth\d+", re.IGNORECASE)
-
-
-def _is_wired_device(device: dict[str, Any]) -> bool:
-    """Return whether a Livebox device looks like an Ethernet client."""
-    interface_name = device.get("InterfaceName", "")
-    tags = device.get("Tags", "")
-    return (
-        isinstance(interface_name, str)
-        and _WIRED_INTERFACE_RE.fullmatch(interface_name) is not None
-    ) or (isinstance(tags, str) and "eth" in tags.split())
-
-
-def _is_wireless_device(device: dict[str, Any]) -> bool:
-    """Return whether a Livebox device looks like a Wi-Fi client."""
-    interface_name = device.get("InterfaceName", "")
-    tags = device.get("Tags", "")
-    return (
-        isinstance(interface_name, str)
-        and interface_name.startswith(("vap", "wlan", "wl"))
-    ) or (isinstance(tags, str) and "wifi" in tags.split())
 
 
 def _copy_selected_fields(
@@ -177,10 +154,9 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         """Return the device state attributes."""
         attrs = _copy_selected_fields(self._device, _BASE_DEVICE_ATTRIBUTE_FIELDS)
 
-        if _is_wired_device(self._device):
+        if is_wired_device(self._device):
             attrs.update({"connection": "ethernet", "frequency_band": "Wired"})
-
-        if _is_wireless_device(self._device):
+        elif is_wireless_device(self._device):
             iname = self._device.get("InterfaceName")
             signal_quality = _get_signal_quality(self._device.get("SignalStrength"))
             attrs.update(

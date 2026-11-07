@@ -433,6 +433,36 @@ async def test_device_tracker_keeps_wifi_for_repeater_clients_on_eth(
     assert repeater_client["frequency_band"] == "5GHz"
 
 
+ISSUE_326 = "issue_326_wired_behind_wifi_repeater_sanitized.json"
+REPEATER_WIRED_PC = "AA:AA:AA:AA:AA:01"  # eth tag, vap5g0priv0 backhaul
+REPEATER_WIFI_PHONE = "BB:BB:BB:BB:BB:01"  # wifi tag, vap5g0priv0
+
+
+@pytest.mark.usefixtures("AIOSysbus")
+@pytest.mark.parametrize("api_overlay", [ISSUE_326], indirect=True)
+async def test_device_tracker_reports_ethernet_behind_wifi_repeater(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """Wired clients of a Wi-Fi repeater stay ethernet despite their vap interface."""
+    hass.config_entries.async_update_entry(
+        config_entry, options={**config_entry.options, CONF_LAN_TRACKING: True}
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    wired = _tracker_state(hass, REPEATER_WIRED_PC).attributes
+    assert wired["interface_name"] == "vap5g0priv0"
+    assert wired["connection"] == "ethernet"
+    assert wired["frequency_band"] == "Wired"
+    assert "signal_quality" not in wired
+
+    wifi = _tracker_state(hass, REPEATER_WIFI_PHONE).attributes
+    assert wifi["connection"] == "wifi"
+    assert wifi["frequency_band"] == "5GHz"
+
+
 @pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
 async def test_device_tracker_new_device_after_empty_start(
     hass: HomeAssistant,

@@ -27,7 +27,7 @@ from . import LiveboxConfigEntry
 from .const import DOMAIN, DOWNLOAD_ICON, PHONE_ICON, UPLOAD_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
-from .helpers import find_item
+from .helpers import find_item, is_wireless_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -192,16 +192,6 @@ def _get_associated_wifi_metric_value_fn(
         return default if value is None else value
 
     return value_fn
-
-
-def _is_wireless_device(device: dict[str, Any]) -> bool:
-    """Return whether a Livebox device looks like a Wi-Fi client."""
-    interface_name = device.get("InterfaceName", "")
-    tags = device.get("Tags", "")
-    return (
-        isinstance(interface_name, str)
-        and interface_name.startswith(("vap", "wlan", "wl"))
-    ) or (isinstance(tags, str) and "wifi" in tags.split())
 
 
 DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
@@ -575,7 +565,7 @@ def async_add_new_device_entities(
     new_entities = []
 
     for device_key, device in coordinator.data.get("devices", {}).items():
-        if not _is_wireless_device(device):
+        if not is_wireless_device(device):
             continue
         device_name = device.get("Name") or device_key
         device_key_fragment = _normalize_device_key(device_key)

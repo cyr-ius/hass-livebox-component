@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfDataRate, UnitOfInformation
 from homeassistant.core import HomeAssistant, State
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import CONF_LAN_TRACKING, DOMAIN
 from custom_components.livebox.sensor import SENSOR_TYPES
 
 from .helpers import load_fixture, object_not_found
@@ -397,3 +397,31 @@ async def test_fiber_onu_state_upper_case_key(
 
 
 REPEATER_WIRED_PC = "AA:AA:AA:AA:AA:01"
+
+
+@pytest.mark.usefixtures("AIOSysbus", "entity_registry_enabled_by_default")
+@pytest.mark.parametrize(
+    "api_overlay",
+    ["issue_326_wired_behind_wifi_repeater_sanitized.json"],
+    indirect=True,
+)
+async def test_device_metric_sensors_skip_wired_clients_of_wifi_repeater(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+) -> None:
+    """Wired clients on a repeater vap backhaul get no Wi-Fi metric sensors."""
+    hass.config_entries.async_update_entry(
+        config_entry, options={**config_entry.options, CONF_LAN_TRACKING: True}
+    )
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert REPEATER_WIRED_PC in config_entry.runtime_data.data["devices"]
+    entity_registry = er.async_get(hass)
+    unique_id = config_entry.runtime_data.unique_id
+    assert not entity_registry.async_get_entity_id(
+        "sensor", DOMAIN, f"{unique_id}_aa_aa_aa_aa_aa_01_signal_strength"
+    )
+    assert entity_registry.async_get_entity_id(
+        "sensor", DOMAIN, f"{unique_id}_bb_bb_bb_bb_bb_01_signal_strength"
+    )

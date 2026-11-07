@@ -1,0 +1,49 @@
+{
+  "api_raw": {
+    "Devices.async_get_devices": {
+      "status": [
+        {
+          "Key": "AA:AA:AA:AA:AA:01",
+          "Name": "SuperPapa-PC-Eth",
+          "DeviceType": "Computer",
+          "Tags": "lan edev mac physical ipv4 ipv6 flowstats dhcp microsoft lltd events eth",
+          "Active": true,
+          "PhysAddress": "AA:AA:AA:AA:AA:01",
+          "IPAddress": "192.168.1.44",
+          "InterfaceName": "vap5g0priv0",
+          "OperatingFrequencyBand": ""
+        },
+        {
+          "Key": "BB:BB:BB:BB:BB:01",
+          "Name": "Anna Phone 15",
+          "DeviceType": "Mobile iOS",
+          "Tags": "lan edev mac physical wifi flowstats ipv4 ipv6 dhcp apple ssw_sta mdns events",
+          "Active": true,
+          "PhysAddress": "BB:BB:BB:BB:BB:01",
+          "IPAddress": "192.168.1.19",
+          "InterfaceName": "vap5g0priv0",
+          "OperatingFrequencyBand": "5GHz",
+          "SignalStrength": -55
+        },
+        {
+          "Key": "CC:CC:CC:CC:CC:01",
+          "Name": "Repeteur WiFi - Bureau",
+          "DeviceType": "SAH AP",
+          "Tags": "lan mac physical ssw hnid wifi flowstats orange information ipv4 ipv6 dhcp ssw_sta mdns events manageable",
+          "Active": true,
+          "PhysAddress": "CC:CC:CC:CC:CC:01",
+          "IPAddress": "192.168.1.30",
+          "InterfaceName": "vap5g0priv0",
+          "OperatingFrequencyBand": "5GHz"
+        },
+        {
+          "Key": "vap5g0priv0",
+          "Name": "vap5g0priv0",
+          "Tags": "self lan vap wifi nemo interface events",
+          "Active": true,
+          "OperatingFrequencyBand": "5GHz"
+        }
+      ]
+    }
+  }
+}
