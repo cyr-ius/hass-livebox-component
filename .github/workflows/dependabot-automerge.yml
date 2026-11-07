@@ -1,0 +1,14 @@
+---
+name: Dependabot auto-merge
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  automerge:
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: cyr-ius/.github/.github/workflows/dependabot-automerge.yml@v1

@@ -1,0 +1,17 @@
+---
+name: Validate
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    uses: cyr-ius/.github/.github/workflows/ha-validate.yml@v1
