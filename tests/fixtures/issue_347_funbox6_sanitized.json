@@ -1,0 +1,107 @@
+{
+  "api_raw": {
+    "DeviceInfo.async_get_deviceinfo": {
+      "status": {
+        "Manufacturer": "Sagemcom",
+        "ManufacturerOUI": "984265",
+        "ModelName": "SagemcomFast5670_OPL",
+        "Description": "SagemcomFast5670_OPL Sagemcom pl",
+        "ProductClass": "Funbox6",
+        "SerialNumber": "FUNBOX6SERIAL01",
+        "HardwareVersion": "SG_Funbox6_1.0.1",
+        "SoftwareVersion": "SGF6-pl-03.04.13.17_20.04.21.1",
+        "RescueVersion": "SGF6-pl-03.03.11.17_20.04.21.1",
+        "ModemFirmwareVersion": "",
+        "EnabledOptions": "",
+        "AdditionalHardwareVersion": "",
+        "AdditionalSoftwareVersion": "g6+-f-sip-pl",
+        "SpecVersion": "1.1",
+        "ProvisioningCode": "**REDACTED**",
+        "UpTime": 301191,
+        "FirstUseDate": "0001-01-01T00:00:00Z",
+        "DeviceLog": "",
+        "VendorConfigFileNumberOfEntries": 1,
+        "ManufacturerURL": "http://www.sagemcom.com/",
+        "Country": "pl",
+        "ExternalIPAddress": "**REDACTED**",
+        "DeviceStatus": "Up",
+        "NumberOfReboots": 120,
+        "UpgradeOccurred": false,
+        "ResetOccurred": false,
+        "RestoreOccurred": false,
+        "StandbyOccurred": false,
+        "X_SOFTATHOME-COM_AdditionalSoftwareVersions": "",
+        "BaseMAC": "**REDACTED**"
+      }
+    },
+    "NeMo.async_get_MIBs::veip0": {
+      "status": {
+        "gpon": {
+          "veip0": {
+            "RegistrationID": "",
+            "RegistrationIDIsInHexFormat": false,
+            "VeipPptpUni": true,
+            "MaxBitRateSupported": 10000,
+            "SignalRxPower": 0,
+            "SignalTxPower": -8419,
+            "Temperature": 40,
+            "Voltage": 32616,
+            "Bias": 0,
+            "PonMode": "Unknown",
+            "SerialNumber": "SMBS00000001",
+            "HardwareVersion": "SGFunbox6101",
+            "EquipmentId": "SagemcomFast5670OPL",
+            "VendorId": "SMBS",
+            "VendorProductCode": 0,
+            "ONTSoftwareVersion0": "",
+            "ONTSoftwareVersion1": "",
+            "ONTSoftwareVersionActive": 0,
+            "LowerOpticalThreshold": 0,
+            "UpperOpticalThreshold": 0,
+            "LowerTransmitPowerThreshold": 0,
+            "UpperTransmitPowerThreshold": 0,
+            "Mode": "Normal",
+            "CustomVendorID": "",
+            "CustomEquipmentID": "",
+            "VLANs": "",
+            "RogueOnu": false,
+            "RogueOnuCount": 0,
+            "RogueOnuLastOccurence": "0001-01-01T00:00:00Z",
+            "OnuState": "O1_Initial",
+            "OnuId": 0,
+            "PonId": "",
+            "DownstreamMaxRate": 0,
+            "UpstreamMaxRate": 0,
+            "DownstreamCurrRate": 0,
+            "UpstreamCurrRate": 0
+          }
+        }
+      }
+    },
+    "NeMo.async_get_net_dev_stats::ETH0": {
+      "status": {
+        "RxPackets": 107568120,
+        "TxPackets": 63162675,
+        "RxBytes": 98742267559,
+        "TxBytes": 61764556702,
+        "RxErrors": 0,
+        "TxErrors": 0,
+        "RxDropped": 0,
+        "TxDropped": 0,
+        "Multicast": 2450017,
+        "Collisions": 0,
+        "RxLengthErrors": 0,
+        "RxOverErrors": 0,
+        "RxCrcErrors": 0,
+        "RxFrameErrors": 0,
+        "RxFifoErrors": 0,
+        "RxMissedErrors": 0,
+        "TxAbortedErrors": 0,
+        "TxCarrierErrors": 0,
+        "TxFifoErrors": 0,
+        "TxHeartbeatErrors": 0,
+        "TxWindowErrors": 0
+      }
+    }
+  }
+}

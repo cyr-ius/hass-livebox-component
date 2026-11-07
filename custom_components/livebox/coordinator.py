@@ -528,7 +528,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         veip0 = (
             await self._make_request(self.api.nemo.async_get_MIBs, "veip0", parameters)
         ).get("status", {})
-        return find_item(veip0, "gpon.veip0", {})
+        fiber_status = dict(find_item(veip0, "gpon.veip0", {}))
+        # The gpon MIB gives the supply voltage in units of 100 uV (SFF-8472).
+        if isinstance(voltage := fiber_status.get("Voltage"), int | float):
+            fiber_status["Voltage"] = round(voltage / 10000, 4)
+        return fiber_status
 
     async def async_get_lan(self, lan_devices):
         """Get lan status."""

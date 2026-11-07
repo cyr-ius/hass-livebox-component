@@ -90,9 +90,32 @@ def get_rolling_32_bit_value_fn(
 def _fiber_power_dbm(coordinator_data: dict[str, Any], key: str) -> float | None:
     """Return an optical power in dBm, None when the router gave no reading."""
     value = find_item(coordinator_data, f"fiber_status.{key}")
-    if value is None:
+    # 0 dBm is not a plausible GPON reading: some gateways (Funbox 6) report 0
+    # for the measurements they do not support.
+    if not value:
         return None
     return round(value / 1000, 2)
+
+
+def _fiber_reading(
+    key: str, convert: Callable[[Any], Any] | None = None
+) -> Callable[[dict[str, Any]], Any]:
+    """Return a fiber_status attribute getter, None when not reported (0)."""
+
+    def _get(coordinator_data: dict[str, Any]) -> Any:
+        value = find_item(coordinator_data, f"fiber_status.{key}")
+        if not value:
+            return None
+        return convert(value) if convert else value
+
+    return _get
+
+
+def _onu_state(coordinator_data: dict[str, Any]) -> str | None:
+    """Return the ONU state, whose key casing differs between firmwares."""
+    return find_item(coordinator_data, "fiber_status.ONUState") or find_item(
+        coordinator_data, "fiber_status.OnuState"
+    )
 
 
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
@@ -333,23 +356,19 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_rx",
         attrs={
-            "Downstream max rate Gbps": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.DownstreamMaxRate", 0)
-                )
+            "Downstream max rate Gbps": _fiber_reading(
+                "DownstreamMaxRate", kilobits_per_second_to_gigabits_per_second
             ),
-            "Downstream current rate Gbps": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.DownstreamCurrRate", 0)
-                )
+            "Downstream current rate Gbps": _fiber_reading(
+                "DownstreamCurrRate", kilobits_per_second_to_gigabits_per_second
             ),
             "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
                 find_item(x, "fiber_status.MaxBitRateSupported", 0)
             ),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
-            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
-            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
+            "Bias (mA)": _fiber_reading("Bias"),
+            "ONU State": _onu_state,
         },
     ),
     LiveboxSensorEntityDescription(
@@ -362,15 +381,11 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         translation_key="fiber_power_tx",
         attrs={
-            "Upstream max rate (Gbps)": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.UpstreamMaxRate", 0)
-                )
+            "Upstream max rate (Gbps)": _fiber_reading(
+                "UpstreamMaxRate", kilobits_per_second_to_gigabits_per_second
             ),
-            "Upstream current rate (Gbps)": lambda x: (
-                kilobits_per_second_to_gigabits_per_second(
-                    find_item(x, "fiber_status.UpstreamCurrRate", 0)
-                )
+            "Upstream current rate (Gbps)": _fiber_reading(
+                "UpstreamCurrRate", kilobits_per_second_to_gigabits_per_second
             ),
             "Max bitrate (Gbps)": lambda x: megabits_per_second_to_gigabits_per_second(
                 find_item(x, "fiber_status.MaxBitRateSupported", 0)
@@ -378,8 +393,8 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
             "Tx power (dbm)": lambda x: find_item(x, "fiber_status.SignalTxPower"),
             "Temperature (°C)": lambda x: find_item(x, "fiber_status.Temperature"),
             "Voltage (V)": lambda x: find_item(x, "fiber_status.Voltage"),
-            "Bias (mA)": lambda x: find_item(x, "fiber_status.Bias"),
-            "ONU State": lambda x: find_item(x, "fiber_status.ONUState"),
+            "Bias (mA)": _fiber_reading("Bias"),
+            "ONU State": _onu_state,
         },
     ),
     LiveboxSensorEntityDescription(

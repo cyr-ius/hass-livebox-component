@@ -156,11 +156,7 @@ def mock_router(
 
         def _mock_get_net_dev_stats(*args, **kwargs):
             """Return different values based on the first arg."""
-            if args[0] == "eth0":
-                return api["NeMo.async_get_net_dev_stats::eth0"]
-            if args[0] == "veip0":
-                return api["NeMo.async_get_net_dev_stats::veip0"]
-            return {}
+            return api.get(f"NeMo.async_get_net_dev_stats::{args[0]}", {})
 
         instance.nemo.async_get_net_dev_stats = AsyncMock(
             side_effect=_mock_get_net_dev_stats

@@ -332,3 +332,68 @@ async def test_rolling_counter_state_not_shared_across_setups(
 
     # 1 MB, not 4 GiB + 1 MB from a rollover against the previous entry.
     assert float(hass.states.get(entity_id).state) == 1
+
+
+@pytest.mark.parametrize(
+    "api_overlay", ["issue_347_funbox6_sanitized.json"], indirect=True
+)
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_funbox6_fiber_sensors(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """A Funbox 6 reads traffic on ETH0 and hides unsupported optics (#347)."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    AIOSysbus.nemo.async_get_net_dev_stats.assert_any_call("ETH0")
+    assert ("veip0",) not in [
+        call.args for call in AIOSysbus.nemo.async_get_net_dev_stats.call_args_list
+    ]
+
+    unique_name = AIOSysbus.__unique_name
+    state = hass.states.get(f"sensor.{unique_name}_fiber_rx")
+    assert state is not None
+    assert float(state.state) == pytest.approx(98.742267559)
+
+    # SignalRxPower is 0 on this gateway: unknown, not a perfect 0 dBm.
+    state = hass.states.get(f"sensor.{unique_name}_fiber_power_rx")
+    assert state is not None
+    assert state.state == "unknown"
+
+    state = hass.states.get(f"sensor.{unique_name}_fiber_power_tx")
+    assert state is not None
+    assert float(state.state) == -8.42
+    # Mixed-case `OnuState` key and voltage in units of 100 uV.
+    assert state.attributes["ONU State"] == "O1_Initial"
+    assert state.attributes["Voltage (V)"] == 3.2616
+    # Readings this gateway leaves at 0 are not reported.
+    assert state.attributes["Bias (mA)"] is None
+    assert state.attributes["Upstream max rate (Gbps)"] is None
+    assert state.attributes["Upstream current rate (Gbps)"] is None
+    rx_state = hass.states.get(f"sensor.{unique_name}_fiber_power_rx")
+    assert rx_state is not None
+    assert rx_state.attributes["Downstream max rate Gbps"] is None
+    assert rx_state.attributes["Downstream current rate Gbps"] is None
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_fiber_onu_state_upper_case_key(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """The ONU state is read from the upper-case `ONUState` key too."""
+    gpon = AIOSysbus.api_raw["NeMo.async_get_MIBs::veip0"]["status"]["gpon"]["veip0"]
+    gpon["ONUState"] = gpon.pop("OnuState")
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    state = hass.states.get(f"sensor.{AIOSysbus.__unique_name}_fiber_power_rx")
+    assert state is not None
+    assert state.attributes["ONU State"] == "O5_Operation"
+
+
+REPEATER_WIRED_PC = "AA:AA:AA:AA:AA:01"
