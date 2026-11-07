@@ -1,31 +1,18 @@
 ---
 name: Create release
+
 on:
   push:
     tags:
       - "*.*.*"
+
+permissions:
+  contents: read
+
 jobs:
   release:
-    runs-on: ubuntu-latest
     permissions:
       contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Generate changelog
-        id: changelog
-        uses: metcalfc/changelog-generator@v5.0.1
-        with:
-          mytoken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: ${{ contains(github.ref_name,'-') }}
+    uses: cyr-ius/.github/.github/workflows/ha-release.yml@v1
+    with:
+      domain: "livebox"

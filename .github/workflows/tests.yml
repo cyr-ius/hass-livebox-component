@@ -1,0 +1,14 @@
+---
+name: Tests
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    uses: cyr-ius/.github/.github/workflows/ha-tests.yml@v1
