@@ -10,7 +10,11 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from custom_components.livebox.const import CONF_LAN_TRACKING, CONF_WIFI_TRACKING
-from custom_components.livebox.coordinator import TOPOLOGY_SCAN_INTERVAL
+from custom_components.livebox.coordinator import (
+    SCAN_INTERVAL,
+    TOPOLOGY_SCAN_INTERVAL,
+    TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS,
+)
 
 from .helpers import load_fixture
 
@@ -201,6 +205,71 @@ async def test_topology_rebuilt_after_scan_interval(
     freezer.tick(TOPOLOGY_SCAN_INTERVAL)
     await coordinator.async_refresh()
     build.assert_awaited_once()
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_topology_rebuilt_daily_without_repeaters(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Topology without repeaters is rebuilt daily instead of every five minutes."""
+    topology = AIOSysbus.topologydiagnostics
+    topology.async_get_topodiags.return_value = {"status": {}}
+    topology.async_set_topodiags_build.return_value = {
+        "status": [
+            {
+                "Key": "HGW",
+                "Children": [
+                    {
+                        "Key": "AA:AA:AA:AA:AA:09",
+                        "PhysAddress": "AA:AA:AA:AA:AA:09",
+                    }
+                ],
+            }
+        ]
+    }
+
+    data = await _async_setup(hass, config_entry)
+    assert data["topology_repeaters"] == {}
+    build = topology.async_set_topodiags_build
+    build.assert_awaited_once()
+    build.reset_mock()
+    coordinator = config_entry.runtime_data
+
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
+    await coordinator.async_refresh()
+    build.assert_not_awaited()
+
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL_NO_REPEATERS)
+    await coordinator.async_refresh()
+    build.assert_awaited_once()
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_topology_failed_build_retried_at_regular_interval(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """A failed build is retried after five minutes, not every cycle nor daily."""
+    topology = AIOSysbus.topologydiagnostics
+    topology.async_set_topodiags_build.return_value = {"status": []}
+
+    await _async_setup(hass, config_entry)
+    build = topology.async_set_topodiags_build
+    build.assert_awaited_once()
+    coordinator = config_entry.runtime_data
+
+    freezer.tick(SCAN_INTERVAL)
+    await coordinator.async_refresh()
+    build.assert_awaited_once()
+
+    freezer.tick(TOPOLOGY_SCAN_INTERVAL)
+    await coordinator.async_refresh()
+    assert build.await_count == 2
 
 
 async def test_stats_keep_interfaces_without_traffic(
