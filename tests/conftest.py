@@ -110,6 +110,8 @@ def mock_router(
         instance = mock.return_value
         instance.async_connect = AsyncMock(return_value=True)
         instance.async_logout = AsyncMock(return_value=True)
+        instance.async_release_session = AsyncMock(return_value=True)
+        instance.session_state = None
         instance.async_get_permissions = AsyncMock(
             return_value=api["AIOSysbus.async_get_permissions"]
         )
