@@ -18,11 +18,12 @@ dev = [
   {include-group = "lint"},
   "pytest-homeassistant-custom-component",
   "pytest-asyncio",
+  "mypy>=2.4.1",
 ]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra --cov=custom_components --cov-report=term-missing --cov-fail-under=85"
+addopts = "-ra --cov=custom_components --cov-report=term-missing --cov-fail-under=95"
 pythonpath = ["."]
 testpaths = ["tests/"]
 python_files = ["test_*.py"]
@@ -31,6 +32,12 @@ log_cli = true
 
 [tool.uv]
 package = false
+
+[tool.mypy]
+python_version = "3.14"
+files = ["custom_components/livebox"]
+strict = true
+warn_unreachable = true
 
 [tool.ruff]
 target-version = "py314"

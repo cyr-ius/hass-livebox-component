@@ -372,6 +372,7 @@ def get_config_entry(hass: HomeAssistant) -> ConfigEntry:
             CONF_DISPLAY_DEVICES: DEFAULT_DISPLAY_DEVICES,
         },
         title="Livebox X (012345678901234)",
+        minor_version=2,
     )
     config_entry.add_to_hass(hass)
     return config_entry

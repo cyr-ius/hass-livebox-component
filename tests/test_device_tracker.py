@@ -16,6 +16,8 @@ from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
     CONF_WIFI_TRACKING,
+    DEFAULT_DISPLAY_DEVICES,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 from custom_components.livebox.coordinator import (
@@ -274,7 +276,7 @@ REGULAR_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
     ("display_devices", "expected"),
     [
         (
-            "All",
+            DISPLAY_DEVICES_ALL,
             {
                 APPLE_IPHONE,
                 APPLE_IPAD,
@@ -285,7 +287,7 @@ REGULAR_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
             },
         ),
         (
-            "Active",
+            DEFAULT_DISPLAY_DEVICES,
             {APPLE_IPHONE, APPLE_IPAD, WINDOWS_PC, ORANGE_REPEATER, REGULAR_CLIENT},
         ),
     ],
@@ -341,8 +343,8 @@ WIRED_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
 @pytest.mark.parametrize(
     ("display_devices", "expected"),
     [
-        ("All", {WIRED_IMAC, WIRED_IMAC_OFF, WIRED_CLIENT}),
-        ("Active", {WIRED_IMAC, WIRED_CLIENT}),
+        (DISPLAY_DEVICES_ALL, {WIRED_IMAC, WIRED_IMAC_OFF, WIRED_CLIENT}),
+        (DEFAULT_DISPLAY_DEVICES, {WIRED_IMAC, WIRED_CLIENT}),
     ],
 )
 async def test_device_tracker_tracks_wired_wifi_bridge_clients(
@@ -485,3 +487,30 @@ async def test_device_tracker_new_device_after_empty_start(
     state = hass.states.get("device_tracker.pc_408")
     assert state is not None
     assert hass.states.get("switch.pc_408_wan_access") is not None
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_device_tracker_icon_from_device_type(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """The Livebox device type picks the translation key, hence the icon."""
+    devices = AIOSysbus.__devices["status"]
+    devices[3]["Key"] = "AA:AA:AA:AA:AA:03"  # Google Bureau, Tablet Android
+    devices[8]["Key"] = "AA:AA:AA:AA:AA:08"  # HP Office Jet, Printer
+    devices[69]["Key"] = "AA:AA:AA:AA:AA:69"
+    devices[69]["DeviceType"] = "Unknown gadget"
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    registry = er.async_get(hass)
+    for entity_id, translation_key in (
+        ("device_tracker.google_bureau", "tablet"),
+        ("device_tracker.hp_office_jet", "printer"),
+        ("device_tracker.pc_408", "device"),
+    ):
+        entry = registry.async_get(entity_id)
+        assert entry is not None, entity_id
+        assert entry.translation_key == translation_key

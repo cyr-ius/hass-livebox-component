@@ -3,7 +3,7 @@
 import logging
 import re
 
-import voluptuous as vol
+import probatio as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_CONFIG_ENTRY_ID, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import Event, HomeAssistant, ServiceCall
@@ -11,14 +11,29 @@ from homeassistant.exceptions import ConfigEntryNotReady, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.typing import ConfigType
 
-from .const import CALLID, DOMAIN, PLATFORMS
+from .const import (
+    ATTR_CALL_ID,
+    CALLID,
+    CONF_DISPLAY_DEVICES,
+    DEFAULT_DISPLAY_DEVICES,
+    DISPLAY_DEVICES_ALL,
+    DOMAIN,
+    PLATFORMS,
+)
 from .coordinator import LiveboxDataUpdateCoordinator
+from .helpers import async_call_api
 
 type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
 
 CALLMISSED_SCHEMA = vol.Schema(
-    {vol.Optional(CALLID): str, vol.Optional(ATTR_CONFIG_ENTRY_ID): str}
+    {
+        vol.Optional(ATTR_CALL_ID): str,
+        # Name of the field before 3.0.0, still accepted.
+        vol.Optional(CALLID): str,
+        vol.Optional(ATTR_CONFIG_ENTRY_ID): str,
+    }
 )
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
@@ -31,7 +46,7 @@ _LEGACY_WAN_ACCESS_RE = re.compile(
 )
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Livebox integration."""
 
     async def async_remove_cmissed(call: ServiceCall) -> None:
@@ -43,17 +58,40 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             if entry_id is None or entry.entry_id == entry_id
         ]
         if entry_id is not None and not entries:
-            raise ServiceValidationError(f"Livebox entry {entry_id} is not loaded")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="entry_not_loaded",
+                translation_placeholders={"entry_id": entry_id},
+            )
         for entry in entries:
             coordinator = entry.runtime_data
-            await coordinator.api.voiceservice.async_clear_calllist(
-                {CALLID: call.data.get(CALLID)}
+            await async_call_api(
+                coordinator.api.voiceservice.async_clear_calllist(
+                    {CALLID: call.data.get(ATTR_CALL_ID, call.data.get(CALLID))}
+                )
             )
             await coordinator.async_refresh()
 
     hass.services.async_register(
         DOMAIN, "remove_call_missed", async_remove_cmissed, schema=CALLMISSED_SCHEMA
     )
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
+    """Migrate an old config entry."""
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        # 1.2: the device tracker mode values become translation keys.
+        options = dict(entry.options)
+        if CONF_DISPLAY_DEVICES in options:
+            options[CONF_DISPLAY_DEVICES] = (
+                DISPLAY_DEVICES_ALL
+                if options[CONF_DISPLAY_DEVICES] == "All"
+                else DEFAULT_DISPLAY_DEVICES
+            )
+        hass.config_entries.async_update_entry(entry, options=options, minor_version=2)
     return True
 
 

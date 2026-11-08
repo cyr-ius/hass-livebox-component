@@ -2,34 +2,283 @@
   "config": {
     "step": {
       "user": {
-        "title": "Check your livebox",
+        "title": "Connect to your Livebox",
+        "description": "Enter the connection settings of your Orange Livebox.",
         "data": {
-          "host": "IP Address",
+          "host": "Host",
           "username": "Username",
           "password": "Password",
           "port": "Port",
-          "use_tls": "Use TSL",
-          "verify_tls": "Verify TLS"
+          "use_tls": "Use TLS",
+          "verify_tls": "Verify TLS certificate"
+        },
+        "data_description": {
+          "host": "IP address or hostname of the Livebox, usually 192.168.1.1.",
+          "username": "Administrator account of the Livebox, usually admin.",
+          "password": "Administrator password, printed on the Livebox label by default.",
+          "port": "Port of the Livebox web interface (80 over HTTP, 443 over HTTPS).",
+          "use_tls": "Connect to the Livebox over HTTPS.",
+          "verify_tls": "Check the certificate presented by the Livebox. Disable it for a self-signed certificate."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure your Livebox",
+        "description": "Update the connection settings of your Orange Livebox.",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "port": "Port",
+          "use_tls": "Use TLS",
+          "verify_tls": "Verify TLS certificate"
+        },
+        "data_description": {
+          "host": "IP address or hostname of the Livebox, usually 192.168.1.1.",
+          "username": "Administrator account of the Livebox, usually admin.",
+          "password": "Administrator password, printed on the Livebox label by default.",
+          "port": "Port of the Livebox web interface (80 over HTTP, 443 over HTTPS).",
+          "use_tls": "Connect to the Livebox over HTTPS.",
+          "verify_tls": "Check the certificate presented by the Livebox. Disable it for a self-signed certificate."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Authenticate again",
+        "description": "The Livebox {name} rejected the credentials. Enter the current administrator password.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "data_description": {
+          "username": "Administrator account of the Livebox, usually admin.",
+          "password": "Administrator password, printed on the Livebox label by default."
         }
       }
     },
     "error": {
-      "login_incorrect": "User or password incorrect",
-      "insufficient_permission": "Insufficient permission.",
-      "unknown": "Unknown error occurred",
-      "cannot_connect": "Unable to connect to the livebox"
+      "login_incorrect": "Invalid username or password.",
+      "insufficient_permission": "The account does not have enough permissions on the Livebox.",
+      "unknown": "Unexpected error.",
+      "cannot_connect": "Unable to connect to the Livebox."
+    },
+    "abort": {
+      "already_configured": "This Livebox is already configured.",
+      "reconfigure_successful": "Reconfiguration was successful.",
+      "unique_id_mismatch": "The new settings point to a different Livebox.",
+      "reauth_successful": "Reauthentication was successful."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Device Tracking - Track devices on lan",
-        "description": "you want tracking  yours wired devices in addition to wireless devices",
+        "title": "Device tracking",
+        "description": "Choose which devices connected to the Livebox are tracked.",
         "data": {
           "lan_tracking": "Wired tracking",
           "wifi_tracking": "Wireless tracking",
-          "timeout_tracking": "Timeout tracking",
-          "device_tracker_mode": "Track devices"
+          "timeout_tracking": "Away timeout",
+          "device_tracker_mode": "Devices to track"
+        },
+        "data_description": {
+          "lan_tracking": "Create a device tracker for each device connected by cable.",
+          "wifi_tracking": "Create a device tracker for each device connected over Wi-Fi.",
+          "timeout_tracking": "Delay, in seconds, before a disconnected device is considered away.",
+          "device_tracker_mode": "Track only the devices currently connected, or every device known by the Livebox."
+        }
+      }
+    }
+  },
+  "selector": {
+    "device_tracker_mode": {
+      "options": {
+        "all": "All devices",
+        "active_only": "Active devices only"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connectivity": {
+        "name": "WAN status",
+        "state_attributes": {
+          "link_type": {
+            "name": "Link type"
+          },
+          "link_state": {
+            "name": "Link state"
+          },
+          "last_connection_error": {
+            "name": "Last connection error"
+          },
+          "wan_ipaddress": {
+            "name": "WAN IPv4 address"
+          },
+          "wan_gw": {
+            "name": "WAN gateway"
+          },
+          "wan_ipv6address": {
+            "name": "WAN IPv6 address"
+          },
+          "wan_ipv6prefix": {
+            "name": "WAN IPv6 prefix"
+          }
+        }
+      },
+      "callmissed": {
+        "name": "Call missed",
+        "state_attributes": {
+          "missed_calls": {
+            "name": "Missed calls"
+          }
+        }
+      },
+      "remote_access": {
+        "name": "Remote access"
+      },
+      "ddns": {
+        "name": "Dynamic DNS ({service})",
+        "state_attributes": {
+          "last_update": {
+            "name": "Last update"
+          }
+        }
+      }
+    },
+    "button": {
+      "restart_btn": {
+        "name": "Livebox restart"
+      },
+      "ring_btn": {
+        "name": "Ring your phone"
+      },
+      "cmissed_clear_btn": {
+        "name": "Clear calls"
+      }
+    },
+    "calendar": {
+      "call_log": {
+        "name": "Call log"
+      }
+    },
+    "sensor": {
+      "down_rate": {
+        "name": "xDSL download"
+      },
+      "up_rate": {
+        "name": "xDSL upload"
+      },
+      "wifi_rx": {
+        "name": "Wifi Rx"
+      },
+      "wifi_tx": {
+        "name": "Wifi Tx"
+      },
+      "fiber_power_rx": {
+        "name": "Fiber power Rx"
+      },
+      "fiber_power_tx": {
+        "name": "Fiber power Tx"
+      },
+      "fiber_rx": {
+        "name": "Fiber Rx"
+      },
+      "fiber_tx": {
+        "name": "Fiber Tx"
+      },
+      "callers": {
+        "name": "Callers",
+        "state_attributes": {
+          "callers": {
+            "name": "Callers"
+          }
+        }
+      },
+      "upnp": {
+        "name": "Ports forwarding"
+      },
+      "dhcp_leases": {
+        "name": "DHCP leases"
+      },
+      "guest_dhcp_leases": {
+        "name": "Guest DHCP leases"
+      },
+      "last_reboot_reason": {
+        "name": "Last reboot reason"
+      },
+      "uptime": {
+        "name": "Uptime"
+      },
+      "interface_rate_rx": {
+        "name": "{interface} rate Rx"
+      },
+      "interface_rate_tx": {
+        "name": "{interface} rate Tx"
+      },
+      "downlink_rate": {
+        "name": "Downlink rate"
+      },
+      "uplink_rate": {
+        "name": "Uplink rate"
+      },
+      "tx_bytes": {
+        "name": "Tx bytes"
+      },
+      "rx_bytes": {
+        "name": "Rx bytes"
+      },
+      "signal_strength": {
+        "name": "Signal strength"
+      },
+      "signal_noise_ratio": {
+        "name": "Signal noise ratio"
+      }
+    },
+    "switch": {
+      "wifi_switch": {
+        "name": "Wifi"
+      },
+      "guest_wifi": {
+        "name": "Guest Wifi"
+      },
+      "wan_access": {
+        "name": "WAN access"
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_loaded": {
+      "message": "Livebox entry {entry_id} is not loaded."
+    },
+    "incomplete_device_info": {
+      "message": "The Livebox returned incomplete device information (serial number: {serial}, product class: {product_class})."
+    },
+    "update_failed": {
+      "message": "Error while fetching data from the Livebox: {error}"
+    },
+    "wan_access_unlock_failed": {
+      "message": "Failed to unlock WAN access of {name} ({key})."
+    },
+    "wan_access_lock_failed": {
+      "message": "Failed to lock WAN access of {name} ({key})."
+    },
+    "invalid_auth": {
+      "message": "The Livebox rejected the credentials."
+    },
+    "communication_error": {
+      "message": "Error while communicating with the Livebox: {error}"
+    }
+  },
+  "services": {
+    "remove_call_missed": {
+      "name": "Remove missed calls",
+      "description": "Removes a missed call, or all calls when no call ID is given.",
+      "fields": {
+        "call_id": {
+          "name": "Call ID",
+          "description": "ID of the call, shown in the attributes of the missed call binary sensor. Leave empty to remove all calls."
+        },
+        "config_entry_id": {
+          "name": "Livebox",
+          "description": "Livebox whose call list is cleared. All of them if omitted."
         }
       }
     }

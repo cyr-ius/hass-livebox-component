@@ -4,8 +4,9 @@ import logging
 from collections.abc import Mapping
 from contextlib import suppress
 from typing import Any
+from urllib.parse import urlparse
 
-import voluptuous as vol
+import probatio as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -20,6 +21,11 @@ from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNA
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
 
 from .const import (
@@ -36,6 +42,7 @@ from .const import (
     DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_USERNAME,
     DEFAULT_WIFI_TRACKING,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 
@@ -50,6 +57,13 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
+REAUTH_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_USERNAME): str,
+        vol.Required(CONF_PASSWORD): str,
+    }
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -57,10 +71,13 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
 
     VERSION = 1
+    MINOR_VERSION = 2
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry):
+    def async_get_options_flow(
+        config_entry: ConfigEntry,
+    ) -> LiveboxOptionsFlowHandler:
         """Get option flow."""
         return LiveboxOptionsFlowHandler()
 
@@ -119,10 +136,6 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             schema = self.add_suggested_values_to_schema(schema, suggested_values)
         return schema
 
-    async def async_step_import(self, import_config) -> ConfigFlowResult:
-        """Import a config entry from configuration.yaml."""
-        return await self.async_step_user(import_config)
-
     async def async_step_user(
         self, user_input: Mapping[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -155,7 +168,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a discovered device."""
         unique_id = discovery_info.upnp[ATTR_UPNP_SERIAL]
         await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
+        host = urlparse(discovery_info.ssdp_location or "").hostname
+        self._abort_if_unique_id_configured(updates={CONF_HOST: host} if host else None)
         return await self.async_step_user()
 
     async def async_step_reconfigure(
@@ -181,6 +195,42 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="reconfigure",
             data_schema=self._get_data_schema(entry.data),
+            errors=errors,
+        )
+
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """Handle a rejected password."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for new credentials."""
+        entry = self._get_reauth_entry()
+        errors: dict[str, str] = {}
+
+        if user_input:
+            infos, errors = await self._async_validate_input(
+                {**entry.data, **user_input}
+            )
+            if (
+                infos
+                and (sn := infos.get("status", {}).get("SerialNumber")) is not None
+            ):
+                await self.async_set_unique_id(sn)
+                self._abort_if_unique_id_mismatch()
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=self.add_suggested_values_to_schema(
+                REAUTH_SCHEMA, {CONF_USERNAME: entry.data[CONF_USERNAME]}
+            ),
+            description_placeholders={"name": entry.title},
             errors=errors,
         )
 
@@ -211,17 +261,15 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                         ): int,
                         vol.Required(
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
-                        ): vol.In(["All", DEFAULT_DISPLAY_DEVICES]),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=[DISPLAY_DEVICES_ALL, DEFAULT_DISPLAY_DEVICES],
+                                mode=SelectSelectorMode.DROPDOWN,
+                                translation_key=CONF_DISPLAY_DEVICES,
+                            )
+                        ),
                     },
                 ),
-                {
-                    **self.config_entry.options,
-                    # Legacy default, still handled as "Active only".
-                    CONF_DISPLAY_DEVICES: (
-                        "All"
-                        if self.config_entry.options.get(CONF_DISPLAY_DEVICES) == "All"
-                        else DEFAULT_DISPLAY_DEVICES
-                    ),
-                },
+                self.config_entry.options,
             ),
         )

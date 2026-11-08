@@ -1,0 +1,124 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "callmissed": {
+        "default": "mdi:phone-alert"
+      },
+      "remote_access": {
+        "default": "mdi:remote-desktop"
+      },
+      "ddns": {
+        "default": "mdi:dns"
+      }
+    },
+    "button": {
+      "restart_btn": {
+        "default": "mdi:restart-alert"
+      },
+      "ring_btn": {
+        "default": "mdi:phone-classic"
+      },
+      "cmissed_clear_btn": {
+        "default": "mdi:close-circle-multiple-outline"
+      }
+    },
+    "device_tracker": {
+      "computer": {
+        "default": "mdi:desktop-tower-monitor"
+      },
+      "laptop": {
+        "default": "mdi:laptop"
+      },
+      "switch": {
+        "default": "mdi:switch"
+      },
+      "access_point": {
+        "default": "mdi:access-point-network"
+      },
+      "tv": {
+        "default": "mdi:television"
+      },
+      "homeplug": {
+        "default": "mdi:network"
+      },
+      "printer": {
+        "default": "mdi:printer"
+      },
+      "set_top_box": {
+        "default": "mdi:dlna"
+      },
+      "phone": {
+        "default": "mdi:cellphone"
+      },
+      "tablet": {
+        "default": "mdi:cellphone"
+      },
+      "game_console": {
+        "default": "mdi:gamepad-square"
+      },
+      "homepoint": {
+        "default": "mdi:home-automation"
+      },
+      "nas": {
+        "default": "mdi:nas"
+      },
+      "device": {
+        "default": "mdi:devices"
+      }
+    },
+    "sensor": {
+      "down_rate": {
+        "default": "mdi:download-network"
+      },
+      "up_rate": {
+        "default": "mdi:upload-network"
+      },
+      "wifi_rx": {
+        "default": "mdi:wifi-arrow-down"
+      },
+      "wifi_tx": {
+        "default": "mdi:wifi-arrow-up"
+      },
+      "fiber_rx": {
+        "default": "mdi:download-network"
+      },
+      "fiber_tx": {
+        "default": "mdi:upload-network"
+      },
+      "callers": {
+        "default": "mdi:card-account-phone-outline"
+      },
+      "last_reboot_reason": {
+        "default": "mdi:restart-alert"
+      },
+      "uptime": {
+        "default": "mdi:progress-clock"
+      },
+      "downlink_rate": {
+        "default": "mdi:download-network"
+      },
+      "uplink_rate": {
+        "default": "mdi:upload-network"
+      },
+      "tx_bytes": {
+        "default": "mdi:upload-network"
+      },
+      "rx_bytes": {
+        "default": "mdi:download-network"
+      }
+    },
+    "switch": {
+      "guest_wifi": {
+        "default": "mdi:wifi-lock-open"
+      },
+      "wan_access": {
+        "default": "mdi:wan"
+      }
+    }
+  },
+  "services": {
+    "remove_call_missed": {
+      "service": "mdi:phone-remove"
+    }
+  }
+}

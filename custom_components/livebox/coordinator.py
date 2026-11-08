@@ -7,10 +7,15 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from aiosysbus import AIOSysbus
-from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
+from aiosysbus.exceptions import (
+    AiosysbusException,
+    AuthenticationFailed,
+    HttpRequestFailed,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -28,6 +33,7 @@ from .const import (
     DEFAULT_DISPLAY_DEVICES,
     DEFAULT_LAN_TRACKING,
     DEFAULT_WIFI_TRACKING,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 from .helpers import find_item
@@ -65,7 +71,7 @@ def _is_wired_wifi_bridge(device: dict[str, Any]) -> bool:
     return not tags & {"edev", "hnid"} and device.get("DeviceType") == "WiFi Bridge"
 
 
-class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
+class LiveboxDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Define an object to fetch data."""
 
     def __init__(
@@ -151,8 +157,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             product_class = infos.get("ProductClass")
             if not serial or not product_class:
                 raise UpdateFailed(
-                    "Livebox returned incomplete device info "
-                    f"(SerialNumber={serial!r}, ProductClass={product_class!r})"
+                    translation_domain=DOMAIN,
+                    translation_key="incomplete_device_info",
+                    translation_placeholders={
+                        "serial": repr(serial),
+                        "product_class": repr(product_class),
+                    },
                 )
             self.unique_id = serial
             match product_class:
@@ -219,6 +229,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             }
             await self._async_save_session()
             return data
+        except AuthenticationFailed as error:
+            raise ConfigEntryAuthFailed(
+                translation_domain=DOMAIN,
+                translation_key="invalid_auth",
+            ) from error
         except AiosysbusException as error:
             # If the Livebox API is unreachable (empty reply, connection reset),
             # invalidate the session token so aiosysbus will re-authenticate
@@ -229,12 +244,18 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "Cleared session token after communication failure, "
                     "will re-authenticate on next update"
                 )
-            _LOGGER.error("Error while fetch data information: %s", error)
-            raise UpdateFailed(error) from error
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="update_failed",
+                translation_placeholders={"error": str(error)},
+            ) from error
 
     async def async_get_infos(self) -> dict[str, Any]:
         """Get router infos."""
-        return (await self.api.deviceinfo.async_get_deviceinfo()).get("status", {})
+        infos: dict[str, Any] = (await self.api.deviceinfo.async_get_deviceinfo()).get(
+            "status", {}
+        )
+        return infos
 
     async def async_get_devices(
         self,
@@ -243,12 +264,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         repeater_keys: set[str] | None = None,
     ) -> tuple[dict[str, Any], dict[str, int]]:
         """Get all devices."""
-        devices_tracker = {}
+        devices_tracker: dict[str, dict[str, Any]] = {}
         device_counters = {"wireless": 0, "wired": 0}
         mode = self.config_entry.options.get(
             CONF_DISPLAY_DEVICES, DEFAULT_DISPLAY_DEVICES
         )
-        if mode == "All":
+        if mode == DISPLAY_DEVICES_ALL:
             parameters = {
                 "expression": {
                     "wifi": (
@@ -415,7 +436,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         parent_key = data.get("topology_via_device", {}).get(device_key)
         if not isinstance(parent_key, str):
             return None
-        return data.get("topology_repeaters", {}).get(parent_key)
+        device_id: str | None = data.get("topology_repeaters", {}).get(parent_key)
+        return device_id
 
     async def async_get_callers(
         self,
@@ -456,7 +478,8 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         dsl0 = (
             await self._make_request(self.api.nemo.async_get_MIBs, "data", parameters)
         ).get("status", {})
-        return find_item(dsl0, "dsl.dsl0", {})
+        dsl_status: dict[str, Any] = find_item(dsl0, "dsl.dsl0", {})
+        return dsl_status
 
     async def async_get_reboot_log(self) -> dict[str, Any]:
         """Get the gateway reboot history (why it went down, how it came back).
@@ -500,7 +523,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             "counters": counters,
         }
 
-    async def async_get_fiber_status(self):
+    async def async_get_fiber_status(self) -> dict[str, Any]:
         """Get fiber status."""
         if not self.has_ont:
             return {}
@@ -534,7 +557,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             fiber_status["Voltage"] = round(voltage / 10000, 4)
         return fiber_status
 
-    async def async_get_lan(self, lan_devices):
+    async def async_get_lan(
+        self, lan_devices: dict[str, dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Get lan status."""
         self_devices = (
             await self._make_request(
@@ -585,13 +610,14 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     )
         return devices
 
-    async def async_get_wifi_stats(self) -> bool:
+    async def async_get_wifi_stats(self) -> dict[str, Any]:
         """Get wifi stats."""
-        return (await self._make_request(self.api.nmc.async_get_wifi_stats)).get(
-            "data", {}
-        )
+        stats: dict[str, Any] = (
+            await self._make_request(self.api.nmc.async_get_wifi_stats)
+        ).get("data", {})
+        return stats
 
-    async def async_get_fiber_stats(self) -> bool:
+    async def async_get_fiber_stats(self) -> dict[str, Any]:
         """Get fiber stats."""
         if self.model == 4:
             intf = "eth0"
@@ -603,19 +629,24 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             intf = "ETH0"
         else:
             intf = "veip0"
-        return (
+        stats: dict[str, Any] = (
             await self._make_request(self.api.nemo.async_get_net_dev_stats, intf)
         ).get("status", {})
+        return stats
 
     async def async_get_wan_status(self) -> dict[str, Any]:
         """Get status."""
-        return (await self._make_request(self.api.nmc.async_get_wan_status)).get(
-            "data", {}
-        )
+        wan_status: dict[str, Any] = (
+            await self._make_request(self.api.nmc.async_get_wan_status)
+        ).get("data", {})
+        return wan_status
 
     async def async_get_nmc(self) -> dict[str, Any]:
         """Get dsl status."""
-        return (await self._make_request(self.api.nmc.async_get)).get("status", {})
+        nmc: dict[str, Any] = (await self._make_request(self.api.nmc.async_get)).get(
+            "status", {}
+        )
+        return nmc
 
     async def async_is_wifi(self) -> bool:
         """Get wireless status."""
@@ -636,13 +667,14 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         )
         return ddns if isinstance(ddns, list) else []
 
-    async def async_get_device_schedule(self, device_key):
+    async def async_get_device_schedule(self, device_key: str) -> dict[str, Any]:
         """Get device schedule."""
         parameters = {"type": "ToD", "ID": device_key}
         data = (
             await self._make_request(self.api.schedule.async_get_schedule, parameters)
         ).get("data", {})
-        return data.get("scheduleInfo", {})
+        schedule: dict[str, Any] = data.get("scheduleInfo", {})
+        return schedule
 
     async def async_is_remote_access(self) -> bool:
         """Get Remote access status."""
@@ -651,7 +683,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
         )
         return ra.get("Enable", False) is True
 
-    async def async_detect_new_dvices(self, devices) -> None:
+    async def async_detect_new_dvices(self, devices: dict[str, Any]) -> None:
         """New devices detected."""
         # On the first refresh, platforms create entities from the returned data.
         if self.data is not None:
@@ -788,10 +820,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> dict[str, Any]:
         """Execute request."""
         try:
-            return await func(*args)
+            result: dict[str, Any] = await func(*args)
         except AiosysbusException as error:
             _LOGGER.error("Error while execute: %s (%s)", func.__name__, error)
-        return {}
+            return {}
+        return result
 
     @property
     def signal_device_new(self) -> str:

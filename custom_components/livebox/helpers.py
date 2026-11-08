@@ -1,7 +1,13 @@
 """Helpers functions."""
 
 import re
+from collections.abc import Awaitable
 from typing import Any
+
+from aiosysbus.exceptions import AiosysbusException
+from homeassistant.exceptions import HomeAssistantError
+
+from .const import DOMAIN
 
 _WIRED_INTERFACE_RE = re.compile(r"eth\d+", re.IGNORECASE)
 _WIRELESS_INTERFACE_PREFIXES = ("vap", "wlan", "wl")
@@ -70,3 +76,15 @@ def find_item(data: dict[str, Any], key_chain: str, default: Any = None) -> Any:
         if current is None:
             break
     return default if current is None and default is not None else current
+
+
+async def async_call_api[T](request: Awaitable[T]) -> T:
+    """Await a Livebox request sent by an action, as a translated error on failure."""
+    try:
+        return await request
+    except AiosysbusException as error:
+        raise HomeAssistantError(
+            translation_domain=DOMAIN,
+            translation_key="communication_error",
+            translation_placeholders={"error": str(error)},
+        ) from error

@@ -116,17 +116,6 @@ async def async_get_config_entry_diagnostics(
     """Return diagnostics for a config entry."""
     coordinator = entry.runtime_data
 
-    # Only dump devices with a MAC address
-    params = {
-        "expression": {
-            "wifi": 'wifi && (edev || hnid) and .PhysAddress!=""',
-            "eth": 'eth && (edev || hnid) and .PhysAddress!=""',
-        }
-    }
-
-    end_time = int(time())
-    start_time = end_time - 60
-
     api_methods = [
         coordinator.api.async_get_permissions,
         coordinator.api.deviceinfo.async_get_deviceinfo,
@@ -245,21 +234,21 @@ async def async_get_config_entry_diagnostics(
     ]
 
     _LOGGER.debug("Start building diagnostics data...")
-    start_time = time()
+    build_start = time()
     api_raw: dict[str, Any] = {}
     for api_method in api_methods:
-        params = None
+        call_args: list[Any] = []
         qualified_name = "unknown"
         try:
             if isinstance(api_method, tuple):
-                api_method, params = api_method
-                str_p = "_".join(str(e) for e in params)
+                api_method, call_args = api_method
+                str_p = "_".join(str(e) for e in call_args)
                 qualified_name = f"{api_method.__qualname__}::{str_p}"
             else:
                 qualified_name = api_method.__qualname__
 
             _LOGGER.debug("Call API %s method...", qualified_name)
-            result = await api_method(*params) if params else await api_method()
+            result = await api_method(*call_args)
             api_raw[qualified_name] = (
                 result
                 if isinstance(result, (dict, list, set, float, int, str, tuple))
@@ -272,7 +261,7 @@ async def async_get_config_entry_diagnostics(
             )
         except Exception as err:  # pylint: disable=broad-exception-caught
             api_raw[qualified_name] = f"Exception: {err}"
-    _LOGGER.debug("Diagnostics data built in %0.1fs", time() - start_time)
+    _LOGGER.debug("Diagnostics data built in %0.1fs", time() - build_start)
 
     lucky_address = api_raw.get("NeMo.async_lucky_addr_address::lan", {})
     if isinstance(lucky_address, dict) and lucky_address.get("status"):

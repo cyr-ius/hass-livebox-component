@@ -7,8 +7,11 @@ from aiosysbus.exceptions import (
     AiosysbusException,
     AuthenticationFailed,
     HttpRequestFailed,
+    InsufficientPermissionsError,
+    RetrieveFailed,
 )
 from homeassistant import config_entries, setup
+from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -19,7 +22,7 @@ from custom_components.livebox.const import (
     DOMAIN,
 )
 
-from .const import MOCK_USER_INPUT
+from .const import MOCK_SSDP_INFO, MOCK_USER_INPUT
 
 
 @pytest.fixture(autouse=True)
@@ -69,76 +72,112 @@ async def test_form_success(
     AIOSysbus.async_logout.assert_awaited_once()
 
 
-@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
-async def test_form_cannot_connect(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
-    """Test the flow handles connection errors."""
-    await setup.async_setup_component(hass, "persistent_notification", {})
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+@pytest.mark.parametrize(
+    ("method", "side_effect", "error"),
+    [
+        ("async_connect", HttpRequestFailed("Connection failed"), "cannot_connect"),
+        ("async_connect", RetrieveFailed("No response"), "cannot_connect"),
+        ("async_connect", AuthenticationFailed("Login error"), "login_incorrect"),
+        (
+            "async_get_permissions",
+            InsufficientPermissionsError("Permission denied"),
+            "insufficient_permission",
+        ),
+        ("async_connect", AiosysbusException("Unknown error"), "unknown"),
+    ],
+)
+async def test_form_errors_recover(
+    hass: HomeAssistant,
+    AIOSysbus: AsyncMock,
+    method: str,
+    side_effect: Exception,
+    error: str,
+) -> None:
+    """An error shows the form again and the flow completes once it is fixed."""
+    getattr(AIOSysbus, method).side_effect = side_effect
 
     with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
-        # Simulate a successful connection and info retrieval
         mock_livebox.return_value = AIOSysbus
-        mock_livebox.return_value.async_connect.side_effect = HttpRequestFailed(
-            "Connection failed"
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": config_entries.SOURCE_USER}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], MOCK_USER_INPUT
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"] == {"base": error}
+
+        getattr(AIOSysbus, method).side_effect = None
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], MOCK_USER_INPUT
         )
 
-        # Start the flow and submit data
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == "012345678901234"
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_form_without_serial_number(
+    hass: HomeAssistant, AIOSysbus: AsyncMock
+) -> None:
+    """A Livebox answering without serial number cannot be configured."""
+    infos = AIOSysbus.api_raw["DeviceInfo.async_get_deviceinfo"]["status"]
+    serial = infos.pop("SerialNumber")
+
+    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
+        mock_livebox.return_value = AIOSysbus
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": config_entries.SOURCE_USER},
             data=MOCK_USER_INPUT,
         )
-
-        # Assert the form is shown again with a connection error
         assert result["type"] == FlowResultType.FORM
         assert result["errors"] == {"base": "cannot_connect"}
 
-
-@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
-async def test_form_invalid_auth(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
-    """Test the flow handles invalid authentication."""
-    await setup.async_setup_component(hass, "persistent_notification", {})
-
-    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
-        # Simulate an authentication error
-        mock_livebox.return_value = AIOSysbus
-        mock_livebox.return_value.async_connect.side_effect = AuthenticationFailed(
-            "Login error"
+        infos["SerialNumber"] = serial
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], MOCK_USER_INPUT
         )
 
-        # Start the flow and submit data
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_ssdp_discovery(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
+    """A Livebox discovered over SSDP is set up through the user form."""
+    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
+        mock_livebox.return_value = AIOSysbus
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
-            context={"source": config_entries.SOURCE_USER},
-            data=MOCK_USER_INPUT,
+            context={"source": config_entries.SOURCE_SSDP},
+            data=MOCK_SSDP_INFO,
         )
-
-        # Assert the form is shown again with an auth error
         assert result["type"] == FlowResultType.FORM
-        assert result["errors"] == {"base": "login_incorrect"}
+        assert result["step_id"] == "user"
 
-
-@pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
-async def test_form_unknown(hass: HomeAssistant, AIOSysbus: AsyncMock) -> None:
-    """Test the flow handles invalid authentication."""
-    await setup.async_setup_component(hass, "persistent_notification", {})
-
-    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
-        # Simulate an authentication error
-        mock_livebox.return_value = AIOSysbus
-        mock_livebox.return_value.async_connect.side_effect = AiosysbusException(
-            "Unknown error"
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], MOCK_USER_INPUT
         )
 
-        # Start the flow and submit data
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN,
-            context={"source": config_entries.SOURCE_USER},
-            data=MOCK_USER_INPUT,
-        )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == "012345678901234"
 
-        # Assert the form is shown again with an auth error
-        assert result["type"] == FlowResultType.FORM
-        assert result["errors"] == {"base": "unknown"}
+
+async def test_ssdp_discovery_already_configured(hass: HomeAssistant) -> None:
+    """A Livebox already configured is not discovered again."""
+    MockConfigEntry(
+        domain=DOMAIN, unique_id="012345678901234", data=MOCK_USER_INPUT
+    ).add_to_hass(hass)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_SSDP},
+        data=MOCK_SSDP_INFO,
+    )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
 
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
@@ -237,13 +276,15 @@ async def test_form_logout_error(hass: HomeAssistant, AIOSysbus: AsyncMock) -> N
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
-@pytest.mark.parametrize("stored", [None, "Active"])
+@pytest.mark.parametrize("stored", [None, DEFAULT_DISPLAY_DEVICES])
 async def test_options_flow_defaults_are_valid(
     hass: HomeAssistant, stored: str | None
 ) -> None:
-    """The options form accepts its defaults, including the legacy value."""
+    """The options form accepts its defaults."""
     options = {} if stored is None else {CONF_DISPLAY_DEVICES: stored}
-    entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT, options=options)
+    entry = MockConfigEntry(
+        domain=DOMAIN, data=MOCK_USER_INPUT, options=options, minor_version=2
+    )
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
@@ -252,3 +293,92 @@ async def test_options_flow_defaults_are_valid(
     result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_DISPLAY_DEVICES] == DEFAULT_DISPLAY_DEVICES
+
+
+@pytest.fixture
+def reauth_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Return a configured Livebox whose password was changed."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Livebox 7 (012345678901234)",
+        unique_id="012345678901234",
+        data=MOCK_USER_INPUT,
+    )
+    entry.add_to_hass(hass)
+    return entry
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reauth(
+    hass: HomeAssistant, AIOSysbus: AsyncMock, reauth_entry: MockConfigEntry
+) -> None:
+    """New credentials are stored, a rejected password can be typed again."""
+    AIOSysbus.async_connect.side_effect = AuthenticationFailed("Login error")
+
+    with (
+        patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox,
+        patch.object(hass.config_entries, "async_schedule_reload") as mock_reload,
+    ):
+        mock_livebox.return_value = AIOSysbus
+        result = await reauth_entry.start_reauth_flow(hass)
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "reauth_confirm"
+        assert result["description_placeholders"] == {"name": reauth_entry.title}
+
+        credentials = {"username": "admin", "password": "new_password"}
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], credentials
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"] == {"base": "login_incorrect"}
+
+        AIOSysbus.async_connect.side_effect = None
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], credentials
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert reauth_entry.data == {**MOCK_USER_INPUT, **credentials}
+    mock_reload.assert_called_once_with(reauth_entry.entry_id)
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reauth_other_livebox(
+    hass: HomeAssistant, AIOSysbus: AsyncMock, reauth_entry: MockConfigEntry
+) -> None:
+    """Credentials of another Livebox do not replace those of the entry."""
+    AIOSysbus.api_raw["DeviceInfo.async_get_deviceinfo"]["status"]["SerialNumber"] = (
+        "999999999999999"
+    )
+
+    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
+        mock_livebox.return_value = AIOSysbus
+        result = await reauth_entry.start_reauth_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"username": "admin", "password": "new_password"}
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "unique_id_mismatch"
+    assert reauth_entry.data == MOCK_USER_INPUT
+
+
+async def test_ssdp_discovery_updates_host(hass: HomeAssistant) -> None:
+    """A configured Livebox found at a new address gets its host updated."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="012345678901234",
+        data={**MOCK_USER_INPUT, CONF_HOST: "192.168.0.254"},
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_SSDP},
+        data=MOCK_SSDP_INFO,
+    )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert entry.data[CONF_HOST] == "192.168.1.1"

@@ -2,34 +2,283 @@
   "config": {
     "step": {
       "user": {
-        "title": "Vérification de votre livebox.",
+        "title": "Connexion à votre Livebox",
+        "description": "Saisissez les paramètres de connexion de votre Livebox Orange.",
         "data": {
-          "host": "Adresse IP",
-          "username": "Utilisateur",
+          "host": "Hôte",
+          "username": "Nom d'utilisateur",
           "password": "Mot de passe",
           "port": "Port",
-          "use_tls": "Utiliser SSL/TLS",
-          "verify_tls": "Verify SSL/TLS"
+          "use_tls": "Utiliser TLS",
+          "verify_tls": "Vérifier le certificat TLS"
+        },
+        "data_description": {
+          "host": "Adresse IP ou nom d'hôte de la Livebox, généralement 192.168.1.1.",
+          "username": "Compte administrateur de la Livebox, généralement admin.",
+          "password": "Mot de passe administrateur, imprimé par défaut sur l'étiquette de la Livebox.",
+          "port": "Port de l'interface web de la Livebox (80 en HTTP, 443 en HTTPS).",
+          "use_tls": "Se connecter à la Livebox en HTTPS.",
+          "verify_tls": "Vérifier le certificat présenté par la Livebox. À désactiver pour un certificat auto-signé."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurer votre Livebox",
+        "description": "Modifiez les paramètres de connexion de votre Livebox Orange.",
+        "data": {
+          "host": "Hôte",
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe",
+          "port": "Port",
+          "use_tls": "Utiliser TLS",
+          "verify_tls": "Vérifier le certificat TLS"
+        },
+        "data_description": {
+          "host": "Adresse IP ou nom d'hôte de la Livebox, généralement 192.168.1.1.",
+          "username": "Compte administrateur de la Livebox, généralement admin.",
+          "password": "Mot de passe administrateur, imprimé par défaut sur l'étiquette de la Livebox.",
+          "port": "Port de l'interface web de la Livebox (80 en HTTP, 443 en HTTPS).",
+          "use_tls": "Se connecter à la Livebox en HTTPS.",
+          "verify_tls": "Vérifier le certificat présenté par la Livebox. À désactiver pour un certificat auto-signé."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Nouvelle authentification",
+        "description": "La Livebox {name} a refusé les identifiants. Saisissez le mot de passe administrateur actuel.",
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe"
+        },
+        "data_description": {
+          "username": "Compte administrateur de la Livebox, généralement admin.",
+          "password": "Mot de passe administrateur, imprimé par défaut sur l'étiquette de la Livebox."
         }
       }
     },
     "error": {
-      "login_incorrect": "Utilisateur ou mot de passe incorrect.",
-      "insufficient_permission": "Permission insuffisante.",
-      "unknown": "Erreur inconnue.",
+      "login_incorrect": "Nom d'utilisateur ou mot de passe incorrect.",
+      "insufficient_permission": "Le compte n'a pas les droits suffisants sur la Livebox.",
+      "unknown": "Erreur inattendue.",
       "cannot_connect": "Impossible de se connecter à la Livebox."
+    },
+    "abort": {
+      "already_configured": "Cette Livebox est déjà configurée.",
+      "reconfigure_successful": "La reconfiguration a réussi.",
+      "unique_id_mismatch": "Les nouveaux paramètres désignent une autre Livebox.",
+      "reauth_successful": "La nouvelle authentification a réussi."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Suivre les équipements filaires",
-        "description": "Pour suivre les équipements filaires en plus des équipements Wifi",
+        "title": "Suivi des équipements",
+        "description": "Choisissez les équipements connectés à la Livebox à suivre.",
         "data": {
-          "lan_tracking": "Equipements Filaires",
-          "wifi_tracking": "Equipements Wifi",
-          "timeout_tracking": "Délai avant de considérer un équipement absent",
-          "device_tracker_mode": "Afficher les équipements"
+          "lan_tracking": "Suivi filaire",
+          "wifi_tracking": "Suivi Wi-Fi",
+          "timeout_tracking": "Délai d'absence",
+          "device_tracker_mode": "Équipements à suivre"
+        },
+        "data_description": {
+          "lan_tracking": "Crée un device tracker pour chaque équipement connecté par câble.",
+          "wifi_tracking": "Crée un device tracker pour chaque équipement connecté en Wi-Fi.",
+          "timeout_tracking": "Délai, en secondes, avant de considérer un équipement déconnecté comme absent.",
+          "device_tracker_mode": "Suivre uniquement les équipements actuellement connectés, ou tous les équipements connus de la Livebox."
+        }
+      }
+    }
+  },
+  "selector": {
+    "device_tracker_mode": {
+      "options": {
+        "all": "Tous les équipements",
+        "active_only": "Équipements actifs uniquement"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connectivity": {
+        "name": "État WAN",
+        "state_attributes": {
+          "link_type": {
+            "name": "Type de lien"
+          },
+          "link_state": {
+            "name": "État du lien"
+          },
+          "last_connection_error": {
+            "name": "Dernière erreur de connexion"
+          },
+          "wan_ipaddress": {
+            "name": "Adresse IPv4 WAN"
+          },
+          "wan_gw": {
+            "name": "Passerelle WAN"
+          },
+          "wan_ipv6address": {
+            "name": "Adresse IPv6 WAN"
+          },
+          "wan_ipv6prefix": {
+            "name": "Préfixe IPv6 WAN"
+          }
+        }
+      },
+      "callmissed": {
+        "name": "Appel manqué",
+        "state_attributes": {
+          "missed_calls": {
+            "name": "Appels manqués"
+          }
+        }
+      },
+      "remote_access": {
+        "name": "Accès à distance"
+      },
+      "ddns": {
+        "name": "DNS dynamique ({service})",
+        "state_attributes": {
+          "last_update": {
+            "name": "Dernière mise à jour"
+          }
+        }
+      }
+    },
+    "button": {
+      "restart_btn": {
+        "name": "Redémarrer la Livebox"
+      },
+      "ring_btn": {
+        "name": "Faire sonner le téléphone"
+      },
+      "cmissed_clear_btn": {
+        "name": "Effacer les appels"
+      }
+    },
+    "calendar": {
+      "call_log": {
+        "name": "Journal des appels"
+      }
+    },
+    "sensor": {
+      "down_rate": {
+        "name": "Débit descendant xDSL"
+      },
+      "up_rate": {
+        "name": "Débit montant xDSL"
+      },
+      "wifi_rx": {
+        "name": "Wi-Fi reçu"
+      },
+      "wifi_tx": {
+        "name": "Wi-Fi émis"
+      },
+      "fiber_power_rx": {
+        "name": "Puissance fibre reçue"
+      },
+      "fiber_power_tx": {
+        "name": "Puissance fibre émise"
+      },
+      "fiber_rx": {
+        "name": "Fibre reçu"
+      },
+      "fiber_tx": {
+        "name": "Fibre émis"
+      },
+      "callers": {
+        "name": "Appelants",
+        "state_attributes": {
+          "callers": {
+            "name": "Appelants"
+          }
+        }
+      },
+      "upnp": {
+        "name": "Redirections de ports"
+      },
+      "dhcp_leases": {
+        "name": "Baux DHCP"
+      },
+      "guest_dhcp_leases": {
+        "name": "Baux DHCP invités"
+      },
+      "last_reboot_reason": {
+        "name": "Raison du dernier redémarrage"
+      },
+      "uptime": {
+        "name": "Durée de fonctionnement"
+      },
+      "interface_rate_rx": {
+        "name": "Débit reçu {interface}"
+      },
+      "interface_rate_tx": {
+        "name": "Débit émis {interface}"
+      },
+      "downlink_rate": {
+        "name": "Débit descendant"
+      },
+      "uplink_rate": {
+        "name": "Débit montant"
+      },
+      "tx_bytes": {
+        "name": "Octets émis"
+      },
+      "rx_bytes": {
+        "name": "Octets reçus"
+      },
+      "signal_strength": {
+        "name": "Force du signal"
+      },
+      "signal_noise_ratio": {
+        "name": "Rapport signal/bruit"
+      }
+    },
+    "switch": {
+      "wifi_switch": {
+        "name": "Wi-Fi"
+      },
+      "guest_wifi": {
+        "name": "Wi-Fi invité"
+      },
+      "wan_access": {
+        "name": "Accès Internet"
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_loaded": {
+      "message": "L'entrée Livebox {entry_id} n'est pas chargée."
+    },
+    "incomplete_device_info": {
+      "message": "La Livebox a renvoyé des informations incomplètes (numéro de série : {serial}, classe de produit : {product_class})."
+    },
+    "update_failed": {
+      "message": "Erreur lors de la récupération des données de la Livebox : {error}"
+    },
+    "wan_access_unlock_failed": {
+      "message": "Impossible de débloquer l'accès Internet de {name} ({key})."
+    },
+    "wan_access_lock_failed": {
+      "message": "Impossible de bloquer l'accès Internet de {name} ({key})."
+    },
+    "invalid_auth": {
+      "message": "La Livebox a refusé les identifiants."
+    },
+    "communication_error": {
+      "message": "Erreur de communication avec la Livebox : {error}"
+    }
+  },
+  "services": {
+    "remove_call_missed": {
+      "name": "Supprimer les appels manqués",
+      "description": "Supprime un appel manqué, ou tous les appels si aucun identifiant n'est indiqué.",
+      "fields": {
+        "call_id": {
+          "name": "Identifiant de l'appel",
+          "description": "Identifiant de l'appel, visible dans les attributs du capteur binaire des appels manqués. Laisser vide pour supprimer tous les appels."
+        },
+        "config_entry_id": {
+          "name": "Livebox",
+          "description": "Livebox dont la liste d'appels est effacée. Toutes si non renseigné."
         }
       }
     }

@@ -25,3 +25,12 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run --locked --group dev mypy
+        language: system
+        types: [python]
+        files: ^custom_components/
+        pass_filenames: false

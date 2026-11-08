@@ -2,34 +2,283 @@
   "config": {
     "step": {
       "user": {
-        "title": "Sjekk liveboxen din",
+        "title": "Koble til Liveboxen din",
+        "description": "Angi tilkoblingsinnstillingene for Orange Livebox.",
         "data": {
-          "host": "IP Address",
+          "host": "Vert",
           "username": "Brukernavn",
           "password": "Passord",
           "port": "Port",
-          "use_tls": "Use TSL",
-          "verify_ssl": "SSL/TLS"
+          "use_tls": "Bruk TLS",
+          "verify_tls": "Bekreft TLS-sertifikat"
+        },
+        "data_description": {
+          "host": "IP-adresse eller vertsnavn for Liveboxen, vanligvis 192.168.1.1.",
+          "username": "Administratorkontoen på Liveboxen, vanligvis admin.",
+          "password": "Administratorpassordet, som standard trykt på etiketten til Liveboxen.",
+          "port": "Porten til webgrensesnittet på Liveboxen (80 for HTTP, 443 for HTTPS).",
+          "use_tls": "Koble til Liveboxen over HTTPS.",
+          "verify_tls": "Kontroller sertifikatet fra Liveboxen. Slå av ved selvsignert sertifikat."
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurer Liveboxen på nytt",
+        "description": "Oppdater tilkoblingsinnstillingene for Orange Livebox.",
+        "data": {
+          "host": "Vert",
+          "username": "Brukernavn",
+          "password": "Passord",
+          "port": "Port",
+          "use_tls": "Bruk TLS",
+          "verify_tls": "Bekreft TLS-sertifikat"
+        },
+        "data_description": {
+          "host": "IP-adresse eller vertsnavn for Liveboxen, vanligvis 192.168.1.1.",
+          "username": "Administratorkontoen på Liveboxen, vanligvis admin.",
+          "password": "Administratorpassordet, som standard trykt på etiketten til Liveboxen.",
+          "port": "Porten til webgrensesnittet på Liveboxen (80 for HTTP, 443 for HTTPS).",
+          "use_tls": "Koble til Liveboxen over HTTPS.",
+          "verify_tls": "Kontroller sertifikatet fra Liveboxen. Slå av ved selvsignert sertifikat."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Autentiser på nytt",
+        "description": "Liveboxen {name} avviste påloggingsinformasjonen. Angi gjeldende administratorpassord.",
+        "data": {
+          "username": "Brukernavn",
+          "password": "Passord"
+        },
+        "data_description": {
+          "username": "Administratorkontoen på Liveboxen, vanligvis admin.",
+          "password": "Administratorpassordet, som standard trykt på etiketten til Liveboxen."
         }
       }
     },
     "error": {
-      "login_incorrect": "Feil bruker eller passord",
-      "insufficient_permission": "Utilstrekkelig tillatelse.",
-      "unknown": "Det oppstod en ukjent feil",
-      "cannot_connect": "Kan ikke koble til liveboxen"
+      "login_incorrect": "Ugyldig brukernavn eller passord.",
+      "insufficient_permission": "Kontoen har ikke tilstrekkelige rettigheter på Liveboxen.",
+      "unknown": "Uventet feil.",
+      "cannot_connect": "Kan ikke koble til Liveboxen."
+    },
+    "abort": {
+      "already_configured": "Denne Liveboxen er allerede konfigurert.",
+      "reconfigure_successful": "Rekonfigureringen var vellykket.",
+      "unique_id_mismatch": "De nye innstillingene peker til en annen Livebox.",
+      "reauth_successful": "Reautentiseringen var vellykket."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Enhetssporing - Spor enheter på lan",
-        "description": "du vil spore dine kablede enheter i tillegg til trådløse enheter",
+        "title": "Enhetssporing",
+        "description": "Velg hvilke enheter koblet til Liveboxen som skal spores.",
         "data": {
           "lan_tracking": "Kablet sporing",
           "wifi_tracking": "Trådløs sporing",
-          "timeout_tracking": "Tid før overvejelse om manglende udstyr",
-          "device_tracker_mode": "Spor enheter"
+          "timeout_tracking": "Tidsavbrudd for borte",
+          "device_tracker_mode": "Enheter som skal spores"
+        },
+        "data_description": {
+          "lan_tracking": "Oppretter en enhetssporer for hver enhet tilkoblet med kabel.",
+          "wifi_tracking": "Oppretter en enhetssporer for hver enhet tilkoblet over Wi-Fi.",
+          "timeout_tracking": "Forsinkelse i sekunder før en frakoblet enhet regnes som borte.",
+          "device_tracker_mode": "Spor bare enheter som er tilkoblet nå, eller alle enheter Liveboxen kjenner til."
+        }
+      }
+    }
+  },
+  "selector": {
+    "device_tracker_mode": {
+      "options": {
+        "all": "Alle enheter",
+        "active_only": "Bare aktive enheter"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "connectivity": {
+        "name": "WAN-status",
+        "state_attributes": {
+          "link_type": {
+            "name": "Koblingstype"
+          },
+          "link_state": {
+            "name": "Koblingsstatus"
+          },
+          "last_connection_error": {
+            "name": "Siste tilkoblingsfeil"
+          },
+          "wan_ipaddress": {
+            "name": "WAN IPv4-adresse"
+          },
+          "wan_gw": {
+            "name": "WAN-gateway"
+          },
+          "wan_ipv6address": {
+            "name": "WAN IPv6-adresse"
+          },
+          "wan_ipv6prefix": {
+            "name": "WAN IPv6-prefiks"
+          }
+        }
+      },
+      "callmissed": {
+        "name": "Tapt anrop",
+        "state_attributes": {
+          "missed_calls": {
+            "name": "Tapte anrop"
+          }
+        }
+      },
+      "remote_access": {
+        "name": "Fjerntilgang"
+      },
+      "ddns": {
+        "name": "Dynamisk DNS ({service})",
+        "state_attributes": {
+          "last_update": {
+            "name": "Siste oppdatering"
+          }
+        }
+      }
+    },
+    "button": {
+      "restart_btn": {
+        "name": "Start Liveboxen på nytt"
+      },
+      "ring_btn": {
+        "name": "Ring telefonen"
+      },
+      "cmissed_clear_btn": {
+        "name": "Slett anrop"
+      }
+    },
+    "calendar": {
+      "call_log": {
+        "name": "Anropslogg"
+      }
+    },
+    "sensor": {
+      "down_rate": {
+        "name": "xDSL nedlasting"
+      },
+      "up_rate": {
+        "name": "xDSL opplasting"
+      },
+      "wifi_rx": {
+        "name": "Wi-Fi mottatt"
+      },
+      "wifi_tx": {
+        "name": "Wi-Fi sendt"
+      },
+      "fiber_power_rx": {
+        "name": "Fiber effekt mottatt"
+      },
+      "fiber_power_tx": {
+        "name": "Fiber effekt sendt"
+      },
+      "fiber_rx": {
+        "name": "Fiber mottatt"
+      },
+      "fiber_tx": {
+        "name": "Fiber sendt"
+      },
+      "callers": {
+        "name": "Innringere",
+        "state_attributes": {
+          "callers": {
+            "name": "Innringere"
+          }
+        }
+      },
+      "upnp": {
+        "name": "Portvideresendinger"
+      },
+      "dhcp_leases": {
+        "name": "DHCP-leieavtaler"
+      },
+      "guest_dhcp_leases": {
+        "name": "DHCP-leieavtaler for gjester"
+      },
+      "last_reboot_reason": {
+        "name": "Årsak til siste omstart"
+      },
+      "uptime": {
+        "name": "Oppetid"
+      },
+      "interface_rate_rx": {
+        "name": "{interface} hastighet mottatt"
+      },
+      "interface_rate_tx": {
+        "name": "{interface} hastighet sendt"
+      },
+      "downlink_rate": {
+        "name": "Nedlinkshastighet"
+      },
+      "uplink_rate": {
+        "name": "Opplinkshastighet"
+      },
+      "tx_bytes": {
+        "name": "Byte sendt"
+      },
+      "rx_bytes": {
+        "name": "Byte mottatt"
+      },
+      "signal_strength": {
+        "name": "Signalstyrke"
+      },
+      "signal_noise_ratio": {
+        "name": "Signal/støy-forhold"
+      }
+    },
+    "switch": {
+      "wifi_switch": {
+        "name": "Wi-Fi"
+      },
+      "guest_wifi": {
+        "name": "Gjeste-Wi-Fi"
+      },
+      "wan_access": {
+        "name": "Internettilgang"
+      }
+    }
+  },
+  "exceptions": {
+    "entry_not_loaded": {
+      "message": "Livebox-oppføringen {entry_id} er ikke lastet."
+    },
+    "incomplete_device_info": {
+      "message": "Liveboxen returnerte ufullstendig enhetsinformasjon (serienummer: {serial}, produktklasse: {product_class})."
+    },
+    "update_failed": {
+      "message": "Feil ved henting av data fra Liveboxen: {error}"
+    },
+    "wan_access_unlock_failed": {
+      "message": "Kunne ikke åpne internettilgangen for {name} ({key})."
+    },
+    "wan_access_lock_failed": {
+      "message": "Kunne ikke sperre internettilgangen for {name} ({key})."
+    },
+    "invalid_auth": {
+      "message": "Liveboxen avviste påloggingsinformasjonen."
+    },
+    "communication_error": {
+      "message": "Feil under kommunikasjon med Liveboxen: {error}"
+    }
+  },
+  "services": {
+    "remove_call_missed": {
+      "name": "Fjern tapte anrop",
+      "description": "Fjerner et tapt anrop, eller alle anrop hvis ingen anrops-ID er oppgitt.",
+      "fields": {
+        "call_id": {
+          "name": "Anrops-ID",
+          "description": "ID-en til anropet, vist i attributtene til den binære sensoren for tapte anrop. La stå tom for å fjerne alle anrop."
+        },
+        "config_entry_id": {
+          "name": "Livebox",
+          "description": "Liveboxen der anropslisten tømmes. Alle hvis utelatt."
         }
       }
     }
