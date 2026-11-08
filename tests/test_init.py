@@ -4,14 +4,19 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from aiosysbus.exceptions import HttpRequestFailed
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.typing import WebSocketGenerator
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import (
+    CONF_DISPLAY_DEVICES,
+    DEFAULT_DISPLAY_DEVICES,
+    DISPLAY_DEVICES_ALL,
+    DOMAIN,
+)
 
 
 async def test_remove_call_missed_targets_loaded_entries(
@@ -99,3 +104,41 @@ async def test_remove_call_missed_communication_error(
         await hass.services.async_call(DOMAIN, "remove_call_missed", {}, blocking=True)
 
     assert err.value.translation_key == "communication_error"
+
+
+@pytest.mark.parametrize(
+    ("stored", "migrated"),
+    [
+        ("All", DISPLAY_DEVICES_ALL),
+        ("Active only", DEFAULT_DISPLAY_DEVICES),
+        ("Active", DEFAULT_DISPLAY_DEVICES),
+    ],
+)
+@pytest.mark.usefixtures("AIOSysbus")
+async def test_migrate_device_tracker_mode(
+    hass: HomeAssistant, config_entry: ConfigEntry, stored: str, migrated: str
+) -> None:
+    """Entries of 1.1 store the device tracker mode as translation keys."""
+    hass.config_entries.async_update_entry(
+        config_entry,
+        options={**config_entry.options, CONF_DISPLAY_DEVICES: stored},
+        minor_version=1,
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert config_entry.minor_version == 2
+    assert config_entry.options[CONF_DISPLAY_DEVICES] == migrated
+
+
+async def test_migrate_from_future_version(
+    hass: HomeAssistant, config_entry: ConfigEntry
+) -> None:
+    """An entry created by a newer version of the integration is not loaded."""
+    hass.config_entries.async_update_entry(config_entry, version=2)
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert config_entry.state == ConfigEntryState.MIGRATION_ERROR

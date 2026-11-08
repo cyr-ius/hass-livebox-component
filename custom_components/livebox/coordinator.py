@@ -33,6 +33,7 @@ from .const import (
     DEFAULT_DISPLAY_DEVICES,
     DEFAULT_LAN_TRACKING,
     DEFAULT_WIFI_TRACKING,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 from .helpers import find_item
@@ -268,7 +269,7 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         mode = self.config_entry.options.get(
             CONF_DISPLAY_DEVICES, DEFAULT_DISPLAY_DEVICES
         )
-        if mode == "All":
+        if mode == DISPLAY_DEVICES_ALL:
             parameters = {
                 "expression": {
                     "wifi": (

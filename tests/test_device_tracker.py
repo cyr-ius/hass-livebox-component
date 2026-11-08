@@ -16,6 +16,8 @@ from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
     CONF_LAN_TRACKING,
     CONF_WIFI_TRACKING,
+    DEFAULT_DISPLAY_DEVICES,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 from custom_components.livebox.coordinator import (
@@ -274,7 +276,7 @@ REGULAR_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
     ("display_devices", "expected"),
     [
         (
-            "All",
+            DISPLAY_DEVICES_ALL,
             {
                 APPLE_IPHONE,
                 APPLE_IPAD,
@@ -285,7 +287,7 @@ REGULAR_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
             },
         ),
         (
-            "Active",
+            DEFAULT_DISPLAY_DEVICES,
             {APPLE_IPHONE, APPLE_IPAD, WINDOWS_PC, ORANGE_REPEATER, REGULAR_CLIENT},
         ),
     ],
@@ -341,8 +343,8 @@ WIRED_CLIENT = "EE:EE:EE:EE:EE:01"  # edev
 @pytest.mark.parametrize(
     ("display_devices", "expected"),
     [
-        ("All", {WIRED_IMAC, WIRED_IMAC_OFF, WIRED_CLIENT}),
-        ("Active", {WIRED_IMAC, WIRED_CLIENT}),
+        (DISPLAY_DEVICES_ALL, {WIRED_IMAC, WIRED_IMAC_OFF, WIRED_CLIENT}),
+        (DEFAULT_DISPLAY_DEVICES, {WIRED_IMAC, WIRED_CLIENT}),
     ],
 )
 async def test_device_tracker_tracks_wired_wifi_bridge_clients(

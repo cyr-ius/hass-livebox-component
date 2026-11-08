@@ -42,6 +42,7 @@ from .const import (
     DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_USERNAME,
     DEFAULT_WIFI_TRACKING,
+    DISPLAY_DEVICES_ALL,
     DOMAIN,
 )
 
@@ -70,6 +71,7 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a Livebox config flow."""
 
     VERSION = 1
+    MINOR_VERSION = 2
 
     @staticmethod
     @callback
@@ -261,21 +263,13 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
                         ): SelectSelector(
                             SelectSelectorConfig(
-                                options=["All", DEFAULT_DISPLAY_DEVICES],
+                                options=[DISPLAY_DEVICES_ALL, DEFAULT_DISPLAY_DEVICES],
                                 mode=SelectSelectorMode.DROPDOWN,
                                 translation_key=CONF_DISPLAY_DEVICES,
                             )
                         ),
                     },
                 ),
-                {
-                    **self.config_entry.options,
-                    # Legacy default, still handled as "Active only".
-                    CONF_DISPLAY_DEVICES: (
-                        "All"
-                        if self.config_entry.options.get(CONF_DISPLAY_DEVICES) == "All"
-                        else DEFAULT_DISPLAY_DEVICES
-                    ),
-                },
+                self.config_entry.options,
             ),
         )

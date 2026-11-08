@@ -13,7 +13,14 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CALLID, DOMAIN, PLATFORMS
+from .const import (
+    CALLID,
+    CONF_DISPLAY_DEVICES,
+    DEFAULT_DISPLAY_DEVICES,
+    DISPLAY_DEVICES_ALL,
+    DOMAIN,
+    PLATFORMS,
+)
 from .coordinator import LiveboxDataUpdateCoordinator
 from .helpers import async_call_api
 
@@ -62,6 +69,23 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.services.async_register(
         DOMAIN, "remove_call_missed", async_remove_cmissed, schema=CALLMISSED_SCHEMA
     )
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
+    """Migrate an old config entry."""
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        # 1.2: the device tracker mode values become translation keys.
+        options = dict(entry.options)
+        if CONF_DISPLAY_DEVICES in options:
+            options[CONF_DISPLAY_DEVICES] = (
+                DISPLAY_DEVICES_ALL
+                if options[CONF_DISPLAY_DEVICES] == "All"
+                else DEFAULT_DISPLAY_DEVICES
+            )
+        hass.config_entries.async_update_entry(entry, options=options, minor_version=2)
     return True
 
 

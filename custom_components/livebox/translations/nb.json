@@ -90,8 +90,8 @@
   "selector": {
     "device_tracker_mode": {
       "options": {
-        "All": "Alle enheter",
-        "Active only": "Bare aktive enheter"
+        "all": "Alle enheter",
+        "active_only": "Bare aktive enheter"
       }
     }
   },

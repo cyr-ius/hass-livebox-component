@@ -276,13 +276,15 @@ async def test_form_logout_error(hass: HomeAssistant, AIOSysbus: AsyncMock) -> N
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
-@pytest.mark.parametrize("stored", [None, "Active"])
+@pytest.mark.parametrize("stored", [None, DEFAULT_DISPLAY_DEVICES])
 async def test_options_flow_defaults_are_valid(
     hass: HomeAssistant, stored: str | None
 ) -> None:
-    """The options form accepts its defaults, including the legacy value."""
+    """The options form accepts its defaults."""
     options = {} if stored is None else {CONF_DISPLAY_DEVICES: stored}
-    entry = MockConfigEntry(domain=DOMAIN, data=MOCK_USER_INPUT, options=options)
+    entry = MockConfigEntry(
+        domain=DOMAIN, data=MOCK_USER_INPUT, options=options, minor_version=2
+    )
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
