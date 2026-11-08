@@ -64,10 +64,9 @@ You can use the Configure button to change the following options:
 - Wired tracking (default: **No**): I track wired equipment
 - Wireless tracking (default: **Yes**): I track wireless equipment
 - Timeout tracking (default: **300 seconds**) : Time before the device is considered disconnected (Some iOS devices tend to disconnect/reconnect to networks unexpectedly)
-- Track devices (default: **Active**):
-  - All: Displays all active or inactive devices
-
-  - Active: Displays only active devices (that have an IP address)
+- Devices to track (default: **Active devices only**):
+  - All devices: active and inactive devices known by the Livebox
+  - Active devices only: devices currently connected (that have an IP address)
 
 ### Supported routers
 
@@ -91,23 +90,120 @@ Despite being labelled "Livebox", the following router models **cannot** be supp
 - Arcadyan ERV33AX349B-LT (ARLTFIBRA6 or ["Livebox 6+"](https://ayuda.orange.es/dispositivos-y-routers/2755-router-livebox-6plus))
 - ZTE ZTEGLB7xxxxxx (["Livebox 7 ZTE"](https://ayuda.orange.es/dispositivos-y-routers/3220-router-livebox-7))
 
-## Presence Detection
+## Supported functions
 
-This platform offers presence detection by keeping track of the
-devices connected to a [Livebox](http://www.orange.fr/) router.
+### Livebox
 
-Ability to disable this option by integration options
+| Platform      | Entity                                                                 | Notes                                                                         |
+| ------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Binary sensor | WAN status                                                             | WAN IP addresses, link type and wired / wireless client counts as attributes. |
+| Binary sensor | Call missed                                                            | On while missed calls are in the call list (`missed_calls` attribute).        |
+| Binary sensor | Remote access                                                          | Remote administration of the Livebox enabled.                                 |
+| Binary sensor | Dynamic DNS (_service_)                                                | One per DynDNS host, on when the last update failed.                          |
+| Sensor        | xDSL download / upload                                                 | xDSL lines only. Line attenuation, noise margin and power as attributes.      |
+| Sensor        | Fiber power Rx / Tx, Fiber Rx / Tx                                     | Fiber gateways with an ONT only.                                              |
+| Sensor        | _Interface_ rate Rx / Tx                                               | Current rate of each LAN interface.                                           |
+| Sensor        | Callers                                                                | Number of calls in the call list.                                             |
+| Sensor        | Wifi Rx / Tx, Ports forwarding, DHCP leases, Guest DHCP leases, Uptime | Disabled by default.                                                          |
+| Sensor        | Last reboot reason                                                     | Not available on Livebox 3.                                                   |
+| Switch        | Wifi, Guest Wifi                                                       | Turn the Wi-Fi networks on or off.                                            |
+| Button        | Livebox restart, Ring your phone, Clear calls                          |                                                                               |
+| Calendar      | Call log                                                               | Incoming, outgoing and missed calls.                                          |
 
-### Notes
+### Connected devices
 
-Note that the Livebox waits for some time before marking a device as inactive, meaning that there will be a small delay (1 or 2 minutes) between the time you disconnect a device and the time it will appear as "away" in Home Assistant.
+| Platform       | Entity                                                                     | Notes                                                        |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Device tracker | _Device name_                                                              | Wireless devices by default, wired ones through the options. |
+| Switch         | WAN access                                                                 | Block or allow the Internet access of the device.            |
+| Sensor         | Downlink / uplink rate, Tx / Rx bytes, Signal strength, Signal noise ratio | Wireless devices only, disabled by default.                  |
 
-You should take this into account when specifying the `consider_home` parameter.
-On the contrary, the Livebox immediately reports devices newly connected, so they should appear as "home" almost instantly, as soon as Home Assistant refreshes the devices states.
+## Data updates
 
-## Sensor
+The integration polls the Livebox on the local network every minute. The mesh topology (which repeater a device is connected to) is read every 5 minutes, and once a day when no Wi-Fi repeater is found.
 
-This platform offers you sensors to monitor a Livebox router. The monitored conditions are instant upload and download rates in Mb/s.
+Devices connected for the first time are added automatically, with their entities. Devices that left the network are kept: delete them from their device page when you no longer need them (the Livebox itself cannot be deleted this way).
+
+## Presence detection
+
+Device trackers report whether a device is connected to the Livebox. The Livebox waits for some time before marking a device as inactive, so a device appears as "away" 1 or 2 minutes after it left, plus the **Away timeout** option. Newly connected devices are reported immediately and appear as "home" at the next refresh.
+
+## Use cases
+
+- Know who is at home from the phones connected to the Wi-Fi.
+- Turn the guest Wi-Fi on when guests arrive, off at night.
+- Block the Internet access of the children devices at bedtime.
+- Get notified of a missed call or of a WAN outage.
+- Follow the fiber optical power or the xDSL line quality over time.
+
+## Examples
+
+Turn the guest Wi-Fi off every night:
+
+```yaml
+automation:
+  - alias: "Guest Wi-Fi off at night"
+    triggers:
+      - trigger: time
+        at: "23:00:00"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.livebox_7_guest_wifi
+```
+
+Notify a missed call, then clear the call list:
+
+```yaml
+automation:
+  - alias: "Missed call"
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.livebox_7_call_missed
+        to: "on"
+    actions:
+      - action: notify.notify
+        data:
+          message: "Missed call on the Livebox"
+      - action: livebox.remove_call_missed
+```
+
+Warn when the Internet connection drops for more than 5 minutes:
+
+```yaml
+automation:
+  - alias: "Livebox WAN down"
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.livebox_7_wan_status
+        to: "off"
+        for: "00:05:00"
+    actions:
+      - action: notify.notify
+        data:
+          message: "The Internet connection is down"
+```
+
+Entity IDs depend on the model of your Livebox (here a Livebox 7): check them in **Settings** > **Devices & services** > **Entities**.
+
+## Known limitations
+
+- The Livebox accepts a limited number of open sessions. The integration releases its session when it stops, but after a power loss the previous session stays open until the Livebox expires it.
+- Wired devices are not tracked by default: enable **Wired tracking** in the options.
+- xDSL sensors only exist on xDSL lines, fiber sensors only on gateways with an ONT.
+- The counters of the Livebox are 32-bit: they roll over and restart from 0 when the Livebox reboots; Home Assistant statistics handle both.
+- The call log calendar is kept in memory: it restarts empty when Home Assistant or the Livebox restarts.
+- WAN access switches use the Livebox parental control schedules, a schedule set on the Livebox web interface overrides them.
+
+## Troubleshooting
+
+- **Unable to connect to the Livebox**: check the host and port, and that **Use TLS** matches the port (443 for HTTPS). With a self-signed certificate, disable **Verify TLS certificate**.
+- **Invalid username or password**: use the `admin` account and the password of the Livebox web interface. When it changes, Home Assistant asks for the new one.
+- **The account does not have enough permissions**: use the `admin` account.
+- **Entities become unavailable from time to time**: the Livebox may reject new sessions when too many are open (web interface, mobile app). Close them or reboot the Livebox.
+- **A device stays "home"**: lower the **Away timeout** option.
+
+To report a problem, enable the debug logs from the Livebox entry menu (**Enable debug logging**), reproduce it, then attach the logs and the diagnostics (**Download diagnostics**) to an [issue](https://github.com/cyr-ius/hass-livebox-component/issues). Passwords, serial numbers and MAC addresses are removed from the diagnostics.
 
 ## Actions
 

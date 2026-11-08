@@ -32,15 +32,3 @@ DEFAULT_TRACKING_TIMEOUT = 300
 
 CONF_DISPLAY_DEVICES = "device_tracker_mode"
 DEFAULT_DISPLAY_DEVICES = "Active only"
-
-UPLOAD_ICON = "mdi:upload-network"
-DOWNLOAD_ICON = "mdi:download-network"
-MISSED_ICON = "mdi:phone-alert"
-RESTART_ICON = "mdi:restart-alert"
-RING_ICON = "mdi:phone-classic"
-GUESTWIFI_ICON = "mdi:wifi-lock-open"
-DEVICE_WANACCESS_ICON = "mdi:wan"
-RA_ICON = "mdi:remote-desktop"
-DDNS_ICON = "mdi:dns"
-PHONE_ICON = "mdi:card-account-phone-outline"
-CLEARCALLS_ICON = "mdi:close-circle-multiple-outline"

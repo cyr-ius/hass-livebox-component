@@ -11,6 +11,7 @@ from aiosysbus.exceptions import (
     RetrieveFailed,
 )
 from homeassistant import config_entries, setup
+from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -359,3 +360,23 @@ async def test_reauth_other_livebox(
     assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "unique_id_mismatch"
     assert reauth_entry.data == MOCK_USER_INPUT
+
+
+async def test_ssdp_discovery_updates_host(hass: HomeAssistant) -> None:
+    """A configured Livebox found at a new address gets its host updated."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="012345678901234",
+        data={**MOCK_USER_INPUT, CONF_HOST: "192.168.0.254"},
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_SSDP},
+        data=MOCK_SSDP_INFO,
+    )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert entry.data[CONF_HOST] == "192.168.1.1"

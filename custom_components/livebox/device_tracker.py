@@ -127,6 +127,40 @@ def async_add_new_tracked_entities(
     async_add_entities(repeater_entities + client_entities)
 
 
+# Livebox DeviceType -> translation key, which picks the icon in icons.json.
+DEVICE_TYPE_TRANSLATION_KEYS: dict[str, str] = {
+    "Computer": "computer",
+    "Desktop iOS": "computer",
+    "Desktop Windows": "computer",
+    "Desktop Linux": "computer",
+    "Laptop": "laptop",
+    "Laptop iOS": "laptop",
+    "Laptop Windows": "laptop",
+    "Laptop Linux": "laptop",
+    "Switch4": "switch",
+    "Switch8": "switch",
+    "Switch": "switch",
+    "Access Point": "access_point",
+    "TV": "tv",
+    "TVKey": "tv",
+    "Apple TV": "tv",
+    "HomePlug": "homeplug",
+    "Printer": "printer",
+    "Set-top Box TV UHD": "set_top_box",
+    "Set-top Box": "set_top_box",
+    "Mobile iOS": "phone",
+    "Mobile": "phone",
+    "Mobile Android": "phone",
+    "Tablet iOS": "tablet",
+    "Tablet": "tablet",
+    "Tablet Android": "tablet",
+    "Tablet Windows": "tablet",
+    "Game Console": "game_console",
+    "Homepoint": "homepoint",
+    "Nas": "nas",
+}
+
+
 @callback
 class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
     LiveboxEntity, ScannerEntity
@@ -148,6 +182,9 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         self._old_status = datetime.today()
         self._attr_is_connected = device.get("Active", False)
         self._attr_source_type = SourceType.ROUTER
+        self._attr_translation_key = DEVICE_TYPE_TRANSLATION_KEYS.get(
+            device.get("DeviceType", ""), "device"
+        )
         self._attr_mac_address = self._device_key
         self._attr_ip_address = device.get("IPAddress")
 
@@ -171,39 +208,6 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
                 }
             )
         return attrs
-
-    @property
-    def icon(self) -> str:
-        """Return icon."""
-        match self._device.get("DeviceType"):
-            case "Computer" | "Desktop iOS" | "Desktop Windows" | "Desktop Linux":
-                return "mdi:desktop-tower-monitor"
-            case "Laptop" | "Laptop iOS" | "Laptop Windows" | "Laptop Linux":
-                return "mdi:laptop"
-            case "Switch4" | "Switch8" | "Switch":
-                return "mdi:switch"
-            case "Access Point":
-                return "mdi:access-point-network"
-            case "TV" | "TVKey" | "Apple TV":
-                return "mdi:television"
-            case "HomePlug":
-                return "mdi:network"
-            case "Printer":
-                return "mdi:printer"
-            case "Set-top Box TV UHD" | "Set-top Box":
-                return "mdi:dlna"
-            case "Mobile iOS" | "Mobile" | "Mobile Android":
-                return "mdi:cellphone"
-            case "Tablet iOS" | "Tablet" | "Tablet Android" | "Tablet Windows":
-                return "mdi:cellphone"
-            case "Game Console":
-                return "mdi:gamepad-square"
-            case "Homepoint":
-                return "mdi:home-automation"
-            case "Nas":
-                return "mdi:nas"
-            case _:
-                return "mdi:devices"
 
     @property
     def is_connected(self) -> bool:

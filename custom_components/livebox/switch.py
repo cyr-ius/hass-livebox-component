@@ -12,7 +12,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
+from .const import DOMAIN
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import async_call_api
@@ -39,7 +39,6 @@ SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: x.get("guest_wifi"),
         turn_on=lambda x: x.nmc.async_set_guest_wifi(enable=True),
@@ -57,7 +56,6 @@ SWITCH_TYPES_5: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: x.get("guest_wifi"),
         turn_on=lambda x: x.nmc.async_guest_wifi(True),
@@ -142,8 +140,6 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inconsisten
 
 class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inconsistent-inheritance]
     """Representation of a livebox device WAN access switch."""
-
-    _attr_icon = DEVICE_WANACCESS_ICON
 
     def __init__(
         self,

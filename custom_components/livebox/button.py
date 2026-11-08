@@ -4,12 +4,16 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final, cast
 
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
+from homeassistant.components.button import (
+    ButtonDeviceClass,
+    ButtonEntity,
+    ButtonEntityDescription,
+)
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .const import CLEARCALLS_ICON, RESTART_ICON, RING_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import async_call_api
@@ -27,19 +31,18 @@ class LiveboxButtonEntityDescription(ButtonEntityDescription):
 BUTTON_TYPES: Final[tuple[LiveboxButtonEntityDescription, ...]] = (
     LiveboxButtonEntityDescription(
         key="restart",
-        icon=RESTART_ICON,
+        device_class=ButtonDeviceClass.RESTART,
+        entity_category=EntityCategory.CONFIG,
         translation_key="restart_btn",
         value_fn=lambda x: x.nmc.async_reboot,
     ),
     LiveboxButtonEntityDescription(
         key="ring",
-        icon=RING_ICON,
         translation_key="ring_btn",
         value_fn=lambda x: x.voiceservice.async_ring,
     ),
     LiveboxButtonEntityDescription(
         key="clear_calls",
-        icon=CLEARCALLS_ICON,
         translation_key="cmissed_clear_btn",
         value_fn=lambda x: x.voiceservice.async_clear_calllist,
     ),

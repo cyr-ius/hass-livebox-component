@@ -4,6 +4,7 @@ import logging
 from collections.abc import Mapping
 from contextlib import suppress
 from typing import Any
+from urllib.parse import urlparse
 
 import voluptuous as vol
 from aiosysbus import AIOSysbus
@@ -163,7 +164,8 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a discovered device."""
         unique_id = discovery_info.upnp[ATTR_UPNP_SERIAL]
         await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
+        host = urlparse(discovery_info.ssdp_location or "").hostname
+        self._abort_if_unique_id_configured(updates={CONF_HOST: host} if host else None)
         return await self.async_step_user()
 
     async def async_step_reconfigure(

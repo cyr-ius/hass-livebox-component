@@ -485,3 +485,30 @@ async def test_device_tracker_new_device_after_empty_start(
     state = hass.states.get("device_tracker.pc_408")
     assert state is not None
     assert hass.states.get("switch.pc_408_wan_access") is not None
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_device_tracker_icon_from_device_type(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """The Livebox device type picks the translation key, hence the icon."""
+    devices = AIOSysbus.__devices["status"]
+    devices[3]["Key"] = "AA:AA:AA:AA:AA:03"  # Google Bureau, Tablet Android
+    devices[8]["Key"] = "AA:AA:AA:AA:AA:08"  # HP Office Jet, Printer
+    devices[69]["Key"] = "AA:AA:AA:AA:AA:69"
+    devices[69]["DeviceType"] = "Unknown gadget"
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    registry = er.async_get(hass)
+    for entity_id, translation_key in (
+        ("device_tracker.google_bureau", "tablet"),
+        ("device_tracker.hp_office_jet", "printer"),
+        ("device_tracker.pc_408", "device"),
+    ):
+        entry = registry.async_get(entity_id)
+        assert entry is not None, entity_id
+        assert entry.translation_key == translation_key
