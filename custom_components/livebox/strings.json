@@ -260,8 +260,12 @@
     "wan_access_lock_failed": {
       "message": "Failed to lock WAN access of {name} ({key})."
     },
-    "invalid_auth": "The Livebox rejected the credentials.",
-    "communication_error": "Error while communicating with the Livebox: {error}"
+    "invalid_auth": {
+      "message": "The Livebox rejected the credentials."
+    },
+    "communication_error": {
+      "message": "Error while communicating with the Livebox: {error}"
+    }
   },
   "services": {
     "remove_call_missed": {

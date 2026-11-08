@@ -260,8 +260,12 @@
     "wan_access_lock_failed": {
       "message": "Impossible de bloquer l'accès Internet de {name} ({key})."
     },
-    "invalid_auth": "La Livebox a refusé les identifiants.",
-    "communication_error": "Erreur de communication avec la Livebox : {error}"
+    "invalid_auth": {
+      "message": "La Livebox a refusé les identifiants."
+    },
+    "communication_error": {
+      "message": "Erreur de communication avec la Livebox : {error}"
+    }
   },
   "services": {
     "remove_call_missed": {

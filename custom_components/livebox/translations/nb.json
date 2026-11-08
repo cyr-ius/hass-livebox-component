@@ -260,8 +260,12 @@
     "wan_access_lock_failed": {
       "message": "Kunne ikke sperre internettilgangen for {name} ({key})."
     },
-    "invalid_auth": "Liveboxen avviste påloggingsinformasjonen.",
-    "communication_error": "Feil under kommunikasjon med Liveboxen: {error}"
+    "invalid_auth": {
+      "message": "Liveboxen avviste påloggingsinformasjonen."
+    },
+    "communication_error": {
+      "message": "Feil under kommunikasjon med Liveboxen: {error}"
+    }
   },
   "services": {
     "remove_call_missed": {
