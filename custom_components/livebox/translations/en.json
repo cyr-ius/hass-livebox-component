@@ -268,7 +268,7 @@
       "name": "Remove missed calls",
       "description": "Removes a missed call, or all calls when no call ID is given.",
       "fields": {
-        "callId": {
+        "call_id": {
           "name": "Call ID",
           "description": "ID of the call, shown in the attributes of the missed call binary sensor. Leave empty to remove all calls."
         },

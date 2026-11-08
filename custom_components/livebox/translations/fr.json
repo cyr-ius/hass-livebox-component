@@ -268,7 +268,7 @@
       "name": "Supprimer les appels manqués",
       "description": "Supprime un appel manqué, ou tous les appels si aucun identifiant n'est indiqué.",
       "fields": {
-        "callId": {
+        "call_id": {
           "name": "Identifiant de l'appel",
           "description": "Identifiant de l'appel, visible dans les attributs du capteur binaire des appels manqués. Laisser vide pour supprimer tous les appels."
         },

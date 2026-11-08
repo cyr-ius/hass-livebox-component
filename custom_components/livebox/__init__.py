@@ -14,6 +14,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
+    ATTR_CALL_ID,
     CALLID,
     CONF_DISPLAY_DEVICES,
     DEFAULT_DISPLAY_DEVICES,
@@ -27,7 +28,12 @@ from .helpers import async_call_api
 type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
 
 CALLMISSED_SCHEMA = vol.Schema(
-    {vol.Optional(CALLID): str, vol.Optional(ATTR_CONFIG_ENTRY_ID): str}
+    {
+        vol.Optional(ATTR_CALL_ID): str,
+        # Name of the field before 3.0.0, still accepted.
+        vol.Optional(CALLID): str,
+        vol.Optional(ATTR_CONFIG_ENTRY_ID): str,
+    }
 )
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
@@ -61,7 +67,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             coordinator = entry.runtime_data
             await async_call_api(
                 coordinator.api.voiceservice.async_clear_calllist(
-                    {CALLID: call.data.get(CALLID)}
+                    {CALLID: call.data.get(ATTR_CALL_ID, call.data.get(CALLID))}
                 )
             )
             await coordinator.async_refresh()

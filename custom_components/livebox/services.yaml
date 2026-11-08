@@ -2,7 +2,7 @@
 ---
 remove_call_missed:
   fields:
-    callId:
+    call_id:
       example: '"666"'
       selector:
         text:

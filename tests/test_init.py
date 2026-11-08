@@ -32,10 +32,17 @@ async def test_remove_call_missed_targets_loaded_entries(
     await hass.services.async_call(
         DOMAIN,
         "remove_call_missed",
-        {"callId": "1", "config_entry_id": config_entry.entry_id},
+        {"call_id": "1", "config_entry_id": config_entry.entry_id},
         blocking=True,
     )
     clear.assert_awaited_once_with({"callId": "1"})
+
+    # Field name before 3.0.0.
+    clear.reset_mock()
+    await hass.services.async_call(
+        DOMAIN, "remove_call_missed", {"callId": "2"}, blocking=True
+    )
+    clear.assert_awaited_once_with({"callId": "2"})
 
     with pytest.raises(ServiceValidationError):
         await hass.services.async_call(

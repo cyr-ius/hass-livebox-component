@@ -20,6 +20,7 @@ DEFAULT_HOST = "192.168.1.1"
 DEFAULT_PORT = 80
 
 CALLID = "callId"
+ATTR_CALL_ID = "call_id"
 CONF_USE_TLS = "use_tls"
 CONF_VERIFY_TLS = "verify_tls"
 CONF_LAN_TRACKING = "lan_tracking"

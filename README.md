@@ -213,14 +213,16 @@ Removes missed calls from the call list of the Livebox.
 
 | Field             | Required | Description                                                                                                     |
 | ----------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
-| `callId`          | No       | ID of the call, shown in the `missed_calls` attribute of the _Call missed_ binary sensor. All calls if omitted. |
+| `call_id`         | No       | ID of the call, shown in the `missed_calls` attribute of the _Call missed_ binary sensor. All calls if omitted. |
 | `config_entry_id` | No       | Livebox whose call list is cleared. All configured Livebox if omitted.                                          |
 
 ```yaml
 action: livebox.remove_call_missed
 data:
-  callId: "666"
+  call_id: "666"
 ```
+
+The field was named `callId` before 3.0.0; this name is still accepted.
 
 ## Removal
 

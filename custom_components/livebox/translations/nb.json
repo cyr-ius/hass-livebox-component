@@ -268,7 +268,7 @@
       "name": "Fjern tapte anrop",
       "description": "Fjerner et tapt anrop, eller alle anrop hvis ingen anrops-ID er oppgitt.",
       "fields": {
-        "callId": {
+        "call_id": {
           "name": "Anrops-ID",
           "description": "ID-en til anropet, vist i attributtene til den binære sensoren for tapte anrop. La stå tom for å fjerne alle anrop."
         },
