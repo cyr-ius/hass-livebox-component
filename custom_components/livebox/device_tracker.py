@@ -18,6 +18,8 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import is_wired_device, is_wireless_device
 
+PARALLEL_UPDATES = 0
+
 _LOGGER = logging.getLogger(__name__)
 
 # Left side = Home Assistant attribute names, right side = raw Livebox keys.

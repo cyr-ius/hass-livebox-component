@@ -290,3 +290,72 @@ async def test_options_flow_defaults_are_valid(
     result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_DISPLAY_DEVICES] == DEFAULT_DISPLAY_DEVICES
+
+
+@pytest.fixture
+def reauth_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Return a configured Livebox whose password was changed."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Livebox 7 (012345678901234)",
+        unique_id="012345678901234",
+        data=MOCK_USER_INPUT,
+    )
+    entry.add_to_hass(hass)
+    return entry
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reauth(
+    hass: HomeAssistant, AIOSysbus: AsyncMock, reauth_entry: MockConfigEntry
+) -> None:
+    """New credentials are stored, a rejected password can be typed again."""
+    AIOSysbus.async_connect.side_effect = AuthenticationFailed("Login error")
+
+    with (
+        patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox,
+        patch.object(hass.config_entries, "async_schedule_reload") as mock_reload,
+    ):
+        mock_livebox.return_value = AIOSysbus
+        result = await reauth_entry.start_reauth_flow(hass)
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "reauth_confirm"
+        assert result["description_placeholders"] == {"name": reauth_entry.title}
+
+        credentials = {"username": "admin", "password": "new_password"}
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], credentials
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"] == {"base": "login_incorrect"}
+
+        AIOSysbus.async_connect.side_effect = None
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], credentials
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert reauth_entry.data == {**MOCK_USER_INPUT, **credentials}
+    mock_reload.assert_called_once_with(reauth_entry.entry_id)
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_reauth_other_livebox(
+    hass: HomeAssistant, AIOSysbus: AsyncMock, reauth_entry: MockConfigEntry
+) -> None:
+    """Credentials of another Livebox do not replace those of the entry."""
+    AIOSysbus.api_raw["DeviceInfo.async_get_deviceinfo"]["status"]["SerialNumber"] = (
+        "999999999999999"
+    )
+
+    with patch("custom_components.livebox.config_flow.AIOSysbus") as mock_livebox:
+        mock_livebox.return_value = AIOSysbus
+        result = await reauth_entry.start_reauth_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"username": "admin", "password": "new_password"}
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "unique_id_mismatch"
+    assert reauth_entry.data == MOCK_USER_INPUT

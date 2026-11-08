@@ -44,7 +44,18 @@ Add your device via the Integration menu
 
 You must have set a password for your Livebox router web administration page.
 
-The first time Home Assistant will connect to your Livebox, you will need to specify the password of livebox.
+The Livebox is discovered automatically (SSDP). Otherwise add it from **Settings** > **Devices & services** > **Add integration** > **Orange Livebox**, then fill in:
+
+| Parameter              | Default       | Description                                                                       |
+| ---------------------- | ------------- | --------------------------------------------------------------------------------- |
+| Host                   | `192.168.1.1` | IP address or hostname of the Livebox.                                            |
+| Username               | `admin`       | Administrator account of the Livebox.                                             |
+| Password               |               | Administrator password, printed on the Livebox label unless you changed it.       |
+| Port                   | `80`          | Port of the Livebox web interface (`443` over HTTPS).                             |
+| Use TLS                | No            | Connect to the Livebox over HTTPS.                                                |
+| Verify TLS certificate | Yes           | Check the certificate presented by the Livebox. Disable it for a self-signed one. |
+
+These settings can be changed later with **Reconfigure** on the Livebox entry. When the Livebox rejects the password (it was changed on the router, for instance), Home Assistant asks for the new one.
 
 ### Options configure
 

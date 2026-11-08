@@ -7,10 +7,15 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from aiosysbus import AIOSysbus
-from aiosysbus.exceptions import AiosysbusException, HttpRequestFailed
+from aiosysbus.exceptions import (
+    AiosysbusException,
+    AuthenticationFailed,
+    HttpRequestFailed,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -223,6 +228,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             }
             await self._async_save_session()
             return data
+        except AuthenticationFailed as error:
+            raise ConfigEntryAuthFailed(
+                translation_domain=DOMAIN,
+                translation_key="invalid_auth",
+            ) from error
         except AiosysbusException as error:
             # If the Livebox API is unreachable (empty reply, connection reset),
             # invalidate the session token so aiosysbus will re-authenticate
@@ -233,7 +243,6 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "Cleared session token after communication failure, "
                     "will re-authenticate on next update"
                 )
-            _LOGGER.error("Error while fetch data information: %s", error)
             raise UpdateFailed(
                 translation_domain=DOMAIN,
                 translation_key="update_failed",

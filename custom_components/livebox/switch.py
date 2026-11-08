@@ -15,6 +15,9 @@ from . import LiveboxConfigEntry
 from .const import DEVICE_WANACCESS_ICON, DOMAIN, GUESTWIFI_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
+from .helpers import async_call_api
+
+PARALLEL_UPDATES = 1
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -127,13 +130,13 @@ class LiveboxSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inconsisten
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
         description = cast(LiveboxSwitchEntityDescription, self.entity_description)
-        await description.turn_on(self.coordinator.api)
+        await async_call_api(description.turn_on(self.coordinator.api))
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
         description = cast(LiveboxSwitchEntityDescription, self.entity_description)
-        await description.turn_off(self.coordinator.api)
+        await async_call_api(description.turn_off(self.coordinator.api))
         await self.coordinator.async_request_refresh()
 
 
@@ -188,7 +191,9 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
         schedule = self._get_device_schedule()
         if schedule:
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Enable"}
-            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
+            result = await async_call_api(
+                self.coordinator.api.schedule.async_set_schedule(parameters)
+            )
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     translation_domain=DOMAIN,
@@ -205,7 +210,9 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
         schedule = self._get_device_schedule()
         if schedule:
             parameters = {"type": "ToD", "ID": self._device_key, "override": "Disable"}
-            result = await self.coordinator.api.schedule.async_set_schedule(parameters)
+            result = await async_call_api(
+                self.coordinator.api.schedule.async_set_schedule(parameters)
+            )
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     translation_domain=DOMAIN,
@@ -229,7 +236,9 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
                     "override": "Disable",
                 },
             }
-            result = await self.coordinator.api.schedule.async_add_schedule(parameters)
+            result = await async_call_api(
+                self.coordinator.api.schedule.async_add_schedule(parameters)
+            )
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
                     translation_domain=DOMAIN,

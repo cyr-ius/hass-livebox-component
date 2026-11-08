@@ -3,9 +3,10 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from aiosysbus.exceptions import HttpRequestFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.typing import WebSocketGenerator
@@ -80,3 +81,21 @@ async def test_livebox_device_cannot_be_removed(
 
     assert not await _remove(gateway.id)
     assert await _remove(client_device.id)
+
+
+async def test_remove_call_missed_communication_error(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """A Livebox error while clearing calls is reported as a translated error."""
+    AIOSysbus.voiceservice.async_clear_calllist = AsyncMock(
+        side_effect=HttpRequestFailed("boom")
+    )
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    with pytest.raises(HomeAssistantError) as err:
+        await hass.services.async_call(DOMAIN, "remove_call_missed", {}, blocking=True)
+
+    assert err.value.translation_key == "communication_error"

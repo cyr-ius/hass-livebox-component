@@ -12,6 +12,9 @@ from . import LiveboxConfigEntry
 from .const import CLEARCALLS_ICON, RESTART_ICON, RING_ICON
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
+from .helpers import async_call_api
+
+PARALLEL_UPDATES = 1
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -70,4 +73,4 @@ class Button(LiveboxEntity, ButtonEntity):  # pyrefly: ignore[inconsistent-inher
     async def async_press(self) -> None:
         """Triggers the button press service."""
         description = cast(LiveboxButtonEntityDescription, self.entity_description)
-        await description.value_fn(self.coordinator.api)()
+        await async_call_api(description.value_fn(self.coordinator.api)())

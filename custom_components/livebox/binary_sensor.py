@@ -19,6 +19,8 @@ from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
 
+PARALLEL_UPDATES = 0
+
 
 @dataclass(frozen=True, kw_only=True)
 class LiveboxBinarySensorEntityDescription(BinarySensorEntityDescription):

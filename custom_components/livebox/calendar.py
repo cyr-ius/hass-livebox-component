@@ -17,6 +17,8 @@ from . import LiveboxConfigEntry
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 
+PARALLEL_UPDATES = 0
+
 _LOGGER = logging.getLogger(__name__)
 
 

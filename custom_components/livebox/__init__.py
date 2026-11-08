@@ -14,6 +14,7 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import CALLID, DOMAIN, PLATFORMS
 from .coordinator import LiveboxDataUpdateCoordinator
+from .helpers import async_call_api
 
 type LiveboxConfigEntry = ConfigEntry[LiveboxDataUpdateCoordinator]
 
@@ -50,8 +51,10 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             )
         for entry in entries:
             coordinator = entry.runtime_data
-            await coordinator.api.voiceservice.async_clear_calllist(
-                {CALLID: call.data.get(CALLID)}
+            await async_call_api(
+                coordinator.api.voiceservice.async_clear_calllist(
+                    {CALLID: call.data.get(CALLID)}
+                )
             )
             await coordinator.async_refresh()
 

@@ -40,6 +40,18 @@
           "use_tls": "Connect to the Livebox over HTTPS.",
           "verify_tls": "Check the certificate presented by the Livebox. Disable it for a self-signed certificate."
         }
+      },
+      "reauth_confirm": {
+        "title": "Authenticate again",
+        "description": "The Livebox {name} rejected the credentials. Enter the current administrator password.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "data_description": {
+          "username": "Administrator account of the Livebox, usually admin.",
+          "password": "Administrator password, printed on the Livebox label by default."
+        }
       }
     },
     "error": {
@@ -51,7 +63,8 @@
     "abort": {
       "already_configured": "This Livebox is already configured.",
       "reconfigure_successful": "Reconfiguration was successful.",
-      "unique_id_mismatch": "The new settings point to a different Livebox."
+      "unique_id_mismatch": "The new settings point to a different Livebox.",
+      "reauth_successful": "Reauthentication was successful."
     }
   },
   "options": {
@@ -246,7 +259,9 @@
     },
     "wan_access_lock_failed": {
       "message": "Failed to lock WAN access of {name} ({key})."
-    }
+    },
+    "invalid_auth": "The Livebox rejected the credentials.",
+    "communication_error": "Error while communicating with the Livebox: {error}"
   },
   "services": {
     "remove_call_missed": {

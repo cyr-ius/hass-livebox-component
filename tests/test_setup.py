@@ -1,12 +1,14 @@
-"""Tests pour l'intégration Bbox2 utilisant config_entries."""
+"""Tests for the Livebox config entry setup."""
 
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from aiosysbus.exceptions import HttpRequestFailed
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from aiosysbus.exceptions import AuthenticationFailed, HttpRequestFailed
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
+
+from custom_components.livebox.const import DOMAIN
 
 
 @pytest.mark.parametrize("AIOSysbus", ["3", "5", "7", "7.1", "7.2"], indirect=True)
@@ -108,3 +110,23 @@ async def test_setup_retry_releases_session(
 
     assert config_entry.state == ConfigEntryState.SETUP_RETRY
     AIOSysbus.async_logout.assert_awaited_once()
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_rejected_credentials_start_reauth(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock | MagicMock,
+) -> None:
+    """Credentials rejected by the Livebox start a reauthentication flow."""
+    AIOSysbus.deviceinfo.async_get_deviceinfo.side_effect = AuthenticationFailed(
+        "Login error"
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert config_entry.state == ConfigEntryState.SETUP_ERROR
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert [flow["context"]["source"] for flow in flows] == [SOURCE_REAUTH]
+    assert flows[0]["step_id"] == "reauth_confirm"

@@ -40,6 +40,18 @@
           "use_tls": "Koble til Liveboxen over HTTPS.",
           "verify_tls": "Kontroller sertifikatet fra Liveboxen. Slå av ved selvsignert sertifikat."
         }
+      },
+      "reauth_confirm": {
+        "title": "Autentiser på nytt",
+        "description": "Liveboxen {name} avviste påloggingsinformasjonen. Angi gjeldende administratorpassord.",
+        "data": {
+          "username": "Brukernavn",
+          "password": "Passord"
+        },
+        "data_description": {
+          "username": "Administratorkontoen på Liveboxen, vanligvis admin.",
+          "password": "Administratorpassordet, som standard trykt på etiketten til Liveboxen."
+        }
       }
     },
     "error": {
@@ -51,7 +63,8 @@
     "abort": {
       "already_configured": "Denne Liveboxen er allerede konfigurert.",
       "reconfigure_successful": "Rekonfigureringen var vellykket.",
-      "unique_id_mismatch": "De nye innstillingene peker til en annen Livebox."
+      "unique_id_mismatch": "De nye innstillingene peker til en annen Livebox.",
+      "reauth_successful": "Reautentiseringen var vellykket."
     }
   },
   "options": {
@@ -246,7 +259,9 @@
     },
     "wan_access_lock_failed": {
       "message": "Kunne ikke sperre internettilgangen for {name} ({key})."
-    }
+    },
+    "invalid_auth": "Liveboxen avviste påloggingsinformasjonen.",
+    "communication_error": "Feil under kommunikasjon med Liveboxen: {error}"
   },
   "services": {
     "remove_call_missed": {
