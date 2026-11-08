@@ -1,9 +1,8 @@
-from ipaddress import ip_address
-
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNAME
-from homeassistant.helpers.service_info.zeroconf import (
-    ATTR_PROPERTIES_ID,
-    ZeroconfServiceInfo,
+from homeassistant.helpers.service_info.ssdp import (
+    ATTR_UPNP_FRIENDLY_NAME,
+    ATTR_UPNP_SERIAL,
+    SsdpServiceInfo,
 )
 
 from custom_components.livebox.const import CONF_USE_TLS, CONF_VERIFY_TLS
@@ -18,16 +17,14 @@ MOCK_USER_INPUT = {
 }
 
 
-MOCK_DISCOVERY_INFO = ZeroconfServiceInfo(
-    ip_address=ip_address("192.168.1.1"),
-    ip_addresses=[ip_address("192.168.1.1")],
-    hostname="mock_hostname",
-    name="_tcp.local.",
-    port=None,
-    properties={
-        ATTR_PROPERTIES_ID: "00:00:00:00:00:00",
+MOCK_SSDP_INFO = SsdpServiceInfo(
+    ssdp_usn="mock_usn",
+    ssdp_st="urn:schemas-upnp-org:device:InternetGatewayDevice:2",
+    ssdp_location="http://192.168.1.1:49152/gatedesc.xml",
+    upnp={
+        ATTR_UPNP_FRIENDLY_NAME: "Orange Livebox",
+        ATTR_UPNP_SERIAL: "012345678901234",
     },
-    type="mock_type",
 )
 
 # Raw `NMC.Reboot.Reboot:get` / `NMC.Reboot:get` replies, as returned by a

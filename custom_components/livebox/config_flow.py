@@ -124,10 +124,6 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             schema = self.add_suggested_values_to_schema(schema, suggested_values)
         return schema
 
-    async def async_step_import(self, import_config) -> ConfigFlowResult:
-        """Import a config entry from configuration.yaml."""
-        return await self.async_step_user(import_config)
-
     async def async_step_user(
         self, user_input: Mapping[str, Any] | None = None
     ) -> ConfigFlowResult:

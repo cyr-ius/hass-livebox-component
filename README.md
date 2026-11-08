@@ -97,3 +97,30 @@ On the contrary, the Livebox immediately reports devices newly connected, so the
 ## Sensor
 
 This platform offers you sensors to monitor a Livebox router. The monitored conditions are instant upload and download rates in Mb/s.
+
+## Actions
+
+### `livebox.remove_call_missed`
+
+Removes missed calls from the call list of the Livebox.
+
+| Field             | Required | Description                                                                                                     |
+| ----------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `callId`          | No       | ID of the call, shown in the `missed_calls` attribute of the _Call missed_ binary sensor. All calls if omitted. |
+| `config_entry_id` | No       | Livebox whose call list is cleared. All configured Livebox if omitted.                                          |
+
+```yaml
+action: livebox.remove_call_missed
+data:
+  callId: "666"
+```
+
+## Removal
+
+This integration follows the standard integration removal process; no extra step is required.
+
+1. Go to **Settings** > **Devices & services** and select **Orange Livebox**.
+2. Open the menu (⋮) of the Livebox entry and select **Delete**.
+3. To remove the files as well, open **HACS**, select **Orange Livebox**, open its menu and select **Remove**, then restart Home Assistant.
+
+The session opened on the Livebox is closed when the entry is deleted.
