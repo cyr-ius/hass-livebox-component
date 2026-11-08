@@ -378,3 +378,4 @@ async def test_switch_communication_error(
 
     assert err.value.translation_key == "communication_error"
     assert err.value.translation_placeholders == {"error": "boom"}
+    assert str(err.value) == "Error while communicating with the Livebox: boom"

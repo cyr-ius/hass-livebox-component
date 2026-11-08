@@ -130,3 +130,4 @@ async def test_rejected_credentials_start_reauth(
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert [flow["context"]["source"] for flow in flows] == [SOURCE_REAUTH]
     assert flows[0]["step_id"] == "reauth_confirm"
+    assert config_entry.reason == "The Livebox rejected the credentials"
