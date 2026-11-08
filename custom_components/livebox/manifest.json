@@ -1,6 +1,10 @@
 {
   "domain": "livebox",
   "name": "Orange Livebox",
+  "categories": [
+    "computers_network.routers_network",
+    "presence_location.network_presence"
+  ],
   "codeowners": ["@cyr-ius"],
   "config_flow": true,
   "dependencies": ["ssdp"],
