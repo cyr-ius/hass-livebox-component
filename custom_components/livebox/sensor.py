@@ -3,7 +3,7 @@
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, replace
-from typing import Any, Final, cast
+from typing import Any, Final
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    EntityCategory,
     UnitOfDataRate,
     UnitOfInformation,
     UnitOfTime,
@@ -20,8 +21,8 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.entity import EntityCategory, EntityDescription
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
 
 from . import LiveboxConfigEntry
 from .const import DOMAIN
@@ -65,12 +66,12 @@ def get_rolling_32_bit_value_fn(
     previous_uptime: int = 0
     rolls: int = 0
 
-    def value_fn(coordinator_data) -> int:
+    def value_fn(coordinator_data: dict[str, Any]) -> int:
         nonlocal previous_reading
         nonlocal previous_uptime
         nonlocal rolls
-        current_uptime = coordinator_data.get("infos", {}).get("UpTime") or 0
-        current_reading = read_fn(coordinator_data)
+        current_uptime: int = coordinator_data.get("infos", {}).get("UpTime") or 0
+        current_reading: int = read_fn(coordinator_data)
 
         if current_uptime < previous_uptime:
             # The router has reset, so clear up previous counter value
@@ -91,7 +92,7 @@ def get_rolling_32_bit_value_fn(
 
 def _fiber_power_dbm(coordinator_data: dict[str, Any], key: str) -> float | None:
     """Return an optical power in dBm, None when the router gave no reading."""
-    value = find_item(coordinator_data, f"fiber_status.{key}")
+    value: float | None = find_item(coordinator_data, f"fiber_status.{key}")
     # 0 dBm is not a plausible GPON reading: some gateways (Funbox 6) report 0
     # for the measurements they do not support.
     if not value:
@@ -115,9 +116,10 @@ def _fiber_reading(
 
 def _onu_state(coordinator_data: dict[str, Any]) -> str | None:
     """Return the ONU state, whose key casing differs between firmwares."""
-    return find_item(coordinator_data, "fiber_status.ONUState") or find_item(
-        coordinator_data, "fiber_status.OnuState"
-    )
+    state: str | None = find_item(
+        coordinator_data, "fiber_status.ONUState"
+    ) or find_item(coordinator_data, "fiber_status.OnuState")
+    return state
 
 
 def get_closure_value_fn(path: str) -> Callable[..., Any]:
@@ -125,17 +127,17 @@ def get_closure_value_fn(path: str) -> Callable[..., Any]:
     return lambda x: find_item(x, path)
 
 
-def kilobits_per_second_to_megabits_per_second(value: Any) -> float:
+def kilobits_per_second_to_megabits_per_second(value: float) -> float:
     """Convert a Kbit/s API value to Mbit/s."""
     return value / 1000
 
 
-def kilobits_per_second_to_gigabits_per_second(value: Any) -> float:
+def kilobits_per_second_to_gigabits_per_second(value: float) -> float:
     """Convert a Kbit/s API value to Gbit/s."""
     return value / 1000000
 
 
-def megabits_per_second_to_gigabits_per_second(value: Any) -> float:
+def megabits_per_second_to_gigabits_per_second(value: float) -> float:
     """Convert a Mbit/s API value to Gbit/s."""
     return value / 1000
 
@@ -471,8 +473,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensors."""
     coordinator = entry.runtime_data
-    entities = []
-    tracked = set()
+    entities: list[LiveboxSensor] = []
+    tracked: set[str] = set()
     linktype = coordinator.data.get("wan_status", {}).get("LinkType", "").lower()
 
     sensor_stats = []
@@ -578,27 +580,23 @@ def async_add_new_device_entities(
         async_add_entities(new_entities)
 
 
-class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsistent-inheritance]
+class LiveboxSensor(LiveboxEntity, SensorEntity):
     """Representation of a livebox sensor."""
 
-    def __init__(
-        self,
-        coordinator: LiveboxDataUpdateCoordinator,
-        description: EntityDescription,
-    ) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator, description)
+    entity_description: (
+        LiveboxSensorEntityDescription | LiveboxDeviceSensorEntityDescription
+    )
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> StateType:
         """Return the native value of the device."""
-        description = cast(LiveboxSensorEntityDescription, self.entity_description)
-        return description.value_fn(self.coordinator.data)
+        value: StateType = self.entity_description.value_fn(self.coordinator.data)
+        return value
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return the device state attributes."""
-        description = cast(LiveboxSensorEntityDescription, self.entity_description)
+        description = self.entity_description
         if description.attrs:
             return {
                 key: attr(self.coordinator.data)
@@ -607,9 +605,7 @@ class LiveboxSensor(LiveboxEntity, SensorEntity):  # pyrefly: ignore[inconsisten
         return None
 
 
-class LiveboxDeviceSensor(
-    LiveboxSensor,
-):  # pyrefly: ignore[inconsistent-inheritance]
+class LiveboxDeviceSensor(LiveboxSensor):
     """Representation of a per-device sensor."""
 
     def __init__(
@@ -621,22 +617,6 @@ class LiveboxDeviceSensor(
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, description)
-        self._device_key = device_key
-        self._device_name = device_name
-
-    @property
-    def native_value(self) -> float | int | None:
-        """Return the native value of the device."""
-        description = cast(
-            LiveboxDeviceSensorEntityDescription,
-            self.entity_description,
-        )
-        return description.value_fn(self.coordinator.data)
-
-    @property
-    def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
-        """Return device info to link the sensor to the Livebox device."""
-        return DeviceInfo(
-            name=self._device_name,
-            identifiers={(DOMAIN, self._device_key)},
+        self._attr_device_info = DeviceInfo(
+            name=device_name, identifiers={(DOMAIN, device_key)}
         )

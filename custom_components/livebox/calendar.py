@@ -2,9 +2,8 @@
 
 import datetime
 import logging
-from typing import Any, cast
+from typing import Any
 
-from dateutil import parser
 from homeassistant.components.calendar import (
     CalendarEntity,
     CalendarEntityDescription,
@@ -12,6 +11,7 @@ from homeassistant.components.calendar import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.util import dt as dt_util
 
 from . import LiveboxConfigEntry
 from .coordinator import LiveboxDataUpdateCoordinator
@@ -39,9 +39,7 @@ class LiveboxCallLogCalendarEntityDescription(CalendarEntityDescription):
     initial_color: str = "#ff6600"
 
 
-class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
-    LiveboxEntity, CalendarEntity
-):
+class LiveboxCallLogCalendar(LiveboxEntity, CalendarEntity):
     """A homeassistant calendar entity that represents the calls in the call log."""
 
     def __init__(self, coordinator: LiveboxDataUpdateCoordinator) -> None:
@@ -55,13 +53,13 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
         super().__init__(coordinator, entity_description)
 
         self._previous_uptime = 0
-        self._calls = {}
+        self._calls: dict[int, CalendarEvent] = {}
         self._max_call_id = 0
 
     @property
-    def event(self) -> CalendarEvent:
+    def event(self) -> CalendarEvent | None:
         """Returns None since there will never be a 'next event'."""
-        return None  # pyrefly: ignore
+        return None
 
     async def async_get_events(
         self,
@@ -72,8 +70,8 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
         """Return calls within a datetime range."""
         assert start_date < end_date
 
-        infos = cast(dict[str, Any], self.coordinator.data.get("infos"))
-        current_uptime = infos.get("UpTime") or 0
+        infos: dict[str, Any] = self.coordinator.data.get("infos") or {}
+        current_uptime: int = infos.get("UpTime") or 0
         if current_uptime < self._previous_uptime:
             # Router has reset
             self._calls = {}
@@ -94,7 +92,8 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
                     duration = int(call["duration"] or 0)
                 except TypeError, ValueError:
                     duration = 0
-                call_time = parser.parse(call["date"])
+                if (call_time := dt_util.parse_datetime(call["date"])) is None:
+                    continue
                 call_type = "Call" if call["status"] == "succeeded" else "Missed "
                 call_direction = "to" if call["origin"] == "local" else "from"
 

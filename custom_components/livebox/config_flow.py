@@ -6,7 +6,7 @@ from contextlib import suppress
 from typing import Any
 from urllib.parse import urlparse
 
-import voluptuous as vol
+import probatio as vol
 from aiosysbus import AIOSysbus
 from aiosysbus.exceptions import (
     AiosysbusException,
@@ -73,7 +73,9 @@ class LiveboxFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry):
+    def async_get_options_flow(
+        config_entry: ConfigEntry,
+    ) -> LiveboxOptionsFlowHandler:
         """Get option flow."""
         return LiveboxOptionsFlowHandler()
 

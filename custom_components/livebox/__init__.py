@@ -3,7 +3,7 @@
 import logging
 import re
 
-import voluptuous as vol
+import probatio as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_CONFIG_ENTRY_ID, EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import Event, HomeAssistant, ServiceCall
@@ -11,6 +11,7 @@ from homeassistant.exceptions import ConfigEntryNotReady, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.typing import ConfigType
 
 from .const import CALLID, DOMAIN, PLATFORMS
 from .coordinator import LiveboxDataUpdateCoordinator
@@ -32,7 +33,7 @@ _LEGACY_WAN_ACCESS_RE = re.compile(
 )
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Livebox integration."""
 
     async def async_remove_cmissed(call: ServiceCall) -> None:

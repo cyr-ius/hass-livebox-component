@@ -81,7 +81,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up device tracker from config entry."""
     coordinator = entry.runtime_data
-    tracked = set()
+    tracked: set[str] = set()
 
     @callback
     def async_update_router() -> None:
@@ -161,10 +161,7 @@ DEVICE_TYPE_TRANSLATION_KEYS: dict[str, str] = {
 }
 
 
-@callback
-class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
-    LiveboxEntity, ScannerEntity
-):
+class LiveboxDeviceScannerEntity(LiveboxEntity, ScannerEntity):
     """Represent a tracked device."""
 
     _attr_name = None
@@ -215,7 +212,7 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         timeout_tracking = self.coordinator.config_entry.options.get(
             CONF_TRACKING_TIMEOUT, DEFAULT_TRACKING_TIMEOUT
         )
-        status = self._device.get("Active", False)
+        status: bool = self._device.get("Active", False)
         if status is True:
             self._old_status = datetime.today() + timedelta(seconds=timeout_tracking)
         if status is False and self._old_status > datetime.today():
@@ -224,8 +221,10 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
         _LOGGER.debug("Is Connected: %s", status)
         return status
 
-    @property
-    def device_info(self) -> DeviceInfo | None:  # pyrefly: ignore
+    # ScannerEntity creates no device; every Livebox client gets its own, linked
+    # to the Livebox or the repeater it is connected to.
+    @property  # type: ignore[misc]
+    def device_info(self) -> DeviceInfo:
         """Return device info to link entity to the Livebox device."""
         if isinstance(self._device_key, str):
             device_identifier = self._device_key
@@ -233,11 +232,7 @@ class LiveboxDeviceScannerEntity(  # pyrefly: ignore[inconsistent-inheritance]
             device_identifier = self.name
         else:
             device_identifier = DOMAIN
-        return DeviceInfo(
-            name=self._device.get("Name"),
-            identifiers={(DOMAIN, device_identifier)},
-            via_device_id=self.coordinator.get_parent_device_id(self._device_key),
-        )
+        return self._client_device_info(device_identifier, self._device.get("Name"))
 
     @callback
     def _handle_coordinator_update(self) -> None:

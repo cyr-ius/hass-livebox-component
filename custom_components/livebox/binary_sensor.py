@@ -2,19 +2,18 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final, cast
+from typing import Any, Final
 
 from homeassistant.components.binary_sensor import (
-    BinarySensorDeviceClass,
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import find_item
 
@@ -98,35 +97,23 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class LiveboxBinarySensor(  # pyrefly: ignore[inconsistent-inheritance]
-    LiveboxEntity, BinarySensorEntity
-):
+class LiveboxBinarySensor(LiveboxEntity, BinarySensorEntity):
     """Livebox binary sensor."""
 
-    def __init__(
-        self,
-        coordinator: LiveboxDataUpdateCoordinator,
-        description: LiveboxBinarySensorEntityDescription,
-    ) -> None:
-        """Initialize."""
-        super().__init__(coordinator, description)
+    entity_description: LiveboxBinarySensorEntityDescription
 
     @property
     def is_on(self) -> bool:
         """Return state."""
-        description = cast(
-            LiveboxBinarySensorEntityDescription, self.entity_description
-        )
+        description = self.entity_description
         if (idx := description.index) is not None:
-            return description.value_fn(self.coordinator.data, idx)
-        return description.value_fn(self.coordinator.data)
+            return bool(description.value_fn(self.coordinator.data, idx))
+        return bool(description.value_fn(self.coordinator.data))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the device state attributes."""
-        description = cast(
-            LiveboxBinarySensorEntityDescription, self.entity_description
-        )
+        description = self.entity_description
         attributes = {}
         for key, attr in description.attrs.items():
             if (idx := description.index) is not None:

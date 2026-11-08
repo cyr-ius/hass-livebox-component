@@ -24,7 +24,7 @@ This repository uses [`uv`](https://docs.astral.sh/uv/) for local development.
 ```bash
 uv sync --group dev
 uv run pytest
-uv run pyrefly check custom_components tests
+uv run mypy
 uv run pre-commit run --all-files
 ```
 
