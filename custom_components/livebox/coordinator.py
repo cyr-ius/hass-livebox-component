@@ -151,8 +151,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
             product_class = infos.get("ProductClass")
             if not serial or not product_class:
                 raise UpdateFailed(
-                    "Livebox returned incomplete device info "
-                    f"(SerialNumber={serial!r}, ProductClass={product_class!r})"
+                    translation_domain=DOMAIN,
+                    translation_key="incomplete_device_info",
+                    translation_placeholders={
+                        "serial": repr(serial),
+                        "product_class": repr(product_class),
+                    },
                 )
             self.unique_id = serial
             match product_class:
@@ -230,7 +234,11 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator):
                     "will re-authenticate on next update"
                 )
             _LOGGER.error("Error while fetch data information: %s", error)
-            raise UpdateFailed(error) from error
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="update_failed",
+                translation_placeholders={"error": str(error)},
+            ) from error
 
     async def async_get_infos(self) -> dict[str, Any]:
         """Get router infos."""

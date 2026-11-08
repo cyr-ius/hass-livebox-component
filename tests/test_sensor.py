@@ -269,7 +269,7 @@ async def test_device_metric_sensors_are_created_for_wifi_clients(
     assert float(_state("aa_bb_cc_dd_ee_ff_rx_bytes").state) == 0.000654
     assert float(_state("aa_bb_cc_dd_ee_ff_signal_strength").state) == -41
     assert float(_state("aa_bb_cc_dd_ee_ff_signal_noise_ratio").state) == 32
-    assert downlink.attributes["friendly_name"] == "Test device Downlink Rate"
+    assert downlink.attributes["friendly_name"] == "Test device Downlink rate"
 
     entry = entity_registry.async_get(downlink.entity_id)
     assert entry is not None and entry.device_id is not None

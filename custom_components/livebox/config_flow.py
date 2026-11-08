@@ -20,6 +20,11 @@ from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_PORT, CONF_USERNA
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 from homeassistant.helpers.service_info.ssdp import ATTR_UPNP_SERIAL, SsdpServiceInfo
 
 from .const import (
@@ -211,7 +216,13 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                         ): int,
                         vol.Required(
                             CONF_DISPLAY_DEVICES, default=DEFAULT_DISPLAY_DEVICES
-                        ): vol.In(["All", DEFAULT_DISPLAY_DEVICES]),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=["All", DEFAULT_DISPLAY_DEVICES],
+                                mode=SelectSelectorMode.DROPDOWN,
+                                translation_key=CONF_DISPLAY_DEVICES,
+                            )
+                        ),
                     },
                 ),
                 {

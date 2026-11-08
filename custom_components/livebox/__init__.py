@@ -43,7 +43,11 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             if entry_id is None or entry.entry_id == entry_id
         ]
         if entry_id is not None and not entries:
-            raise ServiceValidationError(f"Livebox entry {entry_id} is not loaded")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="entry_not_loaded",
+                translation_placeholders={"entry_id": entry_id},
+            )
         for entry in entries:
             coordinator = entry.runtime_data
             await coordinator.api.voiceservice.async_clear_calllist(

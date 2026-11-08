@@ -47,7 +47,7 @@ class LiveboxCallLogCalendar(  # pyrefly: ignore[inconsistent-inheritance]
 
         entity_description = LiveboxCallLogCalendarEntityDescription(
             key="call_log_calendar",
-            name="Call Log",
+            translation_key="call_log",
         )
 
         super().__init__(coordinator, entity_description)

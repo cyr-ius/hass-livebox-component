@@ -197,7 +197,6 @@ def _get_associated_wifi_metric_value_fn(
 DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     {
         "key": "downlink_rate",
-        "name": "Downlink Rate",
         "icon": DOWNLOAD_ICON,
         "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
             device_key, "LastDataDownlinkRate"
@@ -209,7 +208,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     },
     {
         "key": "uplink_rate",
-        "name": "Uplink Rate",
         "icon": UPLOAD_ICON,
         "value_fn_factory": lambda device_key: _get_wireless_device_rate_value_fn(
             device_key, "LastDataUplinkRate"
@@ -221,7 +219,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     },
     {
         "key": "tx_bytes",
-        "name": "Tx Bytes",
         "icon": UPLOAD_ICON,
         "value_fn_factory": lambda device_key: _get_associated_wifi_metric_value_fn(
             device_key, "TxBytes", 0
@@ -233,7 +230,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     },
     {
         "key": "rx_bytes",
-        "name": "Rx Bytes",
         "icon": DOWNLOAD_ICON,
         "value_fn_factory": lambda device_key: _get_associated_wifi_metric_value_fn(
             device_key, "RxBytes", 0
@@ -245,7 +241,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     },
     {
         "key": "signal_strength",
-        "name": "Signal Strength",
         "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
             device_key, "SignalStrength", None
         ),
@@ -255,7 +250,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
     },
     {
         "key": "signal_noise_ratio",
-        "name": "Signal Noise Ratio",
         "value_fn_factory": lambda device_key: _get_wireless_device_value_fn(
             device_key, "SignalNoiseRatio", None
         ),
@@ -268,7 +262,6 @@ DEVICE_SENSOR_TYPES: Final[list[dict[str, Any]]] = [
 SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     LiveboxSensorEntityDescription(
         key="down",
-        name="xDSL Download",
         icon=DOWNLOAD_ICON,
         translation_key="down_rate",
         value_fn=lambda x: find_item(x, "dsl_status.DownstreamCurrRate", 0),
@@ -291,7 +284,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="up",
-        name="xDSL Upload",
         icon=UPLOAD_ICON,
         translation_key="up_rate",
         value_fn=lambda x: x.get("dsl_status", {}).get("UpstreamCurrRate", 0),
@@ -312,7 +304,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="wifi_rx",
-        name="Wifi Rx",
         icon="mdi:wifi-arrow-down",
         value_fn=lambda x: find_item(x, "wifi_stats.RxBytes", 0),
         rolling_32_bit=True,
@@ -325,7 +316,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="wifi_tx",
-        name="Wifi Tx",
         icon="mdi:wifi-arrow-up",
         value_fn=lambda x: find_item(x, "wifi_stats.TxBytes", 0),
         rolling_32_bit=True,
@@ -338,7 +328,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="fiber_power_rx",
-        name="Fiber Power Rx",
         value_fn=lambda x: _fiber_power_dbm(x, "SignalRxPower"),
         exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
@@ -363,7 +352,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="fiber_power_tx",
-        name="Fiber Power Tx",
         value_fn=lambda x: _fiber_power_dbm(x, "SignalTxPower"),
         exists_fn=lambda coordinator: coordinator.has_ont,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
@@ -389,7 +377,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="fiber_tx",
-        name="Fiber Tx",
         icon=UPLOAD_ICON,
         value_fn=lambda x: find_item(x, "fiber_stats.TxBytes", 0),
         rolling_32_bit=True,
@@ -402,7 +389,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="fiber_rx",
-        name="Fiber Rx",
         icon=DOWNLOAD_ICON,
         value_fn=lambda x: find_item(x, "fiber_stats.RxBytes", 0),
         rolling_32_bit=True,
@@ -415,7 +401,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="callers",
-        name="Callers",
         icon=PHONE_ICON,
         value_fn=lambda x: len(x.get("callers", {})),
         state_class=SensorStateClass.TOTAL,
@@ -424,7 +409,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="upnp",
-        name="Ports forwarding",
         value_fn=lambda x: len(x.get("upnp", {})),
         state_class=SensorStateClass.TOTAL,
         translation_key="upnp",
@@ -433,7 +417,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="dhcp_leases",
-        name="DHCP Leases",
         value_fn=lambda x: len(x.get("dhcp_leases", {})),
         state_class=SensorStateClass.TOTAL,
         translation_key="dhcp_leases",
@@ -442,7 +425,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="guest_dhcp_leases",
-        name="Guest DHCP Leases",
         value_fn=lambda x: len(x.get("guest_dhcp_leases", {})),
         state_class=SensorStateClass.TOTAL,
         translation_key="guest_dhcp_leases",
@@ -451,7 +433,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="last_reboot_reason",
-        name="Last reboot reason",
         icon="mdi:restart-alert",
         value_fn=lambda x: (
             find_item(x, "reboot_log.shutdown_reason")
@@ -476,7 +457,6 @@ SENSOR_TYPES: Final[list[LiveboxSensorEntityDescription]] = [
     ),
     LiveboxSensorEntityDescription(
         key="uptime",
-        name="Uptime",
         icon="mdi:progress-clock",
         value_fn=lambda x: find_item(x, "infos.UpTime", 0),
         native_unit_of_measurement=UnitOfTime.SECONDS,
@@ -504,9 +484,9 @@ async def async_setup_entry(
         sensor_stats.append(
             LiveboxSensorEntityDescription(
                 key=f"{name}_rate_rx",
-                name=f"{item['friendly_name']} Rate Rx",
                 value_fn=get_closure_value_fn(f"stats.{name}.rate_rx"),
-                translation_key=f"{name}_rate_rx",
+                translation_key="interface_rate_rx",
+                translation_placeholders={"interface": item["friendly_name"]},
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 state_class=SensorStateClass.MEASUREMENT,
@@ -516,9 +496,9 @@ async def async_setup_entry(
         sensor_stats.append(
             LiveboxSensorEntityDescription(
                 key=f"{name}_rate_tx",
-                name=f"{item['friendly_name']} Rate Tx",
                 value_fn=get_closure_value_fn(f"stats.{name}.rate_tx"),
-                translation_key=f"{name}_rate_tx",
+                translation_key="interface_rate_tx",
+                translation_placeholders={"interface": item["friendly_name"]},
                 native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 suggested_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
                 state_class=SensorStateClass.MEASUREMENT,
@@ -577,7 +557,7 @@ def async_add_new_device_entities(
 
             description = LiveboxDeviceSensorEntityDescription(
                 key=entity_key,
-                name=template["name"],
+                translation_key=template["key"],
                 icon=template.get("icon"),
                 value_fn=template["value_fn_factory"](device_key),
                 native_unit_of_measurement=template.get("native_unit_of_measurement"),

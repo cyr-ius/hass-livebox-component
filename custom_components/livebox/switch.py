@@ -29,7 +29,6 @@ class LiveboxSwitchEntityDescription(SwitchEntityDescription):
 SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
-        name="Wifi",
         translation_key="wifi_switch",
         value_fn=lambda x: x.get("wifi"),
         turn_on=lambda x: x.nmc.async_set_wifi({"Enable": True, "Status": True}),
@@ -37,7 +36,6 @@ SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        name="Guest Wifi",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: x.get("guest_wifi"),
@@ -49,7 +47,6 @@ SWITCH_TYPES: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
 SWITCH_TYPES_5: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     LiveboxSwitchEntityDescription(
         key="wifi",
-        name="Wifi",
         translation_key="wifi_switch",
         value_fn=lambda x: x.get("wifi"),
         turn_on=lambda x: x.nemo.async_wifi(True),
@@ -57,7 +54,6 @@ SWITCH_TYPES_5: Final[tuple[LiveboxSwitchEntityDescription, ...]] = (
     ),
     LiveboxSwitchEntityDescription(
         key="guest_wifi",
-        name="Guest Wifi",
         icon=GUESTWIFI_ICON,
         translation_key="guest_wifi",
         value_fn=lambda x: x.get("guest_wifi"),
@@ -92,7 +88,9 @@ async def async_setup_entry(
             entities.append(
                 DeviceWANAccessSwitch(
                     coordinator,
-                    SwitchEntityDescription(key=f"{key}_wan_access", name="WAN access"),
+                    SwitchEntityDescription(
+                        key=f"{key}_wan_access", translation_key="wan_access"
+                    ),
                     device,
                 )
             )
@@ -152,7 +150,9 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, description)
-        self._device_key = device.get("Key", self.name)
+        self._device_key = device.get(
+            "Key", description.key.removesuffix("_wan_access")
+        )
         self._device = device
         self._attr_unique_id = f"{coordinator.unique_id or DOMAIN}_{description.key}"
 
@@ -191,9 +191,12 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
             result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to unlock device "
-                    f"{self._device.get('Name')} ({self._device_key}) "
-                    "WAN access"
+                    translation_domain=DOMAIN,
+                    translation_key="wan_access_unlock_failed",
+                    translation_placeholders={
+                        "name": str(self._device.get("Name")),
+                        "key": str(self._device_key),
+                    },
                 )
             await self.coordinator.async_request_refresh()
 
@@ -205,9 +208,12 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
             result = await self.coordinator.api.schedule.async_set_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to lock device "
-                    f"{self._device.get('Name')} ({self._device_key}) "
-                    "WAN access"
+                    translation_domain=DOMAIN,
+                    translation_key="wan_access_lock_failed",
+                    translation_placeholders={
+                        "name": str(self._device.get("Name")),
+                        "key": str(self._device_key),
+                    },
                 )
             await self.coordinator.async_request_refresh()
         else:
@@ -226,8 +232,11 @@ class DeviceWANAccessSwitch(LiveboxEntity, SwitchEntity):  # pyrefly: ignore[inc
             result = await self.coordinator.api.schedule.async_add_schedule(parameters)
             if not isinstance(result, dict) or not result.get("status"):
                 raise HomeAssistantError(
-                    f"Fail to lock device "
-                    f"{self._device.get('Name')} ({self._device_key}) "
-                    "WAN access"
+                    translation_domain=DOMAIN,
+                    translation_key="wan_access_lock_failed",
+                    translation_placeholders={
+                        "name": str(self._device.get("Name")),
+                        "key": str(self._device_key),
+                    },
                 )
             await self.coordinator.async_request_refresh()

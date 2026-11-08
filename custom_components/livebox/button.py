@@ -24,21 +24,18 @@ class LiveboxButtonEntityDescription(ButtonEntityDescription):
 BUTTON_TYPES: Final[tuple[LiveboxButtonEntityDescription, ...]] = (
     LiveboxButtonEntityDescription(
         key="restart",
-        name="Livebox restart",
         icon=RESTART_ICON,
         translation_key="restart_btn",
         value_fn=lambda x: x.nmc.async_reboot,
     ),
     LiveboxButtonEntityDescription(
         key="ring",
-        name="Ring your phone",
         icon=RING_ICON,
         translation_key="ring_btn",
         value_fn=lambda x: x.voiceservice.async_ring,
     ),
     LiveboxButtonEntityDescription(
         key="clear_calls",
-        name="Clear calls",
         icon=CLEARCALLS_ICON,
         translation_key="cmissed_clear_btn",
         value_fn=lambda x: x.voiceservice.async_clear_calllist,
