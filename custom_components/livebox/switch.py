@@ -12,7 +12,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LiveboxConfigEntry
-from .const import DOMAIN
+from .const import CONF_WAN_ACCESS, DEFAULT_WAN_ACCESS, DOMAIN
 from .coordinator import LiveboxDataUpdateCoordinator
 from .entity import LiveboxEntity
 from .helpers import async_call_api
@@ -77,6 +77,9 @@ async def async_setup_entry(
     ]
 
     async_add_entities(entities)
+
+    if not entry.options.get(CONF_WAN_ACCESS, DEFAULT_WAN_ACCESS):
+        return
 
     wan_access: set[str] = set()
 

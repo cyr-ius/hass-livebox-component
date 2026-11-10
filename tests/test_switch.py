@@ -12,7 +12,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from sqlalchemy import false
 
-from custom_components.livebox.const import DOMAIN
+from custom_components.livebox.const import CONF_WAN_ACCESS, DOMAIN
 
 ISSUE_191 = "issue_191_repeater_topology_sanitized.json"
 
@@ -379,3 +379,47 @@ async def test_switch_communication_error(
     assert err.value.translation_key == "communication_error"
     assert err.value.translation_placeholders == {"error": "boom"}
     assert str(err.value) == "Error while communicating with the Livebox: boom"
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_wan_access_switches_off(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """With the option off, no WAN access switch is created nor schedule polled."""
+    hass.config_entries.async_update_entry(
+        config_entry, options={**config_entry.options, CONF_WAN_ACCESS: False}
+    )
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("switch.pc_408_wan_access") is None
+    AIOSysbus.schedule.async_get_schedule.assert_not_called()
+    assert config_entry.runtime_data.data["devices_wan_access"] == {}
+    # The other switches are still created.
+    assert hass.states.async_entity_ids(Platform.SWITCH)
+
+
+@pytest.mark.parametrize("AIOSysbus", ["7"], indirect=True)
+async def test_wan_access_switches_removed_by_options(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    AIOSysbus: AsyncMock,
+) -> None:
+    """Turning the option off removes the existing WAN access switches."""
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    entity_registry = er.async_get(hass)
+    assert entity_registry.async_get("switch.pc_408_wan_access") is not None
+
+    result = await hass.config_entries.options.async_init(config_entry.entry_id)
+    await hass.config_entries.options.async_configure(
+        result["flow_id"], {**config_entry.options, CONF_WAN_ACCESS: False}
+    )
+    await hass.async_block_till_done()
+
+    assert entity_registry.async_get("switch.pc_408_wan_access") is None
+    assert hass.states.get("switch.pc_408_wan_access") is None

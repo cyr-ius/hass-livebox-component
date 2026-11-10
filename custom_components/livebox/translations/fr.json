@@ -76,13 +76,15 @@
           "lan_tracking": "Suivi filaire",
           "wifi_tracking": "Suivi Wi-Fi",
           "timeout_tracking": "Délai d'absence",
-          "device_tracker_mode": "Équipements à suivre"
+          "device_tracker_mode": "Équipements à suivre",
+          "wan_access_switches": "Interrupteurs d'accès WAN"
         },
         "data_description": {
           "lan_tracking": "Crée un device tracker pour chaque équipement connecté par câble.",
           "wifi_tracking": "Crée un device tracker pour chaque équipement connecté en Wi-Fi.",
           "timeout_tracking": "Délai, en secondes, avant de considérer un équipement déconnecté comme absent.",
-          "device_tracker_mode": "Suivre uniquement les équipements actuellement connectés, ou tous les équipements connus de la Livebox."
+          "device_tracker_mode": "Suivre uniquement les équipements actuellement connectés, ou tous les équipements connus de la Livebox.",
+          "wan_access_switches": "Crée un interrupteur par équipement pour bloquer ou autoriser son accès à Internet. Désactivé, les plannings de la Livebox ne sont plus interrogés et les interrupteurs existants sont supprimés."
         }
       }
     }

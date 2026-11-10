@@ -76,13 +76,15 @@
           "lan_tracking": "Wired tracking",
           "wifi_tracking": "Wireless tracking",
           "timeout_tracking": "Away timeout",
-          "device_tracker_mode": "Devices to track"
+          "device_tracker_mode": "Devices to track",
+          "wan_access_switches": "WAN access switches"
         },
         "data_description": {
           "lan_tracking": "Create a device tracker for each device connected by cable.",
           "wifi_tracking": "Create a device tracker for each device connected over Wi-Fi.",
           "timeout_tracking": "Delay, in seconds, before a disconnected device is considered away.",
-          "device_tracker_mode": "Track only the devices currently connected, or every device known by the Livebox."
+          "device_tracker_mode": "Track only the devices currently connected, or every device known by the Livebox.",
+          "wan_access_switches": "Create a switch for each device to block or allow its Internet access. When off, the Livebox schedules are not polled and the existing switches are removed."
         }
       }
     }

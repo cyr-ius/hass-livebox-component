@@ -34,6 +34,7 @@ from .const import (
     CONF_TRACKING_TIMEOUT,
     CONF_USE_TLS,
     CONF_VERIFY_TLS,
+    CONF_WAN_ACCESS,
     CONF_WIFI_TRACKING,
     DEFAULT_DISPLAY_DEVICES,
     DEFAULT_HOST,
@@ -41,6 +42,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_TRACKING_TIMEOUT,
     DEFAULT_USERNAME,
+    DEFAULT_WAN_ACCESS,
     DEFAULT_WIFI_TRACKING,
     DISPLAY_DEVICES_ALL,
     DOMAIN,
@@ -268,6 +270,7 @@ class LiveboxOptionsFlowHandler(config_entries.OptionsFlowWithReload):
                                 translation_key=CONF_DISPLAY_DEVICES,
                             )
                         ),
+                        vol.Required(CONF_WAN_ACCESS, default=DEFAULT_WAN_ACCESS): bool,
                     },
                 ),
                 self.config_entry.options,

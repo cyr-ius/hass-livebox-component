@@ -76,13 +76,15 @@
           "lan_tracking": "Kablet sporing",
           "wifi_tracking": "Trådløs sporing",
           "timeout_tracking": "Tidsavbrudd for borte",
-          "device_tracker_mode": "Enheter som skal spores"
+          "device_tracker_mode": "Enheter som skal spores",
+          "wan_access_switches": "Brytere for WAN-tilgang"
         },
         "data_description": {
           "lan_tracking": "Oppretter en enhetssporer for hver enhet tilkoblet med kabel.",
           "wifi_tracking": "Oppretter en enhetssporer for hver enhet tilkoblet over Wi-Fi.",
           "timeout_tracking": "Forsinkelse i sekunder før en frakoblet enhet regnes som borte.",
-          "device_tracker_mode": "Spor bare enheter som er tilkoblet nå, eller alle enheter Liveboxen kjenner til."
+          "device_tracker_mode": "Spor bare enheter som er tilkoblet nå, eller alle enheter Liveboxen kjenner til.",
+          "wan_access_switches": "Oppretter en bryter for hver enhet for å blokkere eller tillate Internett-tilgangen. Når den er av, hentes ikke tidsplanene fra Liveboxen, og eksisterende brytere fjernes."
         }
       }
     }

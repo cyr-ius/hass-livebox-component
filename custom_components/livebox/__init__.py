@@ -17,7 +17,9 @@ from .const import (
     ATTR_CALL_ID,
     CALLID,
     CONF_DISPLAY_DEVICES,
+    CONF_WAN_ACCESS,
     DEFAULT_DISPLAY_DEVICES,
+    DEFAULT_WAN_ACCESS,
     DISPLAY_DEVICES_ALL,
     DOMAIN,
     PLATFORMS,
@@ -135,6 +137,18 @@ def _migrate_wan_access_unique_ids(
         )
 
 
+def _remove_wan_access_switches(hass: HomeAssistant, entry: LiveboxConfigEntry) -> None:
+    """Remove the WAN access switches when the option turns them off."""
+    entity_registry = er.async_get(hass)
+    for entity_entry in er.async_entries_for_config_entry(
+        entity_registry, entry.entry_id
+    ):
+        if entity_entry.domain == "switch" and entity_entry.unique_id.endswith(
+            "_wan_access"
+        ):
+            entity_registry.async_remove(entity_entry.entity_id)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> bool:
     """Set up Livebox as config entry."""
     coordinator = LiveboxDataUpdateCoordinator(hass, entry)
@@ -152,6 +166,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LiveboxConfigEntry) -> b
     # Migrate legacy WAN access switch unique_ids (issue #287)
     if coordinator.unique_id:
         _migrate_wan_access_unique_ids(hass, entry, coordinator.unique_id)
+
+    if not entry.options.get(CONF_WAN_ACCESS, DEFAULT_WAN_ACCESS):
+        _remove_wan_access_switches(hass, entry)
 
     entry.runtime_data = coordinator
 
