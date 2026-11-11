@@ -67,7 +67,7 @@ You can use the Configure button to change the following options:
 - Devices to track (default: **Active devices only**):
   - All devices: active and inactive devices known by the Livebox
   - Active devices only: devices currently connected (that have an IP address)
-- WAN access switches (default: **Yes**): create a switch per device to block or allow its Internet access. When turned off, the Livebox schedules are no longer polled (one request per device at each update) and the existing switches are removed.
+- WAN access switches (default: **Yes**): create a switch per device to block or allow its Internet access. When turned off, the Livebox schedules are no longer polled (one request per device at each update) and the existing switches are removed, along with their customizations (entity ID, name, area, aliases).
 
 ### Supported routers
 

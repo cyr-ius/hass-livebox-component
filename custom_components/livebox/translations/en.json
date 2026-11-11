@@ -70,8 +70,8 @@
   "options": {
     "step": {
       "init": {
-        "title": "Device tracking",
-        "description": "Choose which devices connected to the Livebox are tracked.",
+        "title": "Devices",
+        "description": "Choose which devices connected to the Livebox are tracked and which entities are created for them.",
         "data": {
           "lan_tracking": "Wired tracking",
           "wifi_tracking": "Wireless tracking",
@@ -84,7 +84,7 @@
           "wifi_tracking": "Create a device tracker for each device connected over Wi-Fi.",
           "timeout_tracking": "Delay, in seconds, before a disconnected device is considered away.",
           "device_tracker_mode": "Track only the devices currently connected, or every device known by the Livebox.",
-          "wan_access_switches": "Create a switch for each device to block or allow its Internet access. When off, the Livebox schedules are not polled and the existing switches are removed."
+          "wan_access_switches": "Create a switch for each device to block or allow its Internet access. When off, the Livebox schedules are not polled and the existing switches are removed, along with their customizations."
         }
       }
     }
