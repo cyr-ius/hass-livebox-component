@@ -414,6 +414,8 @@ async def test_wan_access_switches_removed_by_options(
 
     entity_registry = er.async_get(hass)
     assert entity_registry.async_get("switch.pc_408_wan_access") is not None
+    AIOSysbus.schedule.async_get_schedule.assert_called()
+    AIOSysbus.schedule.async_get_schedule.reset_mock()
 
     result = await hass.config_entries.options.async_init(config_entry.entry_id)
     await hass.config_entries.options.async_configure(
@@ -423,3 +425,6 @@ async def test_wan_access_switches_removed_by_options(
 
     assert entity_registry.async_get("switch.pc_408_wan_access") is None
     assert hass.states.get("switch.pc_408_wan_access") is None
+    # The reloaded entry no longer polls the schedules.
+    AIOSysbus.schedule.async_get_schedule.assert_not_called()
+    assert config_entry.runtime_data.data["devices_wan_access"] == {}
