@@ -29,9 +29,11 @@ from .const import (
     CONF_LAN_TRACKING,
     CONF_USE_TLS,
     CONF_VERIFY_TLS,
+    CONF_WAN_ACCESS,
     CONF_WIFI_TRACKING,
     DEFAULT_DISPLAY_DEVICES,
     DEFAULT_LAN_TRACKING,
+    DEFAULT_WAN_ACCESS,
     DEFAULT_WIFI_TRACKING,
     DISPLAY_DEVICES_ALL,
     DOMAIN,
@@ -191,6 +193,9 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             lan_tracking = self.config_entry.options.get(
                 CONF_LAN_TRACKING, DEFAULT_LAN_TRACKING
             )
+            wan_access = self.config_entry.options.get(
+                CONF_WAN_ACCESS, DEFAULT_WAN_ACCESS
+            )
             topology_via_device, topology_repeaters = await self.async_get_topology()
             devices, device_counters = await self.async_get_devices(
                 lan_tracking, wifi_tracking, set(topology_repeaters)
@@ -211,9 +216,12 @@ class LiveboxDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "guest_wifi": await self.async_is_guest_wifi(),
                 "count_wired_devices": device_counters["wired"],
                 "count_wireless_devices": device_counters["wireless"],
-                "devices_wan_access": {
-                    key: await self.async_get_device_schedule(key) for key in devices
-                },
+                # One request per device: skipped when the switches are off.
+                "devices_wan_access": (
+                    {key: await self.async_get_device_schedule(key) for key in devices}
+                    if wan_access
+                    else {}
+                ),
                 "ddns": await self.async_get_ddns(),
                 "wifi_stats": await self.async_get_wifi_stats(),
                 "reboot_log": await self.async_get_reboot_log(),

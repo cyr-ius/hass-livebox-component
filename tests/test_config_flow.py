@@ -18,7 +18,9 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.livebox.const import (
     CONF_DISPLAY_DEVICES,
+    CONF_WAN_ACCESS,
     DEFAULT_DISPLAY_DEVICES,
+    DEFAULT_WAN_ACCESS,
     DOMAIN,
 )
 
@@ -293,6 +295,7 @@ async def test_options_flow_defaults_are_valid(
     result = await hass.config_entries.options.async_configure(result["flow_id"], {})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_DISPLAY_DEVICES] == DEFAULT_DISPLAY_DEVICES
+    assert result["data"][CONF_WAN_ACCESS] is DEFAULT_WAN_ACCESS
 
 
 @pytest.fixture
