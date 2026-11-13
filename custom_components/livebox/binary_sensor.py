@@ -4,11 +4,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
 
-from homeassistant.components.binary_sensor import (
+# Import from the package, not from `.const`: that module only exists
+# since Home Assistant 2026.10 and we support 2026.9 (see hacs.json).
+from homeassistant.components.binary_sensor import (  # type: ignore[attr-defined]
+    BinarySensorDeviceClass,
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
-from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
