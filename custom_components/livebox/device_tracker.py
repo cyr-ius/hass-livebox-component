@@ -4,8 +4,12 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, cast
 
-from homeassistant.components.device_tracker.const import SourceType
-from homeassistant.components.device_tracker.entity import ScannerEntity
+# Import from the package, not from its submodules, which are not a stable
+# API across the Home Assistant versions we support (see hacs.json).
+from homeassistant.components.device_tracker import (  # type: ignore[attr-defined]
+    ScannerEntity,
+    SourceType,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect

@@ -4,8 +4,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
 
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
-from homeassistant.components.button.const import ButtonDeviceClass
+# Import from the package, not from `.const`: that module only exists
+# since Home Assistant 2026.10 and we support 2026.9 (see hacs.json).
+from homeassistant.components.button import (  # type: ignore[attr-defined]
+    ButtonDeviceClass,
+    ButtonEntity,
+    ButtonEntityDescription,
+)
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
